@@ -1,0 +1,9 @@
+# local / editor files
+.DS_Store
+Thumbs.db
+*.log
+node_modules/
+.vscode/
+.idea/
+*.backup.js
+*.bak

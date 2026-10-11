@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#102c4e" />
+    <meta name="description" content="Project Ignite owner portal for admissions, student progress, and content oversight." />
+    <title>Owner Portal | Project Ignite</title>
+    <link rel="icon" href="./assets/ignite-logo-192.png" type="image/png" />
+    <link rel="stylesheet" href="./admin.css" />
+  </head>
+  <body>
+    <noscript><p class="noscript-banner">JavaScript is required to use the Project Ignite owner portal.</p></noscript>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+
+    <main class="owner-auth-shell" id="authView">
+      <a class="owner-brand" href="./index.html" aria-label="Return to Project Ignite">
+        <img src="./assets/ignite-logo.webp" alt="" width="96" height="96" />
+        <span>Project <strong>Ignite</strong><small>Owner portal</small></span>
+      </a>
+
+      <section class="owner-auth-card" id="setupPanel" aria-labelledby="setupTitle" hidden>
+        <p class="eyebrow">FIRST-TIME OWNER SETUP</p>
+        <h1 id="setupTitle">Create owner access.</h1>
+        <p>Set up the owner account for this browser. The password is hashed before it is stored.</p>
+        <form id="ownerSetupForm" novalidate>
+          <label>Owner name<input id="ownerName" type="text" minlength="2" maxlength="80" autocomplete="name" required /></label>
+          <label>Owner email<input id="ownerEmail" type="email" maxlength="120" autocomplete="email" required /></label>
+          <label>Create password<input id="ownerPassword" type="password" minlength="8" maxlength="72" autocomplete="new-password" required /><small>Use at least eight characters.</small></label>
+          <label>Confirm password<input id="ownerPasswordConfirm" type="password" minlength="8" maxlength="72" autocomplete="new-password" required /></label>
+          <button class="owner-primary" type="submit">Create owner account <span aria-hidden="true">→</span></button>
+          <p class="form-status" id="setupStatus" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+
+      <section class="owner-auth-card" id="loginPanel" aria-labelledby="ownerLoginTitle" hidden>
+        <p class="eyebrow">PROTECTED OWNER ACCESS</p>
+        <h1 id="ownerLoginTitle">Welcome back.</h1>
+        <p>Sign in to review admissions, progress, and content readiness.</p>
+        <form id="ownerLoginForm" novalidate>
+          <label>Owner email<input id="ownerLoginEmail" type="email" maxlength="120" autocomplete="username" required /></label>
+          <label>Password<input id="ownerLoginPassword" type="password" minlength="8" maxlength="72" autocomplete="current-password" required /></label>
+          <button class="owner-primary" type="submit">Open owner dashboard <span aria-hidden="true">→</span></button>
+          <p class="form-status" id="loginStatus" role="status" aria-live="polite"></p>
+        </form>
+        <a class="back-link" href="./index.html">← Return to the public website</a>
+      </section>
+
+      <p class="prototype-warning"><strong>Local prototype:</strong> this owner account can review only enrollment and activity saved in this same browser.</p>
+    </main>
+
+    <div class="owner-app" id="ownerApp" hidden>
+      <header class="owner-topbar">
+        <a class="owner-brand compact" href="./index.html">
+          <img src="./assets/ignite-logo.webp" alt="" width="96" height="96" />
+          <span>Project <strong>Ignite</strong><small>Owner portal</small></span>
+        </a>
+        <div class="owner-account">
+          <span class="owner-avatar" id="ownerAvatar" aria-hidden="true">OW</span>
+          <span><strong id="ownerDisplayName">Owner</strong><small>Super administrator</small></span>
+          <button id="ownerLogout" type="button">Log out</button>
+        </div>
+      </header>
+
+      <div class="owner-layout">
+        <nav class="owner-sidebar" aria-label="Owner navigation">
+          <a class="active" href="#overview"><span aria-hidden="true">⌂</span>Overview</a>
+          <a href="#students"><span aria-hidden="true">◎</span>Students</a>
+          <a href="#content"><span aria-hidden="true">▤</span>Content</a>
+          <a href="#security"><span aria-hidden="true">◇</span>Security</a>
+          <a href="./index.html"><span aria-hidden="true">↗</span>Public site</a>
+        </nav>
+
+        <main class="owner-main" id="main-content">
+          <section class="owner-heading" id="overview">
+            <div><p class="eyebrow">OWNER OVERVIEW</p><h1>Good decisions start with a clear view.</h1><p id="ownerScope">Reviewing data saved on this device.</p></div>
+            <span class="live-pill"><i aria-hidden="true"></i>Local pilot live</span>
+          </section>
+
+          <section class="owner-notice" aria-label="Prototype limitation">
+            <strong>Device-only data</strong>
+            <p>The figures below are drawn from this browser. A production backend is required before you can see students enrolled on other devices.</p>
+          </section>
+
+          <section class="metric-grid" aria-label="Owner metrics">
+            <article><span class="metric-icon lime">◎</span><div><small>Enrolled students</small><strong id="metricStudents">0</strong><p>Single-student pilot capacity</p></div></article>
+            <article><span class="metric-icon blue">✓</span><div><small>Missions completed</small><strong id="metricMissions">0</strong><p>Saved student progress</p></div></article>
+            <article><span class="metric-icon coral">◷</span><div><small>Focused minutes</small><strong id="metricMinutes">0</strong><p>Time spent in missions</p></div></article>
+            <article><span class="metric-icon mint">↗</span><div><small>Mastery</small><strong id="metricMastery">0%</strong><p>Current demo mastery</p></div></article>
+          </section>
+
+          <section class="owner-panel" id="students" aria-labelledby="studentsTitle">
+            <div class="panel-heading"><div><p class="eyebrow">ADMISSIONS</p><h2 id="studentsTitle">Student profiles</h2></div><span id="studentCountBadge">0 records</span></div>
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Student</th><th>Class</th><th>Admission ID</th><th>Enrolled</th><th>Status</th><th><span class="sr-only">Actions</span></th></tr></thead>
+                <tbody id="studentTableBody"></tbody>
+              </table>
+            </div>
+            <div class="empty-state" id="studentEmpty" hidden><strong>No student enrolled on this device.</strong><p>Complete the public enrollment form to create the first pilot profile.</p><a href="./index.html#admission">Open enrollment</a></div>
+          </section>
+
+          <section class="owner-panel" id="content" aria-labelledby="contentTitle">
+            <div class="panel-heading"><div><p class="eyebrow">CONTENT GOVERNANCE</p><h2 id="contentTitle">Publication readiness</h2></div><span>Internal review</span></div>
+            <div class="content-metrics">
+              <article><strong id="contentIndexed">0</strong><span>Files indexed</span></article>
+              <article><strong id="contentPublished">0</strong><span>Student-visible</span></article>
+              <article><strong id="contentPending">0</strong><span>Awaiting review</span></article>
+            </div>
+            <p class="content-warning">Inventory-only files must remain hidden from students until privacy, academic, rights, and answer-key checks are complete.</p>
+          </section>
+
+          <section class="owner-panel security-panel" id="security" aria-labelledby="securityTitle">
+            <div><p class="eyebrow">SECURITY STATUS</p><h2 id="securityTitle">Prototype controls</h2></div>
+            <ul>
+              <li><span>✓</span>Owner password stored as a salted hash</li>
+              <li><span>✓</span>Owner session ends when the browser tab session ends</li>
+              <li><span>✓</span>Student PIN is never displayed</li>
+              <li class="warning"><span>!</span>Cloud authentication, audit logs, and multi-factor authentication are not connected yet</li>
+            </ul>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <dialog id="studentProfileDialog" aria-labelledby="profileTitle">
+      <section class="profile-dialog-card">
+        <button class="dialog-close" id="closeStudentProfile" type="button" aria-label="Close student profile">×</button>
+        <p class="eyebrow">STUDENT PROFILE</p>
+        <h2 id="profileTitle">Student details</h2>
+        <dl class="profile-list">
+          <div><dt>Student</dt><dd id="profileStudent">—</dd></div>
+          <div><dt>Class</dt><dd id="profileClass">—</dd></div>
+          <div><dt>Parent/guardian</dt><dd id="profileGuardian">—</dd></div>
+          <div><dt>Guardian email</dt><dd id="profileEmail">—</dd></div>
+          <div><dt>Contact</dt><dd id="profilePhone">—</dd></div>
+          <div><dt>Admission ID</dt><dd id="profileAdmissionId">—</dd></div>
+          <div><dt>Login ID</dt><dd id="profileLogin">—</dd></div>
+          <div><dt>Enrolled</dt><dd id="profileDate">—</dd></div>
+        </dl>
+        <div class="profile-progress"><article><strong id="profileMissions">0</strong><span>Missions</span></article><article><strong id="profileMinutes">0</strong><span>Minutes</span></article><article><strong id="profileMastery">0%</strong><span>Mastery</span></article></div>
+        <p class="profile-note">Login secrets are not available to owners. Production access recovery should use a secure reset process.</p>
+      </section>
+    </dialog>
+
+    <script src="./data/catalog.js" defer></script>
+    <script src="./admin.js" defer></script>
+  </body>
+</html>

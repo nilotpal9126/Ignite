@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#102c4e" />
+    <meta name="description" content="Project Ignite - focused practice and reviewed worksheets for students." />
+    <title>Student Dashboard | Project Ignite</title>
+    <link rel="icon" href="./assets/ignite-logo-192.png" type="image/png" />
+    <link rel="apple-touch-icon" href="./assets/ignite-logo-192.png" />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <noscript><p class="noscript-banner">Project Ignite needs JavaScript to load the worksheet catalog and the practice mission.</p></noscript>
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <header class="topbar">
+      <a class="brand" href="./index.html" aria-label="Project Ignite landing page">
+        <span class="brand-mark" aria-hidden="true"><img src="./assets/ignite-logo.webp" alt="" width="96" height="96" /></span>
+        <span>Project <strong>Ignite</strong></span>
+      </a>
+      <div class="topbar-actions">
+        <button class="icon-button" id="focusToggle" type="button" aria-pressed="false" aria-label="Focus mode" title="Toggle focus mode">
+          <span aria-hidden="true">◎</span><span class="desktop-label">Focus</span>
+        </button>
+        <div class="profile-button" role="img" aria-label="Student profile">
+          <span class="avatar" aria-hidden="true">ST</span>
+          <span class="profile-copy"><strong>Student</strong><small>Class</small></span>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-shell">
+      <nav class="sidebar" aria-label="Primary navigation">
+        <a class="nav-item active" href="#home" aria-current="true" title="Home"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10.5 9-7.5 9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg>Home</a>
+        <a class="nav-item" href="#library" title="Source review"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11a3 3 0 0 1 3 3v15a3 3 0 0 0-3-3H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H14v18a3 3 0 0 1 3-3h.5a2.5 2.5 0 0 1 2.5 2.5z"/></svg>Source review</a>
+        <button class="nav-item nav-button" id="missionNav" type="button" title="My mission"><span aria-hidden="true">✓</span>My mission</button>
+        <a class="nav-item" href="#progress" title="Progress"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V5"/><path d="M4 20h16"/><path d="m7 15 4-4 3 2 5-6"/><path d="M16 7h3v3"/></svg>Progress</a>
+        <button class="nav-item nav-button" id="doubtNav" type="button" title="Ask a doubt"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15a4 4 0 0 1-4 4H9l-5 3v-7a4 4 0 0 1-1-2.6V8a4 4 0 0 1 4-4h9a4 4 0 0 1 4 4z"/><path d="M9.7 9a2.3 2.3 0 1 1 3.5 2c-.8.5-1.2.9-1.2 2"/><path d="M12 16h.01"/></svg>Ask a doubt</button>
+        <button class="nav-item nav-button" id="logoutNav" type="button" title="Log out"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M14 4h5a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-5"/></svg>Log out</button>
+        <div class="sidebar-note">
+          <span class="status-dot"></span>
+          <p><strong id="sourceTitle">Source library</strong><br /><span id="sourceCount" role="status">Loading catalog…</span></p>
+        </div>
+      </nav>
+
+      <main id="main-content" tabindex="-1">
+        <section class="hero" id="home" aria-labelledby="welcomeTitle">
+          <div class="hero-copy">
+            <p class="eyebrow">TODAY · 12-MINUTE FOCUS</p>
+            <h1 id="welcomeTitle">One clear mission.<br />Then you are done.</h1>
+            <p>Practice a focused topic, review one mistake, and leave with a win—without an endless feed.</p>
+            <div class="hero-actions">
+              <button class="primary-button" id="startMission" type="button">Start today’s mission <span aria-hidden="true">→</span></button>
+              <button class="text-button" id="changeMission" type="button">Choose another topic</button>
+            </div>
+          </div>
+          <div class="mission-card" aria-label="Today's learning mission">
+            <div class="mission-ring" aria-hidden="true"><span id="missionPercent">0%</span></div>
+            <div>
+              <p class="card-kicker">TODAY’S MISSION</p>
+              <h2>Linear equations</h2>
+              <p>Class 8 Mathematics · 3 short steps</p>
+              <ol class="mission-steps">
+                <li><span class="step-dot">1</span>Warm up <small>2 min</small></li>
+                <li><span class="step-dot">2</span>Practice <small>8 min</small></li>
+                <li><span class="step-dot">3</span>Review <small>2 min</small></li>
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        <section class="stats-grid" id="progress" aria-label="Learning progress">
+          <article><span class="stat-icon lime">✓</span><div><strong id="completedCount">0</strong><small>Missions completed</small></div></article>
+          <article><span class="stat-icon blue">◎</span><div><strong id="focusMinutes">0</strong><small>Focused minutes</small></div></article>
+          <article><span class="stat-icon coral">↗</span><div><strong id="masteryScore">0%</strong><small>Demo mastery</small></div></article>
+        </section>
+
+        <section class="section-block" aria-labelledby="subjectsTitle">
+          <div class="section-heading">
+            <div><p class="eyebrow">EXPLORE</p><h2 id="subjectsTitle">Pick a subject</h2></div>
+            <a href="#library">Review source inventory</a>
+          </div>
+          <div class="subject-grid" id="subjectGrid"></div>
+        </section>
+
+        <section class="section-block library-section" id="library" aria-labelledby="libraryTitle">
+          <div class="section-heading library-heading">
+            <div><p class="eyebrow">INTERNAL CONTENT PIPELINE</p><h2 id="libraryTitle">Source inventory preview</h2></div>
+            <p class="review-warning"><span aria-hidden="true">!</span> Staff-only prototype. Nothing below is published or student-visible.</p>
+          </div>
+
+          <div class="filters" aria-label="Worksheet filters">
+            <label class="search-field"><span class="sr-only">Search worksheets</span><span aria-hidden="true">⌕</span><input id="searchInput" type="search" placeholder="Search topic or worksheet" autocomplete="off" /></label>
+            <label><span class="sr-only">Filter by class</span><select id="gradeFilter"><option value="all">All classes</option></select></label>
+            <label><span class="sr-only">Filter by subject</span><select id="subjectFilter"><option value="all">All subjects</option></select></label>
+            <label><span class="sr-only">Filter by type</span><select id="kindFilter"><option value="all">All types</option><option value="practice">Practice</option><option value="assessment">Assessment</option><option value="answer-key">Answer key</option></select></label>
+          </div>
+
+          <div class="result-meta"><p id="resultCount" role="status">Loading worksheets…</p><button class="text-button" id="clearFilters" type="button">Clear filters</button></div>
+          <div class="worksheet-grid" id="worksheetGrid"></div>
+          <nav class="pagination" aria-label="Worksheet pages">
+            <button id="previousPage" type="button">Previous</button>
+            <span id="pageStatus">Page 1</span>
+            <button id="nextPage" type="button">Next</button>
+          </nav>
+        </section>
+
+        <section class="support-banner" aria-labelledby="supportTitle">
+          <div class="support-copy"><p class="eyebrow">WHEN YOU ARE STUCK</p><h2 id="supportTitle">A real teacher can help.</h2><p>Send the topic, choose a short slot, and arrive with a specific doubt. Booking and payment stay disabled until safeguarding and commerce checks pass.</p></div>
+          <figure class="teacher-visual"><img src="./assets/ignite-tortoise-teacher.webp" width="720" height="480" loading="lazy" decoding="async" alt="A smiling wise tortoise teacher seated beside a classroom board." /></figure>
+          <button class="secondary-button" id="openDoubt" type="button">Preview doubt booking</button>
+        </section>
+      </main>
+    </div>
+
+    <nav class="mobile-nav" aria-label="Mobile navigation">
+      <a class="active" href="#home" aria-current="true"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10.5 9-7.5 9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg>Home</a>
+      <a href="#library"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11a3 3 0 0 1 3 3v15a3 3 0 0 0-3-3H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H14v18a3 3 0 0 1 3-3h.5a2.5 2.5 0 0 1 2.5 2.5z"/></svg>Sources</a>
+      <button id="mobileMission" type="button"><span aria-hidden="true">✓</span>Mission</button>
+      <a href="#progress"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V5"/><path d="M4 20h16"/><path d="m7 15 4-4 3 2 5-6"/><path d="M16 7h3v3"/></svg>Progress</a>
+      <button id="mobileLogout" type="button"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M14 4h5a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-5"/></svg>Log out</button>
+    </nav>
+
+    <dialog id="missionDialog" aria-labelledby="missionDialogTitle">
+      <form method="dialog" class="dialog-card">
+        <button class="dialog-close" value="cancel" aria-label="Close mission"><span aria-hidden="true">×</span></button>
+        <p class="eyebrow">FOCUS MODE</p>
+        <h2 id="missionDialogTitle">Linear equations</h2>
+        <p id="missionInstruction">Step 1 of 3 · Take a breath and solve this warm-up mentally.</p>
+        <div class="question-card">
+          <span class="question-label">WARM-UP</span>
+          <p id="missionQuestion">If 3x + 5 = 20, what is x?</p>
+          <div class="answer-options" id="answerOptions">
+            <button type="button" data-answer="3">3</button><button type="button" data-answer="5">5</button><button type="button" data-answer="8">8</button>
+          </div>
+          <p class="feedback" id="answerFeedback" role="status"></p>
+        </div>
+        <div class="dialog-actions">
+          <span id="missionStepStatus">Step 1 of 3</span>
+          <button class="primary-button" id="nextMissionStep" type="button" disabled>Continue</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="doubtDialog" aria-labelledby="doubtDialogTitle">
+      <form method="dialog" class="dialog-card booking-card">
+        <button class="dialog-close" value="cancel" aria-label="Close booking preview"><span aria-hidden="true">×</span></button>
+        <p class="eyebrow">SAFE BOOKING PREVIEW</p>
+        <h2 id="doubtDialogTitle">Prepare a doubt request</h2>
+        <p>This demonstrates the UX only. It will not submit personal information or take payment.</p>
+        <label>Subject<select><option>Mathematics</option><option>Science</option><option>English</option></select></label>
+        <label>What are you stuck on?<textarea rows="3" maxlength="500" placeholder="Example: I can solve one-step equations but get confused when x appears on both sides."></textarea></label>
+        <label>Preferred slot<select><option>Weekday evening · 20 minutes</option><option>Weekend morning · 20 minutes</option></select></label>
+        <button class="primary-button" value="cancel">Finish preview</button>
+      </form>
+    </dialog>
+
+    <template id="worksheetTemplate">
+      <article class="worksheet-card">
+        <div class="worksheet-top"><span class="subject-pill"></span><span class="format-pill"></span></div>
+        <h3></h3>
+        <p class="worksheet-meta"></p>
+        <div class="worksheet-footer"><span class="review-state">Needs review</span><button type="button" class="preview-button">Preview journey</button></div>
+      </article>
+    </template>
+
+    <script src="./data/catalog.js" defer></script>
+    <script src="./app.js" defer></script>
+  </body>
+</html>
