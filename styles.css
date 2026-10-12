@@ -321,3 +321,14 @@ body.focus-mode main { max-width: 1100px; width: 100%; margin: 0 auto; padding-b
 .question-list li { margin: 0 0 14px; padding-left: 6px; line-height: 1.45; overflow-wrap: anywhere; }
 .question-list li::marker { font-weight: 800; color: var(--navy-2); }
 @media (max-width: 720px) { .question-list { max-height: 46vh; } }
+
+/* ---------- practice questions (multiple choice with instant feedback) ---------- */
+.q-text { margin: 0 0 8px; }
+.q-options { display: grid; gap: 8px; margin: 0 0 4px; }
+.q-option { padding: 10px 14px; text-align: left; color: var(--ink); background: #f3f7f8; border: 1.5px solid #cad6da; border-radius: 12px; cursor: pointer; font: inherit; line-height: 1.35; overflow-wrap: anywhere; }
+.q-option:hover:not(:disabled) { background: #e6f0f3; border-color: var(--navy-2); }
+.q-option:disabled { cursor: default; }
+.q-option.is-correct { background: #dff0d4; border-color: #3f9d2f; color: #14420c; font-weight: 700; }
+.q-option.is-wrong { background: #fde0d8; border-color: #d4553a; color: #6d1f10; }
+.q-feedback { margin: 2px 0 0; padding: 9px 12px; color: #6d1f10; background: #fff1ec; border-radius: 10px; font-size: 14px; }
+.q-feedback.is-correct { color: #14420c; background: #eaf6e3; }

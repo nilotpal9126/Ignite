@@ -139,6 +139,31 @@ function pilotContentFor(originalFilename) {
   return match || null;
 }
 
+/* Original practice sets have no source file in the library, so they become catalogue entries of their own. */
+function standaloneItems() {
+  const items = window.__IGNITE_PILOT_CONTENT__?.items;
+  if (!Array.isArray(items)) return [];
+  return items
+    .filter((entry) => entry && !entry.catalog?.originalFilename && Array.isArray(entry.questions) && entry.questions.length)
+    .map((entry) => {
+      const subject = String(entry.subject || 'Unclassified');
+      const grade = Number(entry.classLevel);
+      return {
+        title: String(entry.title || 'Practice set'),
+        subject,
+        grades: Number.isFinite(grade) ? [grade] : [],
+        documentKind: 'practice set',
+        kind: 'practice',
+        format: 'ONLINE',
+        byteSize: null,
+        content: entry,
+        search: `${entry.title} ${subject} ${entry.chapter || ''}`.toLowerCase(),
+      };
+    });
+}
+
+const isOpenToStudents = (item) => Boolean(item.content && item.content.visibility !== 'staff_preview');
+
 function setText(selector, text) {
   const el = $(selector);
   if (el) el.textContent = text;
@@ -245,13 +270,15 @@ function renderWorksheets() {
     heading.textContent = item.title;
     heading.title = item.title;
     const kindText = item.documentKind.replaceAll('_', ' ');
+    const sizeText = item.byteSize ? formatSize(item.byteSize) : `${item.content?.questions?.length || 0} questions`;
     fragment.querySelector('.worksheet-meta').textContent =
-      `${gradeLabel(item.grades)} · ${kindText.charAt(0).toUpperCase()}${kindText.slice(1)} · ${formatSize(item.byteSize)}`;
+      `${gradeLabel(item.grades)} · ${kindText.charAt(0).toUpperCase()}${kindText.slice(1)} · ${sizeText}`;
     const button = fragment.querySelector('.worksheet-footer button');
     if (item.content) {
-      fragment.querySelector('.review-state').textContent = item.content.visibility === 'student' ? 'Published' : 'Draft · staff preview';
-      button.textContent = 'Open worksheet';
-      button.setAttribute('aria-label', `Open worksheet: ${item.title}`);
+      const tier = item.content.visibility;
+      fragment.querySelector('.review-state').textContent = tier === 'student' ? 'Published' : tier === 'demo_sample' ? 'Sample · unreviewed' : 'Draft · staff preview';
+      button.textContent = tier === 'staff_preview' ? 'Open worksheet' : 'Start practice';
+      button.setAttribute('aria-label', `${button.textContent}: ${item.title}`);
       button.addEventListener('click', () => openWorksheet(item));
     } else {
       button.setAttribute('aria-label', `Preview journey for ${item.title}`);
@@ -263,7 +290,8 @@ function renderWorksheets() {
   if (!filtered.length) {
     grid.append(emptyCard('No worksheets match yet.', 'Try a shorter search, or clear one or more filters.', true));
   }
-  setText('#resultCount', `${filtered.length} inventory candidate${filtered.length === 1 ? '' : 's'} found · 0 published`);
+  const openSets = filtered.filter(isOpenToStudents).length;
+  setText('#resultCount', `${filtered.length} inventory candidate${filtered.length === 1 ? '' : 's'} found · ${openSets} practice set${openSets === 1 ? '' : 's'} open`);
   setText('#pageStatus', `Page ${state.page} of ${totalPages}`);
   $('#previousPage').disabled = state.page <= 1;
   $('#nextPage').disabled = state.page >= totalPages;
@@ -305,7 +333,7 @@ function openWorksheet(item) {
   const content = item.content;
   if (!content) return;
   const isDraft = content.visibility !== 'student';
-  setText('#worksheetEyebrow', isDraft ? 'DRAFT · STAFF PREVIEW' : 'WORKSHEET');
+  setText('#worksheetEyebrow', content.visibility === 'demo_sample' ? 'SAMPLE PRACTICE · UNREVIEWED' : isDraft ? 'DRAFT · STAFF PREVIEW' : 'WORKSHEET');
   setText('#worksheetDialogTitle', content.title || item.title);
   setText('#worksheetMeta', [`Class ${content.classLevel}`, content.subject, content.chapter].filter(Boolean).join(' · '));
   const notice = $('#worksheetNotice');
@@ -313,14 +341,63 @@ function openWorksheet(item) {
   notice.hidden = !(isDraft && content.notice);
   const list = $('#worksheetQuestions');
   list.replaceChildren();
+  const tally = { answered: 0, correct: 0, total: content.questions.length, practice: false };
+  const showTally = () => setText('#worksheetCount', tally.practice
+    ? `${tally.answered} of ${tally.total} answered · ${tally.correct} correct`
+    : `${tally.total} questions`);
   for (const question of content.questions) {
     const entry = document.createElement('li');
     entry.value = question.no;
-    entry.textContent = question.text;
+    entry.append(Object.assign(document.createElement('p'), { className: 'q-text', textContent: question.text }));
+    if (Array.isArray(question.options) && question.options.length && Number.isInteger(question.answerIndex)) {
+      tally.practice = true;
+      entry.append(buildOptions(question, tally, showTally));
+    }
     list.append(entry);
   }
-  setText('#worksheetCount', `${content.questions.length} questions`);
+  showTally();
+  list.scrollTop = 0;
   showDialog($('#worksheetDialog'));
+}
+
+/* One multiple-choice question: pick an option, get instant feedback, then the question locks. */
+function buildOptions(question, tally, showTally) {
+  const wrap = document.createElement('div');
+  wrap.className = 'q-options';
+  wrap.setAttribute('role', 'group');
+  wrap.setAttribute('aria-label', `Choices for question ${question.no}`);
+  const feedback = Object.assign(document.createElement('p'), { className: 'q-feedback' });
+  feedback.setAttribute('role', 'status');
+  feedback.hidden = true;
+  const letters = 'ABCDEFGH';
+  const buttons = question.options.map((option, index) => {
+    const button = Object.assign(document.createElement('button'), {
+      type: 'button', // inside a dialog form: must never submit
+      className: 'q-option',
+      textContent: `${letters[index]}. ${option}`,
+    });
+    button.addEventListener('click', () => {
+      if (wrap.dataset.done) return;
+      wrap.dataset.done = '1';
+      const correct = index === question.answerIndex;
+      tally.answered += 1;
+      if (correct) tally.correct += 1;
+      buttons.forEach((other, otherIndex) => {
+        other.disabled = true;
+        if (otherIndex === question.answerIndex) other.classList.add('is-correct');
+        else if (otherIndex === index) other.classList.add('is-wrong');
+      });
+      feedback.textContent = correct
+        ? `Correct. ${question.explanation || ''}`.trim()
+        : `Not quite. The answer is ${letters[question.answerIndex]}. ${question.explanation || ''}`.trim();
+      feedback.classList.toggle('is-correct', correct);
+      feedback.hidden = false;
+      showTally();
+    });
+    return button;
+  });
+  wrap.append(...buttons, feedback);
+  return wrap;
 }
 
 function nextMissionStep() {
@@ -477,12 +554,14 @@ async function loadAndRender() {
   try {
     const catalog = await loadCatalog();
     if (!catalog || !Array.isArray(catalog.worksheets)) throw new Error('Catalog is missing its worksheet list');
-    state.items = catalog.worksheets.map(normalizeItem).filter(Boolean);
+    const practiceSets = standaloneItems();
+    state.items = [...practiceSets, ...catalog.worksheets.map(normalizeItem).filter(Boolean)];
     state.catalog = catalog;
 
-    const count = Number.isFinite(Number(catalog.inventory?.documentCount)) ? Number(catalog.inventory.documentCount) : state.items.length;
+    const count = Number.isFinite(Number(catalog.inventory?.documentCount)) ? Number(catalog.inventory.documentCount) : state.items.length - practiceSets.length;
+    const openCount = state.items.filter(isOpenToStudents).length;
     setText('#sourceTitle', 'Source library ready');
-    setText('#sourceCount', `${count} candidates indexed · 0 published`);
+    setText('#sourceCount', `${count} candidates indexed · ${openCount} practice set${openCount === 1 ? '' : 's'} open`);
     $('.sidebar-note')?.classList.remove('is-error');
 
     const subjectSelect = $('#subjectFilter');
