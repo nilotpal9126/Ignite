@@ -8,7 +8,7 @@ const SESSION_KEY = 'ignite-pilot-session-v1';
 /* ---------- safe storage: never let a blocked/corrupt store break the app ---------- */
 const storage = {
   get(key) { try { return window.localStorage.getItem(key); } catch { return null; } },
-  set(key, value) { try { window.localStorage.setItem(key, value); } catch { /* private mode / quota: progress simply won't persist */ } },
+  set(key, value) { try { window.localStorage.setItem(key, value); return true; } catch { return false; } },
   getSession(key) { try { return window.sessionStorage.getItem(key); } catch { return null; } },
   removeSession(key) { try { window.sessionStorage.removeItem(key); } catch { /* redirect still completes */ } },
 };
@@ -71,6 +71,8 @@ const state = {
   pageSize: 9,
   missionStep: 1,
   progress: loadProgress(),
+  learnerId: '',
+  activePractice: null,
 };
 
 const subjectVisuals = {
@@ -131,11 +133,11 @@ function normalizeItem(raw) {
   };
 }
 
-/* ---------- worksheet content (drafts are staff-preview only; answers never ship to the browser) ---------- */
+/* ---------- public practice content; staff drafts never enter the learner renderer ---------- */
 function pilotContentFor(originalFilename) {
   const items = window.__IGNITE_PILOT_CONTENT__?.items;
   if (!originalFilename || !Array.isArray(items)) return null;
-  const match = items.find((entry) => entry?.catalog?.originalFilename === originalFilename && Array.isArray(entry.questions) && entry.questions.length);
+  const match = items.find((entry) => window.IgnitePractice.playable(entry) && entry.catalog?.originalFilename === originalFilename);
   return match || null;
 }
 
@@ -144,7 +146,7 @@ function standaloneItems() {
   const items = window.__IGNITE_PILOT_CONTENT__?.items;
   if (!Array.isArray(items)) return [];
   return items
-    .filter((entry) => entry && !entry.catalog?.originalFilename && Array.isArray(entry.questions) && entry.questions.length)
+    .filter((entry) => window.IgnitePractice.playable(entry) && !entry.catalog?.originalFilename)
     .map((entry) => {
       const subject = String(entry.subject || 'Unclassified');
       const grade = Number(entry.classLevel);
@@ -162,7 +164,7 @@ function standaloneItems() {
     });
 }
 
-const isOpenToStudents = (item) => Boolean(item.content && item.content.visibility !== 'staff_preview');
+const isOpenToStudents = (item) => window.IgnitePractice.playable(item.content);
 
 function setText(selector, text) {
   const el = $(selector);
@@ -214,7 +216,8 @@ function renderSubjects() {
       iconEl.innerHTML = `<svg viewBox="0 0 24 24" focusable="false">${icon}</svg>`;
       iconEl.setAttribute('aria-hidden', 'true');
       const nameEl = Object.assign(document.createElement('strong'), { textContent: subject });
-      const countEl = Object.assign(document.createElement('small'), { textContent: `${count} source file${count === 1 ? '' : 's'}` });
+      const available = state.items.filter((item) => item.subject === subject && isOpenToStudents(item)).length;
+      const countEl = Object.assign(document.createElement('small'), { textContent: `${available} practice sets · ${count - available} source candidates` });
       button.append(iconEl, nameEl, countEl);
       button.addEventListener('click', () => {
         leaveFocusMode();
@@ -274,10 +277,12 @@ function renderWorksheets() {
     fragment.querySelector('.worksheet-meta').textContent =
       `${gradeLabel(item.grades)} · ${kindText.charAt(0).toUpperCase()}${kindText.slice(1)} · ${sizeText}`;
     const button = fragment.querySelector('.worksheet-footer button');
-    if (item.content) {
+    if (isOpenToStudents(item)) {
       const tier = item.content.visibility;
       fragment.querySelector('.review-state').textContent = tier === 'student' ? 'Published' : tier === 'demo_sample' ? 'Sample · unreviewed' : 'Draft · staff preview';
-      button.textContent = tier === 'staff_preview' ? 'Open worksheet' : 'Start practice';
+      const answers = window.IgnitePractice.restore(item.content, storage.get(window.IgnitePractice.key(state.learnerId, item.content.id)));
+      const savedScore = window.IgnitePractice.score(item.content.questions, answers);
+      button.textContent = savedScore.complete ? 'Review results' : savedScore.answered ? 'Resume practice' : 'Start practice';
       button.setAttribute('aria-label', `${button.textContent}: ${item.title}`);
       button.addEventListener('click', () => openWorksheet(item));
     } else {
@@ -331,7 +336,13 @@ function openMission(item) {
 
 function openWorksheet(item) {
   const content = item.content;
-  if (!content) return;
+  if (!window.IgnitePractice.playable(content)) return;
+  const key = window.IgnitePractice.key(state.learnerId, content.id);
+  state.activePractice = {
+    item, key, content, mode: 'full',
+    answers: window.IgnitePractice.restore(content, storage.get(key)),
+    retryAnswers: Object.create(null), questions: content.questions,
+  };
   const isDraft = content.visibility !== 'student';
   setText('#worksheetEyebrow', content.visibility === 'demo_sample' ? 'SAMPLE PRACTICE · UNREVIEWED' : isDraft ? 'DRAFT · STAFF PREVIEW' : 'WORKSHEET');
   setText('#worksheetDialogTitle', content.title || item.title);
@@ -339,29 +350,60 @@ function openWorksheet(item) {
   const notice = $('#worksheetNotice');
   notice.textContent = content.notice || '';
   notice.hidden = !(isDraft && content.notice);
-  const list = $('#worksheetQuestions');
-  list.replaceChildren();
-  const tally = { answered: 0, correct: 0, total: content.questions.length, practice: false };
-  const showTally = () => setText('#worksheetCount', tally.practice
-    ? `${tally.answered} of ${tally.total} answered · ${tally.correct} correct`
-    : `${tally.total} questions`);
-  for (const question of content.questions) {
-    const entry = document.createElement('li');
-    entry.value = question.no;
-    entry.append(Object.assign(document.createElement('p'), { className: 'q-text', textContent: question.text }));
-    if (Array.isArray(question.options) && question.options.length && Number.isInteger(question.answerIndex)) {
-      tally.practice = true;
-      entry.append(buildOptions(question, tally, showTally));
-    }
-    list.append(entry);
-  }
-  showTally();
-  list.scrollTop = 0;
+  setText('#practiceSaveStatus', 'Your answers are saved on this device so you can return later.');
+  renderPracticeQuestions();
   showDialog($('#worksheetDialog'));
 }
 
-/* One multiple-choice question: pick an option, get instant feedback, then the question locks. */
-function buildOptions(question, tally, showTally) {
+function renderPracticeQuestions() {
+  const attempt = state.activePractice;
+  if (!attempt) return;
+  const list = $('#worksheetQuestions');
+  list.replaceChildren();
+  for (const question of attempt.questions) {
+    const entry = document.createElement('li');
+    entry.value = question.no;
+    entry.append(Object.assign(document.createElement('p'), { className: 'q-text', textContent: question.text }));
+    entry.append(buildOptions(question, attempt));
+    list.append(entry);
+  }
+  updatePracticeSummary();
+  list.scrollTop = 0;
+}
+
+function updatePracticeSummary() {
+  const attempt = state.activePractice;
+  const answers = attempt.mode === 'retry' ? attempt.retryAnswers : attempt.answers;
+  const result = window.IgnitePractice.score(attempt.questions, answers);
+  setText('#worksheetCount', `${attempt.mode === 'retry' ? 'Retry · ' : ''}${result.answered} of ${result.total} answered · ${result.correct} correct`);
+  $('#practiceSummary').hidden = !result.complete;
+  $('#retryMistakes').hidden = attempt.mode === 'retry' || !result.mistakes.length;
+  if (result.complete) {
+    setText('#practiceSummaryTitle', attempt.mode === 'retry' ? 'Mistake review complete' : 'Practice complete');
+    const score = `${result.correct}/${result.total} correct (${Math.round(100 * result.correct / result.total)}%)`;
+    setText('#practiceSummaryText', attempt.mode === 'retry'
+      ? `${score} on this retry. Your original attempt score is preserved. You can finish here.`
+      : `${score}. ${result.mistakes.length ? 'Review the explanations, then retry just the mistakes.' : 'Well done. You can finish here.'}`);
+  }
+}
+
+function renderPracticeProgress() {
+  let completed = 0;
+  let correct = 0;
+  let total = 0;
+  for (const content of window.__IGNITE_PILOT_CONTENT__?.items || []) {
+    if (!window.IgnitePractice.playable(content)) continue;
+    const saved = storage.get(window.IgnitePractice.key(state.learnerId, content.id));
+    const result = window.IgnitePractice.score(content.questions, window.IgnitePractice.restore(content, saved));
+    if (!result.complete) continue;
+    completed += 1; correct += result.correct; total += result.total;
+  }
+  setText('#practiceCompletedCount', completed);
+  setText('#practiceAccuracy', total ? `${Math.round(100 * correct / total)}%` : '—');
+}
+
+/* Each question locks on its first choice; reopening restores that choice. */
+function buildOptions(question, attempt) {
   const wrap = document.createElement('div');
   wrap.className = 'q-options';
   wrap.setAttribute('role', 'group');
@@ -370,33 +412,43 @@ function buildOptions(question, tally, showTally) {
   feedback.setAttribute('role', 'status');
   feedback.hidden = true;
   const letters = 'ABCDEFGH';
+  const answers = attempt.mode === 'retry' ? attempt.retryAnswers : attempt.answers;
+  const paintFeedback = (index) => {
+    const correct = index === question.answerIndex;
+    buttons.forEach((other, otherIndex) => {
+      other.disabled = true;
+      other.setAttribute('aria-pressed', String(otherIndex === index));
+      if (otherIndex === question.answerIndex) other.classList.add('is-correct');
+      else if (otherIndex === index) other.classList.add('is-wrong');
+    });
+    feedback.textContent = correct
+      ? `Correct. ${question.explanation}`
+      : `Not quite. The answer is ${letters[question.answerIndex]}. ${question.explanation}`;
+    feedback.classList.toggle('is-correct', correct);
+    feedback.hidden = false;
+  };
   const buttons = question.options.map((option, index) => {
     const button = Object.assign(document.createElement('button'), {
       type: 'button', // inside a dialog form: must never submit
       className: 'q-option',
       textContent: `${letters[index]}. ${option}`,
     });
+    button.setAttribute('aria-pressed', 'false');
     button.addEventListener('click', () => {
-      if (wrap.dataset.done) return;
-      wrap.dataset.done = '1';
-      const correct = index === question.answerIndex;
-      tally.answered += 1;
-      if (correct) tally.correct += 1;
-      buttons.forEach((other, otherIndex) => {
-        other.disabled = true;
-        if (otherIndex === question.answerIndex) other.classList.add('is-correct');
-        else if (otherIndex === index) other.classList.add('is-wrong');
-      });
-      feedback.textContent = correct
-        ? `Correct. ${question.explanation || ''}`.trim()
-        : `Not quite. The answer is ${letters[question.answerIndex]}. ${question.explanation || ''}`.trim();
-      feedback.classList.toggle('is-correct', correct);
-      feedback.hidden = false;
-      showTally();
+      if (Number.isInteger(answers[question.id])) return;
+      answers[question.id] = index;
+      paintFeedback(index);
+      if (attempt.mode === 'full') {
+        const saved = storage.set(attempt.key, JSON.stringify({ version: window.IgnitePractice.version(attempt.content), answers: attempt.answers }));
+        setText('#practiceSaveStatus', saved ? 'Answers saved on this device.' : 'This browser could not save your answers. Keep this page open to retain them.');
+        renderPracticeProgress();
+      }
+      updatePracticeSummary();
     });
     return button;
   });
   wrap.append(...buttons, feedback);
+  if (Number.isInteger(answers[question.id])) paintFeedback(answers[question.id]);
   return wrap;
 }
 
@@ -499,6 +551,34 @@ function bindControls() {
   });
 
   $('#nextMissionStep').addEventListener('click', nextMissionStep);
+  $('#retryMistakes').addEventListener('click', () => {
+    const attempt = state.activePractice;
+    if (!attempt) return;
+    const result = window.IgnitePractice.score(attempt.content.questions, attempt.answers);
+    if (!result.complete || !result.mistakes.length) return;
+    attempt.mode = 'retry';
+    attempt.questions = attempt.content.questions.filter((q) => result.mistakes.includes(q.id));
+    attempt.retryAnswers = Object.create(null);
+    setText('#practiceSaveStatus', 'Retry your mistakes. Your original score stays saved; this retry lasts until you close the set.');
+    renderPracticeQuestions();
+    $('#worksheetQuestions button')?.focus();
+  });
+  $('#restartPractice').addEventListener('click', () => {
+    const attempt = state.activePractice;
+    if (!attempt) return;
+    attempt.mode = 'full';
+    attempt.questions = attempt.content.questions;
+    attempt.answers = Object.create(null);
+    const saved = storage.set(attempt.key, JSON.stringify({ version: window.IgnitePractice.version(attempt.content), answers: attempt.answers }));
+    setText('#practiceSaveStatus', saved ? 'New attempt started. Your previous attempt has been replaced on this device.' : 'This attempt cannot be saved in this browser.');
+    renderPracticeQuestions();
+    renderPracticeProgress();
+    $('#worksheetQuestions button')?.focus();
+  });
+  $('#worksheetDialog').addEventListener('close', () => {
+    state.activePractice = null;
+    if (state.catalog) renderWorksheets();
+  });
   $$('#answerOptions button').forEach((button) => button.addEventListener('click', () => {
     const correct = button.dataset.answer === '5';
     $$('#answerOptions button').forEach((item) => {
@@ -573,6 +653,7 @@ async function loadAndRender() {
 
     renderSubjects();
     renderWorksheets();
+    renderPracticeProgress();
   } catch (error) {
     console.error(error);
     showLoadError(error);
@@ -586,6 +667,7 @@ function init() {
     return;
   }
   applyStudentProfile(admittedStudent);
+  state.learnerId = admittedStudent.admissionId;
   renderProgress();
   bindControls();
   trackActiveSection();

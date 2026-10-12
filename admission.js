@@ -15,6 +15,17 @@ let loginFailures = 0;
 let loginLockedUntil = 0;
 
 const cloudIdentityMode = () => Boolean(window.IgniteIdentity?.configured && window.IgniteApi?.configured);
+// Public early access is a product gate, not a substitute for server authorization.
+const admissionPreviewMode = () => document.body.dataset.admissions === 'preview';
+
+function pauseNewAdmissions(form) {
+  form.hidden = true;
+  form.querySelector('button[type="submit"]').disabled = true;
+  form.addEventListener('submit', (event) => {
+    event.preventDefault();
+    $('#admissionStatus').textContent = 'New student admissions are paused. Try the free demo without entering personal details.';
+  });
+}
 
 const storage = {
   getStudent() {
@@ -70,9 +81,9 @@ function updateEnrollmentControls(student) {
   const enrolled = Boolean(student);
   $('#viewEnrollmentNav').hidden = !enrolled;
   $('#viewEnrollmentFooter').hidden = !enrolled;
-  $('#enrollNav').hidden = enrolled;
+  $('#enrollNav').hidden = enrolled && !admissionPreviewMode();
   const status = $('.admissions-open');
-  if (enrolled) status.innerHTML = '<i aria-hidden="true"></i>1 student enrolled';
+  if (enrolled && !admissionPreviewMode()) status.innerHTML = '<i aria-hidden="true"></i>1 student enrolled';
 }
 
 function showAdmission(student) {
@@ -195,10 +206,10 @@ function showCloudAdmission(student) {
   $('#admittedLoginButton').hidden = true;
   $('#admittedRecordButton').hidden = true;
   $('#loginSetupForm').hidden = true;
-  $('#enrollNav').hidden = true;
+  $('#enrollNav').hidden = !admissionPreviewMode();
   $('#viewEnrollmentNav').hidden = true;
   $('#viewEnrollmentFooter').hidden = true;
-  $('.admissions-open').innerHTML = '<i aria-hidden="true"></i>1 student enrolled';
+  if (!admissionPreviewMode()) $('.admissions-open').innerHTML = '<i aria-hidden="true"></i>1 student enrolled';
 }
 
 function showCloudSignedOut() {
@@ -227,7 +238,7 @@ async function syncCloudSession() {
     if (student) showCloudAdmission(student);
     else {
       $('#admittedCard').hidden = true;
-      $('#admissionForm').hidden = false;
+      $('#admissionForm').hidden = admissionPreviewMode();
     }
   } catch (error) {
     if (['authentication_required', 'expired_token', 'invalid_token'].includes(error.code)) {
@@ -242,13 +253,14 @@ async function syncCloudSession() {
 }
 
 function bindCloudIdentity() {
-  $('#admissionPrivacy').innerHTML = '<strong>Cloud preview:</strong> student information is sent only after verified guardian sign-in and is stored in the protected Project Ignite preview database.';
+  if (!admissionPreviewMode()) $('#admissionPrivacy').innerHTML = '<strong>Cloud preview:</strong> student information is sent only after verified guardian sign-in and is stored in the protected Project Ignite preview database.';
   document.querySelectorAll('[data-local-admission]').forEach((element) => {
     element.hidden = true;
     element.querySelectorAll('input').forEach((input) => { input.required = false; });
   });
 
   const signupForm = $('#guardianSignupForm');
+  signupForm.hidden = admissionPreviewMode();
   const signinForm = $('#guardianSigninForm');
   const githubButton = $('#guardianGithubSignin');
   const githubStatus = $('#guardianGithubStatus');
@@ -269,6 +281,7 @@ function bindCloudIdentity() {
 
   signupForm.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (admissionPreviewMode()) return;
     const status = $('#guardianSignupStatus');
     status.textContent = '';
     if (!signupForm.checkValidity()) {
@@ -331,6 +344,7 @@ function bindCloudIdentity() {
 
 function bindCloudEnrollment() {
   const form = $('#admissionForm');
+  if (admissionPreviewMode()) { pauseNewAdmissions(form); return; }
   const status = $('#admissionStatus');
   bindFieldCleanup(form);
 
@@ -457,6 +471,7 @@ function bindEnrollment() {
   if (existingStudent) showAdmission(existingStudent);
 
   const form = $('#admissionForm');
+  if (admissionPreviewMode()) { pauseNewAdmissions(form); return; }
   const status = $('#admissionStatus');
   bindFieldCleanup(form);
 

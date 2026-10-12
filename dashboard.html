@@ -75,6 +75,12 @@
           <article><span class="stat-icon coral">↗</span><div><strong id="masteryScore">0%</strong><small>Demo mastery</small></div></article>
         </section>
 
+        <section class="practice-progress" aria-label="Sample practice progress">
+          <p><strong id="practiceCompletedCount">0</strong> practice sets finished</p>
+          <p><strong id="practiceAccuracy">—</strong> answer accuracy</p>
+          <small>Latest full attempts · saved on this device · sample scores, not exam marks</small>
+        </section>
+
         <section class="section-block" aria-labelledby="subjectsTitle">
           <div class="section-heading">
             <div><p class="eyebrow">EXPLORE</p><h2 id="subjectsTitle">Pick a subject</h2></div>
@@ -162,9 +168,18 @@
         <h2 id="worksheetDialogTitle">Worksheet</h2>
         <p class="worksheet-view-meta" id="worksheetMeta"></p>
         <p class="draft-notice" id="worksheetNotice" role="note" hidden></p>
+        <p class="practice-save-status" id="practiceSaveStatus" role="status"></p>
+        <section class="practice-summary" id="practiceSummary" aria-labelledby="practiceSummaryTitle" hidden>
+          <h3 id="practiceSummaryTitle">Practice complete</h3>
+          <p id="practiceSummaryText" role="status"></p>
+          <div class="practice-summary-actions">
+            <button class="secondary-button" id="retryMistakes" type="button">Retry mistakes</button>
+            <button class="secondary-button" id="restartPractice" type="button">Start new attempt</button>
+          </div>
+        </section>
         <ol class="question-list" id="worksheetQuestions"></ol>
         <div class="dialog-actions">
-          <span id="worksheetCount"></span>
+          <span id="worksheetCount" role="status"></span>
           <button class="primary-button" value="cancel">Close</button>
         </div>
       </form>
@@ -183,6 +198,7 @@
     <script src="./api-client.js" defer></script>
     <script src="./data/catalog.js" defer></script>
     <script src="./data/pilot-worksheets.js" defer></script>
+    <script src="./practice.js" defer></script>
     <script src="./app.js" defer></script>
   </body>
 </html>
