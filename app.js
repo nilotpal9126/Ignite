@@ -117,6 +117,7 @@ function normalizeItem(raw) {
   const grades = (Array.isArray(classification.grades) ? classification.grades : [])
     .map(Number).filter(Number.isFinite);
   const documentKind = String(classification.documentKind || 'worksheet');
+  const content = pilotContentFor(raw.sourceFile?.originalFilename);
   return {
     title,
     subject,
@@ -125,8 +126,17 @@ function normalizeItem(raw) {
     kind: kindOf(documentKind),
     format: raw.sourceFile?.mediaType === 'application/pdf' ? 'PDF' : 'DOCX',
     byteSize: raw.sourceFile?.byteSize,
-    search: `${title} ${subject}`.toLowerCase(),
+    content,
+    search: `${title} ${subject} ${content ? `${content.title} ${content.chapter}` : ''}`.toLowerCase(),
   };
+}
+
+/* ---------- worksheet content (drafts are staff-preview only; answers never ship to the browser) ---------- */
+function pilotContentFor(originalFilename) {
+  const items = window.__IGNITE_PILOT_CONTENT__?.items;
+  if (!originalFilename || !Array.isArray(items)) return null;
+  const match = items.find((entry) => entry?.catalog?.originalFilename === originalFilename && Array.isArray(entry.questions) && entry.questions.length);
+  return match || null;
 }
 
 function setText(selector, text) {
@@ -238,8 +248,15 @@ function renderWorksheets() {
     fragment.querySelector('.worksheet-meta').textContent =
       `${gradeLabel(item.grades)} · ${kindText.charAt(0).toUpperCase()}${kindText.slice(1)} · ${formatSize(item.byteSize)}`;
     const button = fragment.querySelector('.worksheet-footer button');
-    button.setAttribute('aria-label', `Preview journey for ${item.title}`);
-    button.addEventListener('click', () => openMission(item));
+    if (item.content) {
+      fragment.querySelector('.review-state').textContent = item.content.visibility === 'student' ? 'Published' : 'Draft · staff preview';
+      button.textContent = 'Open worksheet';
+      button.setAttribute('aria-label', `Open worksheet: ${item.title}`);
+      button.addEventListener('click', () => openWorksheet(item));
+    } else {
+      button.setAttribute('aria-label', `Preview journey for ${item.title}`);
+      button.addEventListener('click', () => openMission(item));
+    }
     grid.append(fragment);
   }
 
@@ -282,6 +299,28 @@ function openMission(item) {
     setText('#missionInstruction', `${gradeLabel(item.grades)} · ${item.subject} · Staff-only journey preview`);
   }
   showDialog($('#missionDialog'));
+}
+
+function openWorksheet(item) {
+  const content = item.content;
+  if (!content) return;
+  const isDraft = content.visibility !== 'student';
+  setText('#worksheetEyebrow', isDraft ? 'DRAFT · STAFF PREVIEW' : 'WORKSHEET');
+  setText('#worksheetDialogTitle', content.title || item.title);
+  setText('#worksheetMeta', [`Class ${content.classLevel}`, content.subject, content.chapter].filter(Boolean).join(' · '));
+  const notice = $('#worksheetNotice');
+  notice.textContent = content.notice || '';
+  notice.hidden = !(isDraft && content.notice);
+  const list = $('#worksheetQuestions');
+  list.replaceChildren();
+  for (const question of content.questions) {
+    const entry = document.createElement('li');
+    entry.value = question.no;
+    entry.textContent = question.text;
+    list.append(entry);
+  }
+  setText('#worksheetCount', `${content.questions.length} questions`);
+  showDialog($('#worksheetDialog'));
 }
 
 function nextMissionStep() {

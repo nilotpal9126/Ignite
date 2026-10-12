@@ -155,6 +155,21 @@
       </form>
     </dialog>
 
+    <dialog id="worksheetDialog" aria-labelledby="worksheetDialogTitle">
+      <form method="dialog" class="dialog-card worksheet-view">
+        <button class="dialog-close" value="cancel" aria-label="Close worksheet"><span aria-hidden="true">×</span></button>
+        <p class="eyebrow" id="worksheetEyebrow">WORKSHEET</p>
+        <h2 id="worksheetDialogTitle">Worksheet</h2>
+        <p class="worksheet-view-meta" id="worksheetMeta"></p>
+        <p class="draft-notice" id="worksheetNotice" role="note" hidden></p>
+        <ol class="question-list" id="worksheetQuestions"></ol>
+        <div class="dialog-actions">
+          <span id="worksheetCount"></span>
+          <button class="primary-button" value="cancel">Close</button>
+        </div>
+      </form>
+    </dialog>
+
     <template id="worksheetTemplate">
       <article class="worksheet-card">
         <div class="worksheet-top"><span class="subject-pill"></span><span class="format-pill"></span></div>
@@ -164,7 +179,10 @@
       </article>
     </template>
 
+    <script src="./platform-config.js" defer></script>
+    <script src="./api-client.js" defer></script>
     <script src="./data/catalog.js" defer></script>
+    <script src="./data/pilot-worksheets.js" defer></script>
     <script src="./app.js" defer></script>
   </body>
 </html>

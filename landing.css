@@ -225,3 +225,52 @@ main { min-width: 0; }
   html { scroll-behavior: auto; }
   *, *::before, *::after { transition: none !important; }
 }
+/* Verified guardian identity gate */
+.guardian-gate {
+  align-self: start;
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid rgba(16, 44, 78, 0.14);
+  border-radius: 24px;
+  background: #fff;
+  box-shadow: 0 18px 50px rgba(16, 44, 78, 0.1);
+}
+
+.guardian-gate h3 { margin: 0.35rem 0 0.6rem; color: #102c4e; font-size: clamp(1.45rem, 3vw, 2rem); }
+.guardian-gate > p:not(.eyebrow) { color: #51657a; }
+.github-auth-panel { margin-top: 1.25rem; }
+.github-auth-button {
+  width: 100%;
+  min-height: 52px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  padding: 0.75rem 1rem;
+  border: 1px solid #17212b;
+  border-radius: 13px;
+  background: #17212b;
+  color: #fff;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 900;
+}
+.github-auth-button:hover { background: #263442; }
+.github-auth-button:focus-visible { outline: 3px solid #dff04f; outline-offset: 3px; }
+.github-auth-button:disabled { cursor: wait; opacity: 0.7; }
+.github-auth-button svg { width: 22px; height: 22px; flex: 0 0 auto; }
+.github-auth-panel .form-status { margin-bottom: 0; }
+.auth-divider { display: flex; align-items: center; gap: 0.75rem; margin: 0.9rem 0 0; color: #6a7b8d; font-size: 0.78rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; }
+.auth-divider::before, .auth-divider::after { content: ''; height: 1px; flex: 1; background: #dbe4eb; }
+.guardian-auth-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-top: 1.25rem; }
+.guardian-auth-grid form { display: grid; gap: 0.85rem; padding: 1rem; border: 1px solid #dbe4eb; border-radius: 18px; background: #f8fafb; }
+.guardian-auth-grid h4 { margin: 0; color: #102c4e; }
+.guardian-auth-grid label { display: grid; gap: 0.35rem; color: #243f5d; font-weight: 700; }
+.guardian-auth-grid input { width: 100%; min-height: 46px; padding: 0.7rem 0.8rem; border: 1px solid #bdcbd7; border-radius: 12px; font: inherit; }
+.guardian-session { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.85rem 1rem; border: 1px solid #b8d85c; border-radius: 16px; background: #f4fbdc; color: #173a28; }
+.guardian-session button { min-height: 42px; padding: 0.55rem 0.9rem; border: 1px solid #173a28; border-radius: 999px; background: transparent; color: inherit; font-weight: 800; cursor: pointer; }
+
+@media (max-width: 720px) {
+  .guardian-auth-grid { grid-template-columns: 1fr; }
+  .guardian-session { align-items: flex-start; flex-direction: column; }
+}
+

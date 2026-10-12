@@ -312,3 +312,12 @@ body.focus-mode main { max-width: 1100px; width: 100%; margin: 0 auto; padding-b
   .dialog-card { padding: 20px; }
   .question-card { margin-top: 14px; padding: 16px; }
 }
+
+/* ---------- worksheet viewer (draft content is clearly marked) ---------- */
+.worksheet-view { max-width: 640px; }
+.worksheet-view-meta { margin: 0 0 14px; color: var(--ink-soft); font-size: 14px; }
+.draft-notice { margin: 0 0 16px; padding: 11px 14px; color: #77511c; background: #fff4d7; border-left: 4px solid #e0a82e; border-radius: 10px; font-size: 14px; font-weight: 700; }
+.question-list { margin: 0 0 8px; padding: 0 0 0 28px; max-height: min(52vh, 460px); overflow-y: auto; }
+.question-list li { margin: 0 0 14px; padding-left: 6px; line-height: 1.45; overflow-wrap: anywhere; }
+.question-list li::marker { font-weight: 800; color: var(--navy-2); }
+@media (max-width: 720px) { .question-list { max-height: 46vh; } }

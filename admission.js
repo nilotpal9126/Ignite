@@ -4,6 +4,7 @@ const STUDENT_KEY = 'ignite-pilot-student-v1';
 const SESSION_KEY = 'ignite-pilot-session-v1';
 const MAX_LOGIN_FAILURES = 5;
 const LOGIN_COOLDOWN_MS = 30_000;
+const CLOUD_CONSENT_POLICY = 'ignite-preview-2026-10-12';
 
 const $ = (selector) => document.querySelector(selector);
 const $$ = (selector) => Array.from(document.querySelectorAll(selector));
@@ -12,6 +13,8 @@ const normalizeLogin = (value) => cleanText(value, 24).toLowerCase();
 
 let loginFailures = 0;
 let loginLockedUntil = 0;
+
+const cloudIdentityMode = () => Boolean(window.IgniteIdentity?.configured && window.IgniteApi?.configured);
 
 const storage = {
   getStudent() {
@@ -167,11 +170,203 @@ function closeLogin() {
 }
 
 function bindDialog() {
+  if (cloudIdentityMode()) {
+    $$('.open-login').forEach((button) => button.addEventListener('click', () => {
+      $('#admission').scrollIntoView({ behavior: 'smooth', block: 'start' });
+      window.setTimeout(() => $('#guardianSigninEmail')?.focus(), 350);
+    }));
+    return;
+  }
   $$('.open-login').forEach((button) => button.addEventListener('click', showLogin));
   $('#closeLogin').addEventListener('click', closeLogin);
   $('#loginToEnroll').addEventListener('click', closeLogin);
   $('#loginDialog').addEventListener('click', (event) => { if (event.target === $('#loginDialog')) closeLogin(); });
   if (window.location.hash === '#login') showLogin();
+}
+
+function showCloudAdmission(student) {
+  $('#guardianGate').hidden = true;
+  $('#admissionForm').hidden = true;
+  $('#admittedCard').hidden = false;
+  $('#admittedName').textContent = `${student.studentName} is enrolled.`;
+  $('#admittedDetails').textContent = `Class ${student.classLevel} · Guardian-managed cloud pilot`;
+  $('#admissionId').textContent = student.admissionId;
+  $('#studentLoginSummary').hidden = true;
+  $('#admittedLoginButton').hidden = true;
+  $('#admittedRecordButton').hidden = true;
+  $('#loginSetupForm').hidden = true;
+  $('#enrollNav').hidden = true;
+  $('#viewEnrollmentNav').hidden = true;
+  $('#viewEnrollmentFooter').hidden = true;
+  $('.admissions-open').innerHTML = '<i aria-hidden="true"></i>1 student enrolled';
+}
+
+function showCloudSignedOut() {
+  $('#guardianGate').hidden = false;
+  $('#guardianSession').hidden = true;
+  $('#admissionForm').hidden = true;
+  $('#admittedCard').hidden = true;
+}
+
+async function syncCloudSession() {
+  const identitySession = window.IgniteIdentity.session();
+  if (!identitySession) {
+    showCloudSignedOut();
+    return;
+  }
+
+  $('#guardianSessionEmail').textContent = identitySession.email;
+  $('#guardianSession').hidden = false;
+  $('#guardianGate').hidden = true;
+  $('#guardianEmail').value = identitySession.email;
+  $('#guardianEmail').readOnly = true;
+
+  try {
+    const session = await window.IgniteApi.session(identitySession.token);
+    const student = session.students?.[0];
+    if (student) showCloudAdmission(student);
+    else {
+      $('#admittedCard').hidden = true;
+      $('#admissionForm').hidden = false;
+    }
+  } catch (error) {
+    if (['authentication_required', 'expired_token', 'invalid_token'].includes(error.code)) {
+      window.IgniteIdentity.signOut();
+      showCloudSignedOut();
+      $('#guardianSigninStatus').textContent = 'Your secure session ended. Sign in again.';
+      return;
+    }
+    $('#guardianSigninStatus').textContent = error.message || 'The guardian session could not be loaded.';
+    showCloudSignedOut();
+  }
+}
+
+function bindCloudIdentity() {
+  $('#admissionPrivacy').innerHTML = '<strong>Cloud preview:</strong> student information is sent only after verified guardian sign-in and is stored in the protected Project Ignite preview database.';
+  document.querySelectorAll('[data-local-admission]').forEach((element) => {
+    element.hidden = true;
+    element.querySelectorAll('input').forEach((input) => { input.required = false; });
+  });
+
+  const signupForm = $('#guardianSignupForm');
+  const signinForm = $('#guardianSigninForm');
+  const githubButton = $('#guardianGithubSignin');
+  const githubStatus = $('#guardianGithubStatus');
+  bindFieldCleanup(signupForm);
+  bindFieldCleanup(signinForm);
+
+  githubButton.addEventListener('click', async () => {
+    githubStatus.textContent = '';
+    githubButton.disabled = true;
+    try {
+      const session = await window.IgniteIdentity.signInWithGitHub();
+      if (session) await syncCloudSession();
+    } catch (error) {
+      githubStatus.textContent = error.message || 'GitHub sign-in failed.';
+      githubButton.disabled = false;
+    }
+  });
+
+  signupForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const status = $('#guardianSignupStatus');
+    status.textContent = '';
+    if (!signupForm.checkValidity()) {
+      markInvalidFields(signupForm);
+      status.textContent = 'Enter a valid adult email and a password of at least eight characters.';
+      return;
+    }
+    if ($('#guardianSignupPassword').value !== $('#guardianSignupConfirm').value) {
+      $('#guardianSignupConfirm').setAttribute('aria-invalid', 'true');
+      $('#guardianSignupConfirm').focus();
+      status.textContent = 'The two password entries do not match.';
+      return;
+    }
+    const button = signupForm.querySelector('button[type="submit"]');
+    button.disabled = true;
+    try {
+      const result = await window.IgniteIdentity.signUp($('#guardianSignupEmail').value.trim().toLowerCase(), $('#guardianSignupPassword').value);
+      signupForm.reset();
+      $('#guardianSigninEmail').value = result.email || '';
+      status.textContent = 'Verification email sent. Open it, verify the address, then use Guardian sign in.';
+      $('#guardianSigninPassword').focus();
+    } catch (error) {
+      status.textContent = error.message || 'The guardian account could not be created.';
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  signinForm.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    const status = $('#guardianSigninStatus');
+    status.textContent = '';
+    if (!signinForm.checkValidity()) {
+      markInvalidFields(signinForm);
+      status.textContent = 'Enter the verified guardian email and password.';
+      return;
+    }
+    const button = signinForm.querySelector('button[type="submit"]');
+    button.disabled = true;
+    try {
+      await window.IgniteIdentity.signIn($('#guardianSigninEmail').value.trim().toLowerCase(), $('#guardianSigninPassword').value);
+      signinForm.reset();
+      await syncCloudSession();
+    } catch (error) {
+      status.textContent = error.message || 'Guardian sign-in failed.';
+    } finally {
+      button.disabled = false;
+    }
+  });
+
+  $('#guardianSignout').addEventListener('click', () => {
+    window.IgniteIdentity.signOut();
+    $('#admissionForm').reset();
+    $('#guardianEmail').readOnly = false;
+    showCloudSignedOut();
+  });
+
+  syncCloudSession();
+}
+
+function bindCloudEnrollment() {
+  const form = $('#admissionForm');
+  const status = $('#admissionStatus');
+  bindFieldCleanup(form);
+
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
+    status.textContent = '';
+    if (!form.checkValidity()) {
+      markInvalidFields(form);
+      status.textContent = 'Complete the required student and guardian fields and confirm consent.';
+      return;
+    }
+    const token = window.IgniteIdentity.token();
+    if (!token) {
+      status.textContent = 'The guardian session ended. Sign in again before admitting a student.';
+      showCloudSignedOut();
+      return;
+    }
+    const button = form.querySelector('button[type="submit"]');
+    button.disabled = true;
+    try {
+      const result = await window.IgniteApi.createAdmission(token, {
+        studentName: cleanText($('#studentName').value, 80),
+        classLevel: Number($('#studentClass').value),
+        guardianName: cleanText($('#guardianName').value, 80),
+        guardianPhone: cleanText($('#guardianPhone').value, 20),
+        relationshipLabel: 'Parent or guardian',
+        consent: { accepted: $('#guardianConsent').checked, policyVersion: CLOUD_CONSENT_POLICY },
+      });
+      form.reset();
+      showCloudAdmission(result.admission);
+      $('#admittedCard').focus();
+    } catch (error) {
+      status.textContent = error.message || 'The cloud admission could not be completed.';
+      button.disabled = false;
+    }
+  });
 }
 
 function bindEnrollmentRecord() {
@@ -427,9 +622,14 @@ function init() {
   bindDialog();
   bindEnrollmentRecord();
   bindQuickPaste();
-  bindEnrollment();
-  bindLegacyLoginSetup();
-  bindLogin();
+  if (cloudIdentityMode()) {
+    bindCloudIdentity();
+    bindCloudEnrollment();
+  } else {
+    bindEnrollment();
+    bindLegacyLoginSetup();
+    bindLogin();
+  }
 }
 
 if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
