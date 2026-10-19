@@ -13,6 +13,10 @@
     let step = 0;
     let answers = Object.create(null);
     let generation = 0;
+    const write = (element, text) => {
+      if (window.IgniteScienceText) window.IgniteScienceText.render(element, text, { chemistry: active?.subject === 'Chemistry' });
+      else element.textContent = text;
+    };
     const recoveryRoot = get('demoRecoveryHub');
     const recovery = recoveryRoot && window.IgniteDemoRecovery?.create(recoveryRoot, {
       onStageChange(stage) {
@@ -50,15 +54,18 @@
       const question = active.questions[step];
       const sessionContent = active, questionStep = step, token = generation;
       get('demoStep').textContent = `Question ${step + 1} of ${active.questions.length}`;
-      get('demoQuestionText').textContent = question.text;
+      write(get('demoQuestionText'), question.text);
       get('demoFeedback').textContent = '';
+      delete get('demoFeedback').dataset.correct;
       get('demoNext').disabled = true;
       get('demoNext').textContent = step + 1 === active.questions.length ? 'See my practice snapshot' : 'Next question';
       const buttons = question.options.map((option, index) => {
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'demo-option';
-        button.textContent = option;
+        const label = document.createElement('span'); label.className = 'demo-choice-letter'; label.textContent = 'ABCD'[index];
+        const value = document.createElement('span'); value.className = 'demo-choice-value'; write(value, option);
+        button.append(label, value);
         button.setAttribute('aria-pressed', 'false');
         button.addEventListener('click', () => {
           if (generation !== token || active !== sessionContent || step !== questionStep || Object.hasOwn(answers, question.id)) return;
@@ -70,7 +77,8 @@
             else if (choiceIndex === index) choice.classList.add('incorrect');
           });
           const correct = index === question.answerIndex;
-          get('demoFeedback').textContent = `${correct ? 'Correct against the sample key.' : `The sample key gives: ${question.options[question.answerIndex]}.`} ${question.explanation}`;
+          get('demoFeedback').dataset.correct = String(correct);
+          write(get('demoFeedback'), `${correct ? 'Correct against the sample key.' : `The sample key gives: ${question.options[question.answerIndex]}.`} ${question.explanation}`);
           get('demoProgress').value = Object.keys(answers).length;
           get('demoProgress').setAttribute('aria-valuetext', `${Object.keys(answers).length} of ${active.questions.length} questions answered`);
           get('demoNext').disabled = false;
@@ -117,9 +125,9 @@
       const review = active.questions.filter((question) => tally.mistakes.includes(question.id)).map((question) => {
         const li = document.createElement('li');
         const text = document.createElement('strong');
-        text.textContent = question.text;
+        write(text, question.text);
         const explanation = document.createElement('p');
-        explanation.textContent = `Sample answer: ${question.options[question.answerIndex]}. ${question.explanation}`;
+        write(explanation, `Sample answer: ${question.options[question.answerIndex]}. ${question.explanation}`);
         li.append(text, explanation);
         return li;
       });
@@ -128,8 +136,24 @@
       get('demoResultTitle').focus();
     }
 
-    get('demoClass').addEventListener('change', resetSelection);
+    get('demoClass').addEventListener('change', () => { resetSelection(); syncSubjects(); });
     get('demoSubject').addEventListener('change', resetSelection);
+    const subjectButtons = ['Biology', 'Chemistry', 'Physics'].map(subject => {
+      const button = get(`choose${subject}`); if (button) button.dataset.subject = subject; return button;
+    }).filter(Boolean);
+    function syncSubjects() {
+      for (const button of subjectButtons) {
+        button.setAttribute('aria-pressed', String(button.dataset.subject === get('demoSubject').value));
+        button.disabled = !items.some(item => item.subject === button.dataset.subject && item.classLevel === Number(get('demoClass').value));
+      }
+    }
+    for (const button of subjectButtons) button.addEventListener('click', () => {
+      if (!items.some(item => item.subject === button.dataset.subject && item.classLevel === Number(get('demoClass').value))) return;
+      get('demoSubject').value = button.dataset.subject;
+      resetSelection(); syncSubjects(); start();
+      get('free-demo')?.scrollIntoView?.({ block: 'start' });
+    });
+    get('demoSubject').addEventListener('change', syncSubjects);
     get('demoStart').addEventListener('click', start);
     get('demoRestart').addEventListener('click', start);
     get('demoFinish').addEventListener('click', () => {
@@ -144,6 +168,7 @@
       else showQuestion();
     });
     resetSelection();
+    syncSubjects();
     if (window.location?.search && new URLSearchParams(window.location.search).get('preview') === 'recovery') {
       const example = items.find((item) => item.classLevel === 10 && item.subject === 'Biology');
       if (example) {

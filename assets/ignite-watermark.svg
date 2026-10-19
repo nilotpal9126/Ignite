@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 300" fill="none">
+  <defs>
+    <linearGradient id="wash" x1="47" y1="24" x2="201" y2="266" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#75d5ee" stop-opacity=".14"/>
+      <stop offset=".53" stop-color="#75d5ee" stop-opacity=".7"/>
+      <stop offset="1" stop-color="#bce9d1" stop-opacity=".27"/>
+    </linearGradient>
+    <clipPath id="flame"><path d="M137 19c8 57-51 67-35 119 13-7 29-27 31-46 40 29 69 64 69 103a82 82 0 0 1-164 0c0-49 42-74 37-111 19 9 24 20 24 31 3-37 41-58 38-96Z"/></clipPath>
+  </defs>
+  <!-- Original Ignite spark: a flame silhouette with two quiet water-like washes. -->
+  <path d="M137 19c8 57-51 67-35 119 13-7 29-27 31-46 40 29 69 64 69 103a82 82 0 0 1-164 0c0-49 42-74 37-111 19 9 24 20 24 31 3-37 41-58 38-96Z" fill="url(#wash)" stroke="#75d5ee" stroke-width="3" stroke-linejoin="round"/>
+  <g clip-path="url(#flame)" stroke-linecap="round">
+    <path d="M13 183c37-28 63 24 103 0s67-24 115-4" stroke="#e0faf5" stroke-opacity=".55" stroke-width="3"/>
+    <path d="M7 204c43-24 65 26 109 2s74-23 116-2" stroke="#75d5ee" stroke-opacity=".72" stroke-width="3"/>
+  </g>
+  <path d="m120 163 5 18 17 5-17 5-5 18-5-18-17-5 17-5 5-18Z" fill="#f9f6d4" fill-opacity=".85"/>
+</svg>

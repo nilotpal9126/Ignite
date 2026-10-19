@@ -9,9 +9,11 @@
     const stars = new Set();
     const seen = new Set();
     const completed = new Set();
-    const make = (tag, className, value) => Object.assign(document.createElement(tag), {
-      className: className || '', textContent: value || '',
-    });
+    const make = (tag, className, value) => {
+      const element = Object.assign(document.createElement(tag), { className: className || '', textContent: value || '' });
+      window.IgniteScienceText?.render(element, value || '', { chemistry: content?.subject === 'Chemistry' });
+      return element;
+    };
     const action = (label, name, handler) => {
       const button = make('button', 'demo-game-button', label);
       button.type = 'button'; button.dataset.action = name;
@@ -109,6 +111,7 @@
           const session = { phase: 'recall' }; current = session; view += 1;
           settings.onStageChange?.('recall');
           recallView = window.IgniteLearningReview.mount(root, route, {
+            subject: content.subject,
             isActive: () => current === session,
             notice: content.notice,
             onReturn: renderHub,
@@ -130,6 +133,7 @@
       const token = generation, screen = view;
       const deferred = session.phase === 'assessment';
       window.IgniteActivityView.mount(choices, activity, {
+        subject: content.subject,
         optionClass: 'demo-game-option', actionClass: 'demo-game-button', orderClass: 'demo-game-order',
         correctClass: 'correct', incorrectClass: 'incorrect', deferFeedback: deferred,
         isActive: () => current === session && token === generation && screen === view,
@@ -144,6 +148,7 @@
             : (result.correct ? 'Challenge cleared! ' : 'Let us review this idea. ') + activity.explanation;
           if (!deferred && !result.correct && activity.type === 'ordered_steps') feedback.textContent += ' Correct route: ' + activity.steps.join(' → ') + '.';
           if (!deferred && !result.correct && activity.type === 'single_choice') feedback.textContent += ' Answer: ' + activity.options[activity.answerIndex] + '.';
+          window.IgniteScienceText?.render(feedback, feedback.textContent, { chemistry: content.subject === 'Chemistry' });
           feedback.hidden = false;
           onGraded(result, response);
         },

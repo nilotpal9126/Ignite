@@ -10,6 +10,7 @@
     const make = (tag, className, text) => Object.assign(document.createElement(tag), { className, textContent: text || '' });
     const button = (text, action, handler, className = settings.optionClass || 'rescue-option') => {
       const element = make('button', className, text);
+      window.IgniteScienceText?.render(element, text, { chemistry: settings.subject === 'Chemistry' });
       element.type = 'button'; element.dataset.action = action;
       element.addEventListener('click', () => { if (active()) handler(); });
       return element;

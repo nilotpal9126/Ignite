@@ -10,6 +10,9 @@
     <link rel="apple-touch-icon" href="./assets/ignite-logo-192.png" />
     <link rel="stylesheet" href="./styles.css" />
     <link rel="stylesheet" href="./learning-ui.css" />
+    <link rel="preload" href="./assets/fonts/satoshi-variable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="./assets/fonts/cabinet-grotesk-variable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="./notice-board.css" />
   </head>
   <body>
     <noscript><p class="noscript-banner">Project Ignite needs JavaScript to load the worksheet catalog and the practice mission.</p></noscript>
@@ -128,6 +131,7 @@
       </div>
     </section>
         <section class="hero" id="home" aria-labelledby="welcomeTitle">
+          <svg class="ignite-watermark" viewBox="0 0 240 300" fill="none" aria-hidden="true" focusable="false"><path d="M137 19c8 57-51 67-35 119 13-7 29-27 31-46 40 29 69 64 69 103a82 82 0 0 1-164 0c0-49 42-74 37-111 19 9 24 20 24 31 3-37 41-58 38-96Z" fill="#75d5ee" fill-opacity=".4" stroke="#75d5ee" stroke-width="3"/><path d="M47 190c24-17 45 20 73 0s49-16 72-4M47 211c26-16 47 21 75 1s48-16 70-5" stroke="#d5f7ec" stroke-width="3" stroke-linecap="round"/><path d="m120 163 5 18 17 5-17 5-5 18-5-18-17-5 17-5 5-18Z" fill="#f9f6d4"/></svg>
           <div class="hero-copy">
             <p class="eyebrow">Your next learning step</p>
             <h1 id="welcomeTitle">One clear mission.<br />Then you are done.</h1>
@@ -169,7 +173,7 @@
 
         <section class="section-block library-section" id="library" aria-labelledby="libraryTitle">
           <div class="section-heading library-heading">
-            <div><p class="eyebrow">PRACTICE LIBRARY</p><h2 id="libraryTitle">Choose your next practice</h2></div>
+            <div><p class="eyebrow">PRACTICE LIBRARY</p><h2 id="libraryTitle" tabindex="-1">Choose your next practice</h2></div>
             <p class="review-warning"><span aria-hidden="true">!</span> Original samples await teacher review. Check the status on each set.</p>
           </div>
 
@@ -232,6 +236,7 @@
     <script src="./data/catalog.js" defer></script>
     <script src="./data/pilot-worksheets.js" defer></script>
     <script src="./adaptive-engine.js" defer></script>
+    <script src="./science-text.js" defer></script>
     <script src="./learning-path.js" defer></script>
     <script src="./activity-view.js" defer></script>
     <script src="./learning-review.js" defer></script>

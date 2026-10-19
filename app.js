@@ -160,6 +160,11 @@ function setText(selector, text) {
   if (el) el.textContent = text;
 }
 
+function writeScience(element, text) {
+  if (window.IgniteScienceText) window.IgniteScienceText.render(element, text, { chemistry: state.activePractice?.content.subject === 'Chemistry' });
+  else if (element) element.textContent = text;
+}
+
 function showDialog(dialog) {
   if (!dialog || dialog.open) return;
   if (typeof dialog.showModal === 'function') dialog.showModal();
@@ -218,6 +223,8 @@ function renderSubjects() {
       const button = document.createElement('button');
       button.type = 'button';
       button.className = 'subject-card';
+      button.dataset.subject = subject;
+      button.setAttribute('aria-pressed', String(state.subject === subject));
       button.style.setProperty('--subject-color', color);
       const iconEl = Object.assign(document.createElement('span'), { className: 'subject-icon' });
       iconEl.innerHTML = `<svg viewBox="0 0 24 24" focusable="false">${icon}</svg>`;
@@ -226,16 +233,20 @@ function renderSubjects() {
       const available = state.items.filter((item) => item.subject === subject && isOpenToStudents(item)).length;
       const countEl = Object.assign(document.createElement('small'), { textContent: `${available} practice set${available === 1 ? '' : 's'}` });
       button.append(iconEl, nameEl, countEl);
-      button.addEventListener('click', () => {
-        leaveFocusMode();
-        state.subject = subject;
-        state.page = 1;
-        $('#subjectFilter').value = subject;
-        renderWorksheets();
-        $('#library').scrollIntoView();
-      });
+      button.addEventListener('click', () => selectSubject(subject));
       grid.append(button);
     });
+}
+
+function selectSubject(subject) {
+  leaveFocusMode();
+  state.subject = subject; state.page = 1;
+  // A previous query/class/type must not silently hide the newly selected subject.
+  state.query = ''; state.grade = 'all'; state.kind = 'all';
+  $('#searchInput').value = ''; $('#gradeFilter').value = 'all'; $('#kindFilter').value = 'all';
+  $('#subjectFilter').value = subject;
+  renderWorksheets(); renderSubjects();
+  $('#library').scrollIntoView({ block: 'start' }); $('#libraryTitle').focus();
 }
 
 /* ---------- worksheets ---------- */
@@ -410,6 +421,7 @@ function openAnswerReview(question, selectedIndex) {
   $('#worksheetQuestions').hidden = true; $('#worksheetNavigation').hidden = true;
   $('#conceptRescue').hidden = true; $('#followUpTest').hidden = true; $('#practiceSummary').hidden = true;
   state.activeReview = window.IgniteLearningReview.mount($('#answerReview'), route, {
+    subject: attempt.content.subject,
     isActive: () => state.activePractice === attempt,
     notice: attempt.content.notice,
     onReturn: returnToWorksheet,
@@ -424,7 +436,8 @@ function renderPracticeQuestions() {
   for (const question of attempt.questions) {
     const entry = document.createElement('li');
     entry.value = question.no;
-    entry.append(Object.assign(document.createElement('p'), { className: 'q-text', textContent: question.text }));
+    const prompt = Object.assign(document.createElement('p'), { className: 'q-text' });
+    writeScience(prompt, question.text); entry.append(prompt);
     entry.append(buildOptions(question, attempt));
     list.append(entry);
   }
@@ -555,8 +568,10 @@ function renderFollowUpQuestion() {
     for (const question of plan.questions) {
       if (active.record.latest.answers[question.id] === question.answerIndex) continue;
       const entry = document.createElement('li');
-      entry.append(Object.assign(document.createElement('strong'), { textContent: question.prompt }),
-        Object.assign(document.createElement('p'), { textContent: `Answer: ${question.options[question.answerIndex]}. ${question.explanation}` }));
+      const prompt = document.createElement('strong'), explanation = document.createElement('p');
+      writeScience(prompt, question.prompt);
+      writeScience(explanation, `Answer: ${question.options[question.answerIndex]}. ${question.explanation}`);
+      entry.append(prompt, explanation);
       review.append(entry);
     }
     $('#followUpProgress').value = plan.questions.length;
@@ -573,7 +588,7 @@ function renderFollowUpQuestion() {
   active.record = window.IgniteAssessmentSession.markSeen(active.record, active.record.latest.id, question.id);
   persistFollowUp(active);
   setText('#followUpStep', `Question ${questionIndex + 1} of ${plan.questions.length}`);
-  setText('#followUpPrompt', question.prompt);
+  writeScience($('#followUpPrompt'), question.prompt);
   $('#followUpProgress').max = plan.questions.length;
   $('#followUpProgress').value = result.answered;
   $('#nextFollowUpQuestion').disabled = true;
@@ -581,6 +596,7 @@ function renderFollowUpQuestion() {
   const options = $('#followUpOptions');
   options.replaceChildren();
   window.IgniteActivityView.mount(options, question, {
+    subject: state.activePractice.content.subject,
     letters: true, deferFeedback: true,
     isActive: () => state.activeFollowUp === active && active.index === questionIndex,
     onAnswer(_result, index) {
@@ -664,7 +680,7 @@ function renderConceptRescueStep() {
   setText('#rescueGoal', rescue.mission.goal);
   setText('#rescueReviewNotice', rescue.question.adaptive.reviewStatus === 'approved'
     ? 'Reviewed learning activity.' : 'Sample recovery activity. Teacher review is still pending.');
-  setText('#rescuePrompt', step.prompt);
+  writeScience($('#rescuePrompt'), step.prompt);
   setText('#rescueHint', rescue.mission.hint);
   $('#rescueHint').hidden = true;
   $('#rescueFeedback').hidden = true;
@@ -685,12 +701,13 @@ function renderConceptRescueStep() {
     const correction = step.type === 'ordered_steps'
       ? step.steps.map((value, index) => `${index + 1}. ${value}`).join(' → ')
       : `The best answer is ${'ABCD'[step.answerIndex]}.`;
-    setText('#rescueFeedback', `${result.correct ? 'Challenge complete.' : correction} ${step.explanation}`);
+    writeScience($('#rescueFeedback'), `${result.correct ? 'Challenge complete.' : correction} ${step.explanation}`);
     $('#rescueFeedback').classList.toggle('is-correct', result.correct);
     $('#rescueFeedback').hidden = false;
     $('#nextRescueStep').disabled = false;
   };
   window.IgniteActivityView.mount(options, step, {
+    subject: state.activePractice.content.subject,
     letters: true,
     isActive: () => state.activeRescue === rescue && !rescue.completed && rescue.step === stepIndex,
     onAnswer: (_result, response) => showResult(response),
@@ -768,9 +785,9 @@ function buildOptions(question, attempt) {
       if (otherIndex === question.answerIndex) other.classList.add('is-correct');
       else if (otherIndex === index) other.classList.add('is-wrong');
     });
-    feedback.textContent = correct
+    writeScience(feedback, correct
       ? `Correct. ${question.explanation}`
-      : `Not quite. The answer is ${letters[question.answerIndex]}. ${question.explanation}`;
+      : `Not quite. The answer is ${letters[question.answerIndex]}. ${question.explanation}`);
     feedbackBox.classList.toggle('is-correct', correct);
     offeredRoute = !correct && attempt.mode === 'full'
       ? window.IgniteLearningPath?.recoveryFor(question, index, attempt.content.visibility) : null;
@@ -788,6 +805,7 @@ function buildOptions(question, attempt) {
       className: 'q-option',
       textContent: `${letters[index]}. ${option}`,
     });
+    writeScience(button, `${letters[index]}. ${option}`);
     button.setAttribute('aria-pressed', 'false');
     button.addEventListener('click', () => {
       if (state.activePractice !== attempt || answers !== (attempt.mode === 'retry' ? attempt.retryAnswers : attempt.answers)

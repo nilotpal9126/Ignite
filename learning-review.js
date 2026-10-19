@@ -4,7 +4,11 @@
 (function exposeLearningReview() {
   function mount(root, route, settings = {}) {
     let cancelled = false, view = 0;
-    const make = (tag, className, text) => Object.assign(document.createElement(tag), { className, textContent: text || '' });
+    const make = (tag, className, text) => {
+      const element = Object.assign(document.createElement(tag), { className, textContent: text || '' });
+      window.IgniteScienceText?.render(element, text || '', { chemistry: settings.subject === 'Chemistry' });
+      return element;
+    };
     const active = () => !cancelled && settings.isActive?.() !== false;
     const action = (text, name, handler) => {
       const button = make('button', 'learning-button', text);
@@ -28,6 +32,7 @@
       field.append(make('legend', '', route.activity.prompt));
       const options = make('div', 'rescue-options'); field.append(options); root.append(field);
       window.IgniteActivityView.mount(options, route.activity, {
+        subject: settings.subject,
         isActive: () => active() && root.hidden !== true,
         onAnswer(result) {
           const feedback = make('p', 'learning-feedback', `${result.correct ? 'Recalled correctly.' : `Answer: ${route.activity.options[route.activity.answerIndex]}.`} ${route.activity.explanation}`);

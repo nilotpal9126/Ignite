@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="./landing.css" />
     <link rel="stylesheet" href="./demo-recovery.css" />
     <link rel="stylesheet" href="./learning-ui.css" />
+    <link rel="preload" href="./assets/fonts/satoshi-variable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="preload" href="./assets/fonts/cabinet-grotesk-variable.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="stylesheet" href="./notice-board.css" />
   </head>
   <body data-admissions="preview">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -32,6 +35,7 @@
 
     <main id="main-content">
       <section class="landing-hero" id="top" aria-labelledby="landingTitle">
+        <svg class="ignite-watermark" viewBox="0 0 240 300" fill="none" aria-hidden="true" focusable="false"><path d="M137 19c8 57-51 67-35 119 13-7 29-27 31-46 40 29 69 64 69 103a82 82 0 0 1-164 0c0-49 42-74 37-111 19 9 24 20 24 31 3-37 41-58 38-96Z" fill="#75d5ee" fill-opacity=".4" stroke="#75d5ee" stroke-width="3"/><path d="M47 190c24-17 45 20 73 0s49-16 72-4M47 211c26-16 47 21 75 1s48-16 70-5" stroke="#d5f7ec" stroke-width="3" stroke-linecap="round"/><path d="m120 163 5 18 17 5-17 5-5 18-5-18-17-5 17-5 5-18Z" fill="#f9f6d4"/></svg>
         <div class="hero-copy">
           <p class="eyebrow">SMALL STEPS · STRONGER FOUNDATIONS</p>
           <h1 id="landingTitle">A little practice.<br />A clearer next step.</h1>
@@ -48,7 +52,8 @@
         </div>
 
         <div class="hero-preview" aria-label="Preview of the free sample practice experience">
-          <div class="preview-top"><span>TRY IT TOGETHER</span><strong>6 questions</strong></div>
+          <svg class="paper-watermark" viewBox="0 0 240 300" fill="none" aria-hidden="true" focusable="false"><path d="M137 19c8 57-51 67-35 119 13-7 29-27 31-46 40 29 69 64 69 103a82 82 0 0 1-164 0c0-49 42-74 37-111 19 9 24 20 24 31 3-37 41-58 38-96Z" fill="#75d5ee" fill-opacity=".4" stroke="#75d5ee" stroke-width="3"/><path d="M47 190c24-17 45 20 73 0s49-16 72-4M47 211c26-16 47 21 75 1s48-16 70-5" stroke="#428ba4" stroke-width="3" stroke-linecap="round"/><path d="m120 163 5 18 17 5-17 5-5 18-5-18-17-5 17-5 5-18Z" fill="#fff4c4"/></svg>
+          <div class="preview-top"><span>TRY IT TOGETHER</span><strong class="cutout-badge" aria-label="6 questions"><span class="cutout-number" aria-hidden="true">6</span><span class="cutout-word" aria-hidden="true"><i>Q</i><i>U</i><i>E</i><i>S</i><i>T</i><i>I</i><i>O</i><i>N</i><i>S</i></span></strong></div>
           <h2>Science, one step at a time.</h2>
           <p>Classes 10 and 11 · sample practice</p>
           <ol>
@@ -83,7 +88,7 @@
       <section class="landing-section demo-section" id="free-demo" aria-labelledby="demoTitle">
         <div class="section-heading">
           <p class="eyebrow">FOR STUDENTS · FOR PARENTS</p>
-          <h2 id="demoTitle">Try the experience. No sign-up.</h2>
+          <h2 id="demoTitle">A focused space to practise.</h2>
           <p>Six questions, instant explanations, and a clear finish. Take your time—there is no timer or leaderboard.</p>
         </div>
         <div class="demo-panel">
@@ -126,10 +131,10 @@
           <p class="coverage-boundary">Our longer-term aim is all core subjects through Class 10 and Mathematics and Science for Classes 11–12. That is a roadmap, not current course availability.</p>
         </div>
         <div class="coverage-grid">
-          <article><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3M7.5 16h9"/></svg></span><strong>Physics &amp; Chemistry</strong><small>Available as unreviewed samples · Classes 10 &amp; 11</small></article>
-          <article><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21V11M12 16C3 16 3 7 3 7s9 0 9 9ZM12 12c0-8 9-9 9-9s0 9-9 9Z"/></svg></span><strong>Biology</strong><small>Available as unreviewed samples · Classes 10 &amp; 11</small></article>
-          <article><span aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h2m4 0h2M8 15h2m4 0h2M8 18h2m4 0h2"/></svg></span><strong>Mathematics</strong><small>Planned · no public practice set yet</small></article>
-          <article><span aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 4h6a3 3 0 0 1 3 3v14a3 3 0 0 0-3-3H4ZM13 7a3 3 0 0 1 3-3h5v14h-5a3 3 0 0 0-3 3Z"/></svg></span><strong>Other subjects &amp; classes</strong><small>Roadmap only · not available for enrolment</small></article>
+          <button class="coverage-subject" id="choosePhysics" data-subject="Physics" type="button" aria-pressed="false"><span class="subject-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><ellipse cx="12" cy="12" rx="9" ry="3.8"/><ellipse cx="12" cy="12" rx="9" ry="3.8" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.8" transform="rotate(120 12 12)"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg></span><strong>Physics</strong><small>Classes 10 &amp; 11 - sample practice</small><span class="subject-action">Open sample &#8594;</span></button>
+          <button class="coverage-subject" id="chooseChemistry" data-subject="Chemistry" type="button" aria-pressed="false"><span class="subject-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3M7.5 16h9"/><circle cx="10" cy="18" r=".6"/><circle cx="14" cy="18.5" r=".6"/></svg></span><strong>Chemistry</strong><small>Classes 10 &amp; 11 - sample practice</small><span class="subject-action">Open sample &#8594;</span></button>
+          <button class="coverage-subject" id="chooseBiology" data-subject="Biology" type="button" aria-pressed="false"><span class="subject-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M20 4c-7 0-12 3.5-12 9a5 5 0 0 0 5 5c5.5 0 7-7 7-14Z"/><path d="M4 20c2.5-5 6.5-8 12-10"/></svg></span><strong>Biology</strong><small>Classes 10 &amp; 11 - sample practice</small><span class="subject-action">Open sample &#8594;</span></button>
+          <article class="coverage-planned"><span class="planned-label">Coming later</span><strong>Mathematics &amp; other subjects</strong><small>No practice set available yet. These are not active links.</small></article>
         </div>
       </section>
 
@@ -293,6 +298,7 @@
     <script src="./admission.js" defer></script>
     <script src="./data/pilot-worksheets.js" defer></script>
     <script src="./practice.js" defer></script>
+    <script src="./science-text.js" defer></script>
     <script src="./adaptive-engine.js" defer></script>
     <script src="./learning-path.js" defer></script>
     <script src="./activity-view.js" defer></script>
