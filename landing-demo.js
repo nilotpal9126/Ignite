@@ -12,6 +12,16 @@
     let active = null;
     let step = 0;
     let answers = Object.create(null);
+    let generation = 0;
+    const recoveryRoot = get('demoRecoveryHub');
+    const recovery = recoveryRoot && window.IgniteDemoRecovery?.create(recoveryRoot, {
+      onStageChange(stage) {
+        // The answer key must not remain visible below a recall/check activity.
+        const practising = ['recall', 'recovery', 'assessment'].includes(stage);
+        get('demoMistakes').hidden = practising;
+        get('demoRecommendation').hidden = practising;
+      },
+    });
 
     function selected() {
       return items.find((item) => item.classLevel === Number(get('demoClass').value)
@@ -19,6 +29,9 @@
     }
 
     function resetSelection() {
+      generation += 1;
+      recovery?.reset();
+      get('demoPreviewNotice').hidden = true;
       active = null;
       step = 0;
       answers = Object.create(null);
@@ -35,6 +48,7 @@
 
     function showQuestion() {
       const question = active.questions[step];
+      const sessionContent = active, questionStep = step, token = generation;
       get('demoStep').textContent = `Question ${step + 1} of ${active.questions.length}`;
       get('demoQuestionText').textContent = question.text;
       get('demoFeedback').textContent = '';
@@ -47,7 +61,7 @@
         button.textContent = option;
         button.setAttribute('aria-pressed', 'false');
         button.addEventListener('click', () => {
-          if (Object.hasOwn(answers, question.id)) return;
+          if (generation !== token || active !== sessionContent || step !== questionStep || Object.hasOwn(answers, question.id)) return;
           answers[question.id] = index;
           buttons.forEach((choice, choiceIndex) => {
             choice.disabled = true;
@@ -68,6 +82,9 @@
     }
 
     function start() {
+      generation += 1;
+      recovery?.reset();
+      get('demoPreviewNotice').hidden = true;
       const item = selected();
       if (!item) { resetSelection(); return; }
       active = item;
@@ -92,8 +109,10 @@
       get('demoResult').hidden = false;
       get('demoStatus').textContent = 'Sample finished. You can stop here or choose another set.';
       get('demoScore').textContent = `${tally.correct}/${tally.total} correct (${Math.round(tally.correct / tally.total * 100)}%) against the sample answer key.`;
+      const route = window.IgniteLearningPath?.analyse(active, answers);
       get('demoRecommendation').textContent = tally.mistakes.length
-        ? `Next step: revisit the explanations for these ${tally.mistakes.length} questions before trying again.`
+        ? route?.targeted.length ? 'Next step: choose a short recovery challenge below. Other answers have a review-and-recall option.'
+          : `Next step: review and recall these ${tally.mistakes.length} answers below. Targeted games and fresh checks are not available for these concepts yet.`
         : 'You answered every question correctly against this sample key. You can stop here or explore another subject; this does not establish mastery.';
       const review = active.questions.filter((question) => tally.mistakes.includes(question.id)).map((question) => {
         const li = document.createElement('li');
@@ -105,6 +124,7 @@
         return li;
       });
       get('demoMistakes').replaceChildren(...review);
+      recovery?.show(active, answers);
       get('demoResultTitle').focus();
     }
 
@@ -112,6 +132,11 @@
     get('demoSubject').addEventListener('change', resetSelection);
     get('demoStart').addEventListener('click', start);
     get('demoRestart').addEventListener('click', start);
+    get('demoFinish').addEventListener('click', () => {
+      resetSelection();
+      get('demoStatus').textContent = 'Session finished. Your anonymous answers have been cleared. You can return when you want to practise again.';
+      get('demoStart').focus();
+    });
     get('demoNext').addEventListener('click', () => {
       if (!active || step >= active.questions.length || !Object.hasOwn(answers, active.questions[step].id)) return;
       step += 1;
@@ -119,6 +144,21 @@
       else showQuestion();
     });
     resetSelection();
+    if (window.location?.search && new URLSearchParams(window.location.search).get('preview') === 'recovery') {
+      const example = items.find((item) => item.classLevel === 10 && item.subject === 'Biology');
+      if (example) {
+        get('demoClass').value = '10'; get('demoSubject').value = 'Biology';
+        active = example; step = example.questions.length;
+        const illustrativeMistakes = { 'IG-B10-S1-Q01': 0, 'IG-B10-S1-Q02': 0, 'IG-B10-S1-Q03': 3, 'IG-B10-S1-Q06': 0 };
+        answers = Object.fromEntries(example.questions.map((question) => [question.id,
+          Object.hasOwn(illustrativeMistakes, question.id) ? illustrativeMistakes[question.id] : question.answerIndex]));
+        get('demoNotice').textContent = example.notice;
+        finish();
+        get('demoPreviewNotice').hidden = false;
+        get('demoStatus').textContent = 'Example attempt loaded. Start the recovery mission below, or restart to answer the worksheet yourself.';
+        recoveryRoot?.scrollIntoView?.({ block: 'start' });
+      }
+    }
   }
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', initDemo);

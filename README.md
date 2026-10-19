@@ -1,24 +1,28 @@
 # Project Ignite
 
-A static, no-build prototype of the Project Ignite learning platform: a public landing page with a
-one-student pilot admission, a focused 3-step study mission dashboard, and a local owner portal.
+A static, buildless sample preview of the Project Ignite learning platform: anonymous practice,
+mistake recovery, same-question recall, and a device-local dashboard for existing prototype accounts.
 
-> **Prototype.** There is no server. Everything a visitor enters (admission details, progress, the
-> owner account) is stored only in *that visitor's own browser* (`localStorage` / `sessionStorage`).
-> Nothing is uploaded, and nothing a visitor does is visible to anyone else.
+> **Sample preview, not an approved learning product.** New admissions are paused. Anonymous
+> answers stay in page memory; dashboard attempts stay in that browser. No production account,
+> payment or cloud learning-history service is enabled by this release. Do not enter real child data.
 
 ## Pages
 
 | Page | Purpose |
 |---|---|
-| `index.html` | Landing page, student admission, login |
-| `dashboard.html` | Student dashboard: mission, subjects, worksheet browser |
+| `index.html` | Anonymous sample practice and existing prototype login; new admissions paused |
+| `dashboard.html` | Real practice sets, one-question workspace, recovery and device-local progress |
 | `admin.html` | Owner portal (device-local prototype) |
 
 ## About the data
 
 `data/catalog.js` (and `catalog.json`) contain **anonymised sample data** (36 generated entries), not
 the real worksheet library. Every entry is marked `inventory_only` / `studentVisible: false`.
+Those inventory entries are excluded from the student practice library. Six original practice sets
+(36 questions) ship separately as labelled teacher-review-pending samples. Only one worksheet
+question has targeted recovery mappings. Other mistakes offer recall of the same question, not
+a fabricated diagnosis or a newly generated assessment. Pending follow-up banks are excluded.
 
 ## Important limits
 

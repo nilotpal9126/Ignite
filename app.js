@@ -1,6 +1,5 @@
 'use strict';
 
-const PROGRESS_KEY = 'ignite-demo-progress';
 const FOCUS_KEY = 'ignite-focus-mode';
 const STUDENT_KEY = 'ignite-pilot-student-v1';
 const SESSION_KEY = 'ignite-pilot-session-v1';
@@ -11,11 +10,6 @@ const storage = {
   set(key, value) { try { window.localStorage.setItem(key, value); return true; } catch { return false; } },
   getSession(key) { try { return window.sessionStorage.getItem(key); } catch { return null; } },
   removeSession(key) { try { window.sessionStorage.removeItem(key); } catch { /* redirect still completes */ } },
-};
-
-const clampNumber = (value, min, max) => {
-  const n = Number(value);
-  return Number.isFinite(n) ? Math.min(max, Math.max(min, n)) : min;
 };
 
 function loadAdmittedStudent() {
@@ -30,6 +24,7 @@ function loadAdmittedStudent() {
 }
 
 function applyStudentProfile(student) {
+  state.studentClass = Number(student.studentClass);
   const name = String(student.studentName).trim();
   const firstName = name.split(/\s+/)[0] || 'Student';
   const initials = name.split(/\s+/).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'ST';
@@ -45,21 +40,6 @@ function logOut() {
   window.location.assign('./index.html#login');
 }
 
-function loadProgress() {
-  const fallback = { completed: 0, minutes: 0, mastery: 0 };
-  try {
-    const raw = JSON.parse(storage.get(PROGRESS_KEY) || 'null');
-    if (!raw || typeof raw !== 'object') return fallback;
-    return {
-      completed: Math.round(clampNumber(raw.completed, 0, 100000)),
-      minutes: Math.round(clampNumber(raw.minutes, 0, 1000000)),
-      mastery: Math.round(clampNumber(raw.mastery, 0, 100)),
-    };
-  } catch {
-    return fallback;
-  }
-}
-
 const state = {
   catalog: null,
   items: [],
@@ -69,11 +49,20 @@ const state = {
   kind: 'all',
   page: 1,
   pageSize: 9,
-  missionStep: 1,
-  progress: loadProgress(),
+  studentClass: null,
   learnerId: '',
   activePractice: null,
+  activeRescue: null,
+  activeFollowUp: null,
+  followUpMemory: new Map(),
+  activeReview: null,
+  questionIndex: 0,
+  returnFocus: null,
 };
+
+function newAttemptId() {
+  return window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
 
 const subjectVisuals = {
   Mathematics: [`<rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h2m4 0h2M8 15h2m4 0h2M8 18h2m4 0h2"/>`, '#dff04f'],
@@ -184,17 +173,35 @@ function closeDialog(dialog) {
 
 /* ---------- progress ---------- */
 function renderProgress() {
-  setText('#completedCount', state.progress.completed);
-  setText('#focusMinutes', state.progress.minutes);
-  setText('#masteryScore', `${state.progress.mastery}%`);
-  const percent = Math.min(100, state.progress.completed * 25);
+  const item = recommendedPractice();
+  if (!item) {
+    setText('#recommendedTitle', 'Choose a practice set');
+    setText('#recommendedMeta', 'No playable set is available yet.');
+    $('#startMission').disabled = true;
+    return;
+  }
+  const content = item.content;
+  const answers = window.IgnitePractice.restore(content, storage.get(window.IgnitePractice.key(state.learnerId, content.id)));
+  const result = window.IgnitePractice.score(content.questions, answers);
+  setText('#recommendedTitle', content.title);
+  setText('#recommendedMeta', `Class ${content.classLevel} · ${content.subject} · ${content.questions.length} questions · ${content.visibility === 'student' ? 'Reviewed' : 'Sample, teacher review pending'}`);
+  setText('#startMission', result.complete ? 'Review my practice' : result.answered ? 'Continue practice' : 'Start practice');
+  $('#startMission').disabled = false;
+  const percent = Math.round(100 * result.answered / result.total);
   setText('#missionPercent', `${percent}%`);
   document.documentElement.style.setProperty('--mission-progress', `${percent}%`);
 }
 
-function saveProgress() {
-  storage.set(PROGRESS_KEY, JSON.stringify(state.progress));
-  renderProgress();
+function recommendedPractice() {
+  const items = (state.items.length ? state.items : standaloneItems()).filter(isOpenToStudents);
+  const suitable = items.filter((item) => !state.studentClass || item.content.classLevel === state.studentClass);
+  const choices = suitable.length ? suitable : items;
+  return choices.find((item) => {
+    const content = item.content;
+    const result = window.IgnitePractice.score(content.questions, window.IgnitePractice.restore(content,
+      storage.get(window.IgnitePractice.key(state.learnerId, content.id))));
+    return result.answered > 0 && !result.complete;
+  }) || choices[0] || null;
 }
 
 /* ---------- subjects ---------- */
@@ -217,7 +224,7 @@ function renderSubjects() {
       iconEl.setAttribute('aria-hidden', 'true');
       const nameEl = Object.assign(document.createElement('strong'), { textContent: subject });
       const available = state.items.filter((item) => item.subject === subject && isOpenToStudents(item)).length;
-      const countEl = Object.assign(document.createElement('small'), { textContent: `${available} practice sets · ${count - available} source candidates` });
+      const countEl = Object.assign(document.createElement('small'), { textContent: `${available} practice set${available === 1 ? '' : 's'}` });
       button.append(iconEl, nameEl, countEl);
       button.addEventListener('click', () => {
         leaveFocusMode();
@@ -286,8 +293,8 @@ function renderWorksheets() {
       button.setAttribute('aria-label', `${button.textContent}: ${item.title}`);
       button.addEventListener('click', () => openWorksheet(item));
     } else {
-      button.setAttribute('aria-label', `Preview journey for ${item.title}`);
-      button.addEventListener('click', () => openMission(item));
+      button.textContent = 'Not available for practice';
+      button.disabled = true;
     }
     grid.append(fragment);
   }
@@ -296,7 +303,7 @@ function renderWorksheets() {
     grid.append(emptyCard('No worksheets match yet.', 'Try a shorter search, or clear one or more filters.', true));
   }
   const openSets = filtered.filter(isOpenToStudents).length;
-  setText('#resultCount', `${filtered.length} inventory candidate${filtered.length === 1 ? '' : 's'} found · ${openSets} practice set${openSets === 1 ? '' : 's'} open`);
+  setText('#resultCount', `${openSets} practice set${openSets === 1 ? '' : 's'} available`);
   setText('#pageStatus', `Page ${state.page} of ${totalPages}`);
   $('#previousPage').disabled = state.page <= 1;
   $('#nextPage').disabled = state.page >= totalPages;
@@ -312,37 +319,38 @@ function clearFilters() {
 }
 
 /* ---------- mission ---------- */
-function resetMission() {
-  state.missionStep = 1;
-  setText('#missionDialogTitle', 'Linear equations');
-  setText('#missionInstruction', 'Step 1 of 3 · Take a breath and solve this warm-up mentally.');
-  setText('#missionQuestion', 'If 3x + 5 = 20, what is x?');
-  setText('#missionStepStatus', 'Step 1 of 3');
-  setText('#nextMissionStep', 'Continue');
-  $('#nextMissionStep').disabled = true;
-  setText('#answerFeedback', '');
-  $('#answerOptions').hidden = false;
-  $$('#answerOptions button').forEach((button) => button.classList.remove('selected', 'is-wrong'));
-}
-
-function openMission(item) {
-  resetMission();
-  if (item) {
-    setText('#missionDialogTitle', item.title);
-    setText('#missionInstruction', `${gradeLabel(item.grades)} · ${item.subject} · Staff-only journey preview`);
-  }
-  showDialog($('#missionDialog'));
+function openMission() {
+  const item = recommendedPractice();
+  if (item) openWorksheet(item);
 }
 
 function openWorksheet(item) {
+  if (state.activePractice) closeLearningWorkspace(false);
   const content = item.content;
   if (!window.IgnitePractice.playable(content)) return;
   const key = window.IgnitePractice.key(state.learnerId, content.id);
+  let previous = null;
+  try { previous = JSON.parse(storage.get(key) || 'null'); } catch { /* Start a fresh attempt. */ }
   state.activePractice = {
     item, key, content, mode: 'full',
+    attemptId: previous?.version === window.IgnitePractice.version(content) && typeof previous.attemptId === 'string' && previous.attemptId.trim()
+      ? previous.attemptId : newAttemptId(),
     answers: window.IgnitePractice.restore(content, storage.get(key)),
     retryAnswers: Object.create(null), questions: content.questions,
   };
+  if (previous?.version === window.IgnitePractice.version(content) && previous.attemptId !== state.activePractice.attemptId) {
+    storage.set(key, JSON.stringify({ version: window.IgnitePractice.version(content), attemptId: state.activePractice.attemptId, answers: state.activePractice.answers }));
+  }
+  state.activeRescue = null;
+  state.activeFollowUp = null;
+  state.questionIndex = Math.max(0, content.questions.findIndex((question) => !Object.hasOwn(state.activePractice.answers, question.id)));
+  state.returnFocus = document.activeElement;
+  state.activeReview?.cancel(); state.activeReview = null;
+  $('#answerReview').hidden = true;
+  $('#conceptRescue').hidden = true;
+  $('#followUpTest').hidden = true;
+  $('#worksheetQuestions').hidden = false;
+  $('#worksheetCount').hidden = false;
   const isDraft = content.visibility !== 'student';
   setText('#worksheetEyebrow', content.visibility === 'demo_sample' ? 'SAMPLE PRACTICE · UNREVIEWED' : isDraft ? 'DRAFT · STAFF PREVIEW' : 'WORKSHEET');
   setText('#worksheetDialogTitle', content.title || item.title);
@@ -352,7 +360,60 @@ function openWorksheet(item) {
   notice.hidden = !(isDraft && content.notice);
   setText('#practiceSaveStatus', 'Your answers are saved on this device so you can return later.');
   renderPracticeQuestions();
-  showDialog($('#worksheetDialog'));
+  $('#worksheetWorkspace').hidden = false;
+  document.body.classList.add('learning-open');
+  $('#worksheetDialogTitle').focus();
+  $('#worksheetWorkspace').scrollIntoView({ block: 'start' });
+}
+
+function closeLearningWorkspace(restoreFocus = true) {
+  state.activeReview?.cancel(); state.activeReview = null;
+  state.activePractice = null; state.activeRescue = null; state.activeFollowUp = null;
+  $('#worksheetWorkspace').hidden = true;
+  $('#answerReview').hidden = true; $('#conceptRescue').hidden = true; $('#followUpTest').hidden = true;
+  document.body.classList.remove('learning-open');
+  renderProgress(); renderPracticeProgress(); renderAdaptiveProgress();
+  if (state.catalog) renderWorksheets();
+  if (restoreFocus) (state.returnFocus?.isConnected !== false ? state.returnFocus || $('#startMission') : $('#startMission'))?.focus();
+}
+
+function renderQuestionNavigation() {
+  const attempt = state.activePractice;
+  if (!attempt) return;
+  state.questionIndex = Math.min(Math.max(0, state.questionIndex), attempt.questions.length - 1);
+  [...$('#worksheetQuestions').children].forEach((entry, index) => { entry.hidden = index !== state.questionIndex; });
+  const answers = attempt.mode === 'retry' ? attempt.retryAnswers : attempt.answers;
+  const complete = window.IgnitePractice.score(attempt.questions, answers).complete;
+  setText('#practiceQuestionStep', `Question ${state.questionIndex + 1} of ${attempt.questions.length}`);
+  $('#previousPracticeQuestion').disabled = state.questionIndex === 0;
+  $('#nextPracticeQuestion').disabled = !Object.hasOwn(answers, attempt.questions[state.questionIndex].id);
+  setText('#nextPracticeQuestion', state.questionIndex + 1 === attempt.questions.length ? 'Review my results' : 'Next question');
+  $('#worksheetNavigation').hidden = $('#worksheetQuestions').hidden;
+  $('#practiceResultsHint').hidden = !complete;
+}
+
+function returnToWorksheet() {
+  state.activeReview?.cancel(); state.activeReview = null;
+  state.activeRescue = null; state.activeFollowUp = null;
+  $('#answerReview').hidden = true; $('#conceptRescue').hidden = true; $('#followUpTest').hidden = true;
+  $('#worksheetQuestions').hidden = false; $('#worksheetCount').hidden = false;
+  updatePracticeSummary();
+  $('#worksheetQuestions').children[state.questionIndex]?.querySelector?.('button')?.focus();
+}
+
+function openAnswerReview(question, selectedIndex) {
+  const attempt = state.activePractice;
+  if (!attempt || !window.IgniteLearningPath || !window.IgniteLearningReview) return;
+  const route = window.IgniteLearningPath.recoveryFor(question, selectedIndex, attempt.content.visibility);
+  if (route.kind !== 'recall') return;
+  state.activeReview?.cancel();
+  $('#worksheetQuestions').hidden = true; $('#worksheetNavigation').hidden = true;
+  $('#conceptRescue').hidden = true; $('#followUpTest').hidden = true; $('#practiceSummary').hidden = true;
+  state.activeReview = window.IgniteLearningReview.mount($('#answerReview'), route, {
+    isActive: () => state.activePractice === attempt,
+    notice: attempt.content.notice,
+    onReturn: returnToWorksheet,
+  });
 }
 
 function renderPracticeQuestions() {
@@ -368,6 +429,7 @@ function renderPracticeQuestions() {
     list.append(entry);
   }
   updatePracticeSummary();
+  renderQuestionNavigation();
   list.scrollTop = 0;
 }
 
@@ -385,6 +447,162 @@ function updatePracticeSummary() {
       ? `${score} on this retry. Your original attempt score is preserved. You can finish here.`
       : `${score}. ${result.mistakes.length ? 'Review the explanations, then retry just the mistakes.' : 'Well done. You can finish here.'}`);
   }
+  renderFollowUpAvailability();
+  renderQuestionNavigation();
+}
+
+/* ---------- targeted follow-up tests ---------- */
+function prepareCurrentFollowUp() {
+  const attempt = state.activePractice;
+  if (!attempt || !window.IgniteAssessmentSession || !window.IgniteAssessment) return null;
+  if (!window.IgnitePractice.score(attempt.content.questions, attempt.answers).complete) return null;
+  const skills = new Set(attempt.content.questions.map((question) => question.adaptive?.skill?.id).filter(Boolean));
+  const banks = window.__IGNITE_ASSESSMENT_BANKS__?.banks || [];
+  const bank = banks.find((candidate) => !window.IgniteAssessment.bankIssue(candidate)
+    && candidate.items.some((item) => skills.has(item.skillId)));
+  if (!bank) return null;
+  const key = window.IgniteAssessmentSession.key(state.learnerId, bank.id);
+  const raw = state.followUpMemory.get(key) || storage.get(key);
+  const record = window.IgniteAssessmentSession.restoreRecord(raw, bank.id);
+  const prepared = window.IgniteAssessmentSession.prepareTest(attempt.content, attempt.answers, bank, record, {
+    attemptId: attempt.attemptId, maxQuestions: 3,
+    allowUnreviewedDemo: attempt.content.visibility === 'demo_sample'
+      && window.__IGNITE_ASSESSMENT_BANKS__?.includesSamples === true,
+  });
+  return { ...prepared, key, record, bank };
+}
+
+function renderFollowUpAvailability() {
+  const button = $('#startFollowUpTest');
+  const rescueButton = $('#startRescueFollowUp');
+  button.hidden = true;
+  rescueButton.hidden = true;
+  const attempt = state.activePractice;
+  if (!attempt || attempt.mode !== 'full') { setText('#followUpAvailability', ''); return; }
+  const result = window.IgnitePractice.score(attempt.content.questions, attempt.answers);
+  if (!result.complete) { setText('#followUpAvailability', ''); return; }
+  if (!result.mistakes.length) { setText('#followUpAvailability', 'No follow-up is needed for this attempt.'); return; }
+  if (!window.IgniteActivityView) { setText('#followUpAvailability', 'Interactive checks are unavailable. Your worksheet explanations are still available.'); return; }
+  const prepared = prepareCurrentFollowUp();
+  if (!prepared) { setText('#followUpAvailability', 'Follow-up questions are not available for this worksheet yet.'); return; }
+  const { plan, session } = prepared;
+  if (!['ready', 'partial'].includes(plan.status) || !plan.questions.length) {
+    setText('#followUpAvailability', plan.status === 'review_required'
+      ? 'These follow-up questions are awaiting teacher review.'
+      : plan.status === 'no_target' ? 'These mistakes need a teacher’s review before a targeted follow-up can be prepared.'
+        : 'You have seen all available questions for these mistakes. New questions are needed for another check.');
+    return;
+  }
+  const completed = session && window.IgniteAssessment.gradeFollowUpTest(plan, session.answers).status === 'complete';
+  const label = completed ? 'Review follow-up result' : session ? 'Resume follow-up'
+    : prepared.bank.reviewStatus === 'pending' ? 'Try sample follow-up' : 'Take a short follow-up';
+  setText('#startFollowUpTest', label);
+  setText('#startRescueFollowUp', label);
+  button.hidden = false;
+  rescueButton.hidden = !state.activeRescue?.completed;
+  const unresolved = plan.unresolved.length;
+  setText('#followUpAvailability', `${plan.questions.length}-question check focused on the mistakes we can map.${unresolved ? ` ${unresolved} other mistake${unresolved === 1 ? '' : 's'} still need review.` : ''}${prepared.bank.reviewStatus === 'pending' ? ' Sample questions await teacher review.' : ''}`);
+}
+
+function persistFollowUp(active) {
+  const raw = JSON.stringify(active.record);
+  state.followUpMemory.set(active.key, raw);
+  active.saved = storage.set(active.key, raw);
+  setText('#followUpSaveStatus', active.saved
+    ? 'Follow-up answers saved on this device.'
+    : 'This browser could not save the follow-up. Keep this page open to retain it.');
+}
+
+function openFollowUpTest() {
+  if (!window.IgniteActivityView) return;
+  const prepared = prepareCurrentFollowUp();
+  if (!prepared || state.activePractice?.mode !== 'full' || !['ready', 'partial'].includes(prepared.plan.status)) return;
+  const record = window.IgniteAssessmentSession.begin(prepared.record, prepared, newAttemptId());
+  if (!record.latest) return;
+  const firstUnanswered = prepared.plan.questions.findIndex((question) => !Object.hasOwn(record.latest.answers, question.id));
+  state.activeFollowUp = { ...prepared, record, index: firstUnanswered === -1 ? prepared.plan.questions.length : firstUnanswered };
+  $('#conceptRescue').hidden = true;
+  $('#practiceSummary').hidden = true;
+  $('#worksheetQuestions').hidden = true;
+  $('#worksheetNavigation').hidden = true;
+  $('#answerReview').hidden = true;
+  $('#worksheetCount').hidden = true;
+  $('#followUpTest').hidden = false;
+  $('#followUpTest').scrollIntoView({ block: 'nearest' });
+  setText('#followUpNotice', prepared.bank.reviewStatus === 'pending'
+    ? 'Sample follow-up questions. Teacher review is pending, so answers may contain errors.'
+    : 'Reviewed follow-up questions. Your original worksheet score stays unchanged.');
+  renderFollowUpQuestion();
+}
+
+function renderFollowUpQuestion() {
+  const active = state.activeFollowUp;
+  if (!active) return;
+  const { plan } = active;
+  const result = window.IgniteAssessment.gradeFollowUpTest(plan, active.record.latest.answers);
+  $('#followUpSummary').hidden = true;
+  $('#followUpQuestion').hidden = false;
+  $('#nextFollowUpQuestion').hidden = false;
+  $('#followUpFeedback').hidden = true;
+  setText('#followUpCoverage', `${plan.unresolved.length ? `${plan.unresolved.length} original worksheet mistake${plan.unresolved.length === 1 ? '' : 's'} still need separate review. ` : ''}${plan.coverageGaps.length ? 'Some identified learning gaps are not covered by this test. ' : ''}${plan.questions.length < plan.requestedCount ? `Only ${plan.questions.length} suitable unseen questions were available. ` : ''}This check covers only the selected concepts.`);
+  if (result.status === 'complete') {
+    persistFollowUp(active);
+    setText('#followUpStep', 'Complete');
+    setText('#followUpResultTitle', result.correct === result.total ? 'Follow-up check passed' : 'More practice would help');
+    setText('#followUpResultText', `${result.correct}/${result.total} correct against the answer key. ${result.correct === result.total ? 'You applied these ideas correctly in this check. Revisit them in a later session.' : 'Review the explanations below and revisit the concepts you missed.'}`);
+    const review = $('#followUpReview');
+    review.replaceChildren();
+    for (const question of plan.questions) {
+      if (active.record.latest.answers[question.id] === question.answerIndex) continue;
+      const entry = document.createElement('li');
+      entry.append(Object.assign(document.createElement('strong'), { textContent: question.prompt }),
+        Object.assign(document.createElement('p'), { textContent: `Answer: ${question.options[question.answerIndex]}. ${question.explanation}` }));
+      review.append(entry);
+    }
+    $('#followUpProgress').value = plan.questions.length;
+    $('#followUpProgress').max = plan.questions.length;
+    $('#followUpQuestion').hidden = true;
+    $('#nextFollowUpQuestion').hidden = true;
+    $('#followUpSummary').hidden = false;
+    $('#followUpResultTitle').focus();
+    return;
+  }
+  const question = plan.questions[active.index];
+  if (!question) return;
+  const questionIndex = active.index;
+  active.record = window.IgniteAssessmentSession.markSeen(active.record, active.record.latest.id, question.id);
+  persistFollowUp(active);
+  setText('#followUpStep', `Question ${questionIndex + 1} of ${plan.questions.length}`);
+  setText('#followUpPrompt', question.prompt);
+  $('#followUpProgress').max = plan.questions.length;
+  $('#followUpProgress').value = result.answered;
+  $('#nextFollowUpQuestion').disabled = true;
+  setText('#nextFollowUpQuestion', questionIndex + 1 === plan.questions.length ? 'See my result' : 'Next question');
+  const options = $('#followUpOptions');
+  options.replaceChildren();
+  window.IgniteActivityView.mount(options, question, {
+    letters: true, deferFeedback: true,
+    isActive: () => state.activeFollowUp === active && active.index === questionIndex,
+    onAnswer(_result, index) {
+      active.record = window.IgniteAssessmentSession.recordAnswer(active.record, active.record.latest.id, plan, question.id, index);
+      setText('#followUpFeedback', 'Answer recorded. Feedback will appear after the whole check.');
+      $('#followUpFeedback').hidden = false;
+      $('#followUpProgress').value = window.IgniteAssessment.gradeFollowUpTest(plan, active.record.latest.answers).answered;
+      $('#nextFollowUpQuestion').disabled = false;
+      persistFollowUp(active);
+    },
+  });
+  $('#followUpPrompt').focus();
+}
+
+function returnFromFollowUp() {
+  state.activeFollowUp = null;
+  $('#followUpTest').hidden = true;
+  $('#worksheetQuestions').hidden = false;
+  $('#worksheetCount').hidden = false;
+  updatePracticeSummary();
+  const target = $('#startFollowUpTest');
+  if (!target.hidden) target.focus();
 }
 
 function renderPracticeProgress() {
@@ -402,15 +620,144 @@ function renderPracticeProgress() {
   setText('#practiceAccuracy', total ? `${Math.round(100 * correct / total)}%` : '—');
 }
 
+function loadAdaptiveProgress() {
+  if (!window.IgniteAdaptive) return null;
+  return window.IgniteAdaptive.restoreProgress(storage.get(window.IgniteAdaptive.progressKey(state.learnerId)));
+}
+
+function renderAdaptiveProgress() {
+  if (!window.IgniteAdaptive) { setText('#recoveryCount', 0); return; }
+  setText('#recoveryCount', window.IgniteAdaptive.summary(loadAdaptiveProgress()).rescuesCompleted);
+}
+
+function saveRescueOutcome(rescue) {
+  const current = loadAdaptiveProgress();
+  const progress = window.IgniteAdaptive.updateProgress(current, rescue.diagnosis, {
+    completed: true,
+    sessionId: rescue.sessionId,
+    retryCorrect: rescue.answers[1] === true,
+    hintUsed: rescue.hintUsed,
+    occurredAt: new Date().toISOString(),
+  });
+  const saved = storage.set(window.IgniteAdaptive.progressKey(state.learnerId), JSON.stringify(progress));
+  renderAdaptiveProgress();
+  return saved;
+}
+
+function renderConceptRescueStep() {
+  const rescue = state.activeRescue;
+  if (!rescue) return;
+  const step = rescue.step === 0 ? rescue.mission.challenge : rescue.mission.retry;
+  const panel = $('#conceptRescue');
+  panel.hidden = false;
+  $('#worksheetQuestions').hidden = true;
+  $('#worksheetNavigation').hidden = true;
+  $('#practiceSummary').hidden = true;
+  $('#answerReview').hidden = true;
+  $('#rescueChallenge').hidden = false;
+  $('#showRescueHint').hidden = false;
+  $('#nextRescueStep').hidden = false;
+  $('#nextRescueStep').disabled = true;
+  setText('#rescueTitle', rescue.mission.title);
+  setText('#rescueStep', `${rescue.step + 1} of 2`);
+  setText('#rescueDiagnosis', rescue.step === 0 ? `Learning clue: ${rescue.diagnosis.feedback}` : 'Now use the same idea in a fresh situation.');
+  setText('#rescueGoal', rescue.mission.goal);
+  setText('#rescueReviewNotice', rescue.question.adaptive.reviewStatus === 'approved'
+    ? 'Reviewed learning activity.' : 'Sample recovery activity. Teacher review is still pending.');
+  setText('#rescuePrompt', step.prompt);
+  setText('#rescueHint', rescue.mission.hint);
+  $('#rescueHint').hidden = true;
+  $('#rescueFeedback').hidden = true;
+  $('#startRescueFollowUp').hidden = true;
+  $('#rescueFeedback').classList.remove('is-correct');
+  $('#rescueTrackFill').style.setProperty('width', rescue.step === 0 ? '50%' : '100%');
+  setText('#nextRescueStep', rescue.step === 0 ? 'Try a related question' : 'Finish rescue');
+
+  const options = $('#rescueOptions');
+  options.replaceChildren();
+  const stepIndex = rescue.step;
+  const showResult = (response) => {
+    if (state.activeRescue !== rescue || rescue.completed || rescue.step !== stepIndex
+      || rescue.answers[stepIndex] !== undefined) return;
+    const result = window.IgniteAdaptive.gradeActivity(step, response);
+    if (!result.valid) return;
+    rescue.answers[stepIndex] = result.correct;
+    const correction = step.type === 'ordered_steps'
+      ? step.steps.map((value, index) => `${index + 1}. ${value}`).join(' → ')
+      : `The best answer is ${'ABCD'[step.answerIndex]}.`;
+    setText('#rescueFeedback', `${result.correct ? 'Challenge complete.' : correction} ${step.explanation}`);
+    $('#rescueFeedback').classList.toggle('is-correct', result.correct);
+    $('#rescueFeedback').hidden = false;
+    $('#nextRescueStep').disabled = false;
+  };
+  window.IgniteActivityView.mount(options, step, {
+    letters: true,
+    isActive: () => state.activeRescue === rescue && !rescue.completed && rescue.step === stepIndex,
+    onAnswer: (_result, response) => showResult(response),
+  });
+  panel.scrollIntoView({ block: 'nearest' });
+  $('#rescueTitle').focus();
+}
+
+function openConceptRescue(question, diagnosis) {
+  const route = window.IgniteLearningPath?.recoveryFor(question, state.activePractice?.answers[question.id], state.activePractice?.content.visibility);
+  const mission = route?.kind === 'targeted' ? route.mission : null;
+  if (!mission || !state.activePractice || !window.IgniteActivityView) return;
+  state.activeRescue = {
+    question, diagnosis, mission, step: 0, answers: [], hintUsed: false, completed: false,
+    sessionId: window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+  };
+  renderConceptRescueStep();
+}
+
+function finishConceptRescue() {
+  const rescue = state.activeRescue;
+  if (!rescue || rescue.completed || rescue.answers.length !== 2
+    || !rescue.answers.every((answer) => typeof answer === 'boolean')) return;
+  rescue.completed = true;
+  const recovered = rescue.answers[1] === true;
+  const saved = saveRescueOutcome(rescue);
+  setText('#rescueTitle', recovered ? 'Concept recovered for this session' : 'Concept marked for review');
+  setText('#rescueStep', 'Complete');
+  setText('#rescueDiagnosis', recovered
+    ? '★ Recovery star earned. You used the idea correctly in a new situation.'
+    : 'This concept still needs review. That is useful information—not a penalty.');
+  setText('#rescueGoal', saved ? 'Your latest retry result is saved on this device. Revisit the idea in a later session.' : 'This browser could not save the result.');
+  $('#rescueTrackFill').style.setProperty('width', '100%');
+  $('#rescueChallenge').hidden = true;
+  $('#showRescueHint').hidden = true;
+  $('#rescueHint').hidden = true;
+  $('#rescueFeedback').hidden = true;
+  $('#nextRescueStep').hidden = true;
+  setText('#dismissRescue', 'Return to worksheet');
+  renderFollowUpAvailability();
+  $('#rescueTitle').focus();
+}
+
 /* Each question locks on its first choice; reopening restores that choice. */
 function buildOptions(question, attempt) {
   const wrap = document.createElement('div');
   wrap.className = 'q-options';
   wrap.setAttribute('role', 'group');
   wrap.setAttribute('aria-label', `Choices for question ${question.no}`);
-  const feedback = Object.assign(document.createElement('p'), { className: 'q-feedback' });
+  const feedbackBox = Object.assign(document.createElement('div'), { className: 'q-feedback' });
+  const feedback = document.createElement('p');
   feedback.setAttribute('role', 'status');
-  feedback.hidden = true;
+  const rescueOffer = Object.assign(document.createElement('div'), { className: 'rescue-offer' });
+  const rescueClue = document.createElement('strong');
+  const rescueButton = Object.assign(document.createElement('button'), {
+    type: 'button', className: 'secondary-button', textContent: 'Start Concept Rescue',
+  });
+  let offeredRoute = null;
+  rescueButton.addEventListener('click', () => {
+    if (state.activePractice !== attempt || answers !== (attempt.mode === 'retry' ? attempt.retryAnswers : attempt.answers)) return;
+    if (offeredRoute?.kind === 'targeted') openConceptRescue(question, offeredRoute.diagnosis);
+    else if (offeredRoute?.kind === 'recall') openAnswerReview(question, answers[question.id]);
+  });
+  rescueOffer.append(rescueClue, rescueButton);
+  rescueOffer.hidden = true;
+  feedbackBox.append(feedback, rescueOffer);
+  feedbackBox.hidden = true;
   const letters = 'ABCDEFGH';
   const answers = attempt.mode === 'retry' ? attempt.retryAnswers : attempt.answers;
   const paintFeedback = (index) => {
@@ -424,22 +771,31 @@ function buildOptions(question, attempt) {
     feedback.textContent = correct
       ? `Correct. ${question.explanation}`
       : `Not quite. The answer is ${letters[question.answerIndex]}. ${question.explanation}`;
-    feedback.classList.toggle('is-correct', correct);
-    feedback.hidden = false;
+    feedbackBox.classList.toggle('is-correct', correct);
+    offeredRoute = !correct && attempt.mode === 'full'
+      ? window.IgniteLearningPath?.recoveryFor(question, index, attempt.content.visibility) : null;
+    rescueOffer.hidden = !window.IgniteActivityView || !['targeted', 'recall'].includes(offeredRoute?.kind)
+      || (offeredRoute?.kind === 'recall' && !window.IgniteLearningReview);
+    if (!rescueOffer.hidden) {
+      rescueClue.textContent = offeredRoute.kind === 'targeted' ? `Learning clue: ${offeredRoute.diagnosis.feedback}` : offeredRoute.reason;
+      rescueButton.textContent = offeredRoute.kind === 'targeted' ? 'Start Concept Rescue' : 'Review & recall';
+    }
+    feedbackBox.hidden = false;
   };
   const buttons = question.options.map((option, index) => {
     const button = Object.assign(document.createElement('button'), {
-      type: 'button', // inside a dialog form: must never submit
+      type: 'button',
       className: 'q-option',
       textContent: `${letters[index]}. ${option}`,
     });
     button.setAttribute('aria-pressed', 'false');
     button.addEventListener('click', () => {
-      if (Number.isInteger(answers[question.id])) return;
+      if (state.activePractice !== attempt || answers !== (attempt.mode === 'retry' ? attempt.retryAnswers : attempt.answers)
+        || Number.isInteger(answers[question.id])) return;
       answers[question.id] = index;
       paintFeedback(index);
       if (attempt.mode === 'full') {
-        const saved = storage.set(attempt.key, JSON.stringify({ version: window.IgnitePractice.version(attempt.content), answers: attempt.answers }));
+        const saved = storage.set(attempt.key, JSON.stringify({ version: window.IgnitePractice.version(attempt.content), attemptId: attempt.attemptId, answers: attempt.answers }));
         setText('#practiceSaveStatus', saved ? 'Answers saved on this device.' : 'This browser could not save your answers. Keep this page open to retain them.');
         renderPracticeProgress();
       }
@@ -447,37 +803,9 @@ function buildOptions(question, attempt) {
     });
     return button;
   });
-  wrap.append(...buttons, feedback);
+  wrap.append(...buttons, feedbackBox);
   if (Number.isInteger(answers[question.id])) paintFeedback(answers[question.id]);
   return wrap;
-}
-
-function nextMissionStep() {
-  state.missionStep += 1;
-  const next = $('#nextMissionStep');
-  if (state.missionStep === 2) {
-    setText('#missionInstruction', 'Step 2 of 3 · Work through the source worksheet for eight focused minutes.');
-    setText('#missionQuestion', 'The full source file is ready for academic review and ingestion. For this UX prototype, mark the focused practice step complete.');
-    $('#answerOptions').hidden = true;
-    setText('#answerFeedback', 'No file is published to students yet.');
-    next.disabled = false;
-    next.textContent = 'Mark practice done';
-  } else if (state.missionStep === 3) {
-    setText('#missionInstruction', 'Step 3 of 3 · Capture one thing you understand better now.');
-    setText('#missionQuestion', 'Review complete. You can end the session here—there is no endless feed.');
-    $('#answerOptions').hidden = true;
-    setText('#answerFeedback', 'A short finish is a successful finish.');
-    next.disabled = false;
-    next.textContent = 'Finish mission';
-  } else {
-    state.progress.completed += 1;
-    state.progress.minutes += 12;
-    state.progress.mastery = Math.min(100, state.progress.mastery + 8);
-    saveProgress();
-    closeDialog($('#missionDialog'));
-    return;
-  }
-  setText('#missionStepStatus', `Step ${state.missionStep} of 3`);
 }
 
 /* ---------- focus mode ---------- */
@@ -535,11 +863,15 @@ function bindControls() {
   $('#clearFilters').addEventListener('click', ready(clearFilters));
 
   $('#focusToggle').addEventListener('click', () => setFocusMode(!document.body.classList.contains('focus-mode')));
+  $$('.sidebar a[href^="#"], .mobile-nav a[href^="#"]').forEach((link) => link.addEventListener('click', () => {
+    if (state.activePractice) closeLearningWorkspace(false);
+  }));
 
   ['#startMission', '#missionNav', '#mobileMission'].forEach((selector) => {
     $(selector).addEventListener('click', () => openMission());
   });
   $('#changeMission').addEventListener('click', () => {
+    if (state.activePractice) closeLearningWorkspace(false);
     leaveFocusMode();
     $('#library').scrollIntoView();
   });
@@ -550,12 +882,63 @@ function bindControls() {
     $(selector).addEventListener('click', logOut);
   });
 
-  $('#nextMissionStep').addEventListener('click', nextMissionStep);
+  ['#saveExitPractice', '#finishPractice'].forEach((selector) => $(selector).addEventListener('click', () => closeLearningWorkspace()));
+  $('#previousPracticeQuestion').addEventListener('click', () => {
+    if (!state.activePractice || state.questionIndex === 0) return;
+    state.questionIndex -= 1; renderQuestionNavigation();
+    $('#worksheetQuestions').children[state.questionIndex]?.querySelector?.('button')?.focus();
+  });
+  $('#nextPracticeQuestion').addEventListener('click', () => {
+    const attempt = state.activePractice;
+    if (!attempt || $('#nextPracticeQuestion').disabled) return;
+    if (state.questionIndex + 1 < attempt.questions.length) {
+      state.questionIndex += 1; renderQuestionNavigation();
+      $('#worksheetQuestions').children[state.questionIndex]?.querySelector?.('button')?.focus();
+    } else {
+      $('#practiceSummaryTitle').focus();
+      $('#practiceSummary').scrollIntoView({ block: 'start' });
+    }
+  });
+  $('#startFollowUpTest').addEventListener('click', openFollowUpTest);
+  $('#startRescueFollowUp').addEventListener('click', openFollowUpTest);
+  $('#returnFromFollowUp').addEventListener('click', returnFromFollowUp);
+  $('#nextFollowUpQuestion').addEventListener('click', () => {
+    const active = state.activeFollowUp;
+    if (!active) return;
+    const question = active.plan.questions[active.index];
+    if (!question || !Object.hasOwn(active.record.latest.answers, question.id)) return;
+    active.index += 1;
+    renderFollowUpQuestion();
+  });
+  $('#showRescueHint').addEventListener('click', () => {
+    const rescue = state.activeRescue;
+    if (!rescue || rescue.completed) return;
+    rescue.hintUsed = true;
+    $('#rescueHint').hidden = false;
+    $('#showRescueHint').hidden = true;
+  });
+  $('#nextRescueStep').addEventListener('click', () => {
+    const rescue = state.activeRescue;
+    if (!rescue || rescue.completed || rescue.answers[rescue.step] === undefined) return;
+    if (rescue.step === 0) {
+      rescue.step = 1;
+      renderConceptRescueStep();
+    } else finishConceptRescue();
+  });
+  $('#dismissRescue').addEventListener('click', returnToWorksheet);
   $('#retryMistakes').addEventListener('click', () => {
     const attempt = state.activePractice;
     if (!attempt) return;
     const result = window.IgnitePractice.score(attempt.content.questions, attempt.answers);
     if (!result.complete || !result.mistakes.length) return;
+    state.activeReview?.cancel(); state.activeReview = null; $('#answerReview').hidden = true;
+    state.questionIndex = 0;
+    state.activeRescue = null;
+    state.activeFollowUp = null;
+    $('#conceptRescue').hidden = true;
+    $('#followUpTest').hidden = true;
+    $('#worksheetQuestions').hidden = false;
+    $('#worksheetCount').hidden = false;
     attempt.mode = 'retry';
     attempt.questions = attempt.content.questions.filter((q) => result.mistakes.includes(q.id));
     attempt.retryAnswers = Object.create(null);
@@ -566,28 +949,24 @@ function bindControls() {
   $('#restartPractice').addEventListener('click', () => {
     const attempt = state.activePractice;
     if (!attempt) return;
+    state.activeReview?.cancel(); state.activeReview = null; $('#answerReview').hidden = true;
+    state.questionIndex = 0;
+    state.activeRescue = null;
+    state.activeFollowUp = null;
+    $('#conceptRescue').hidden = true;
+    $('#followUpTest').hidden = true;
+    $('#worksheetQuestions').hidden = false;
+    $('#worksheetCount').hidden = false;
     attempt.mode = 'full';
     attempt.questions = attempt.content.questions;
     attempt.answers = Object.create(null);
-    const saved = storage.set(attempt.key, JSON.stringify({ version: window.IgnitePractice.version(attempt.content), answers: attempt.answers }));
+    attempt.attemptId = newAttemptId();
+    const saved = storage.set(attempt.key, JSON.stringify({ version: window.IgnitePractice.version(attempt.content), attemptId: attempt.attemptId, answers: attempt.answers }));
     setText('#practiceSaveStatus', saved ? 'New attempt started. Your previous attempt has been replaced on this device.' : 'This attempt cannot be saved in this browser.');
     renderPracticeQuestions();
     renderPracticeProgress();
     $('#worksheetQuestions button')?.focus();
   });
-  $('#worksheetDialog').addEventListener('close', () => {
-    state.activePractice = null;
-    if (state.catalog) renderWorksheets();
-  });
-  $$('#answerOptions button').forEach((button) => button.addEventListener('click', () => {
-    const correct = button.dataset.answer === '5';
-    $$('#answerOptions button').forEach((item) => {
-      item.classList.toggle('selected', item === button && correct);
-      item.classList.toggle('is-wrong', item === button && !correct);
-    });
-    setText('#answerFeedback', correct ? 'Correct. 3x = 15, so x = 5.' : 'Not quite. Subtract 5 first, then divide by 3.');
-    $('#nextMissionStep').disabled = !correct;
-  }));
 
   // Click on the dimmed backdrop closes a dialog; the doubt form is cleared so nothing lingers.
   $$('dialog').forEach((dialog) => {
@@ -632,16 +1011,19 @@ function showLoadError(error) {
 async function loadAndRender() {
   setText('#resultCount', 'Loading worksheets…');
   try {
-    const catalog = await loadCatalog();
+    let catalog;
+    try { catalog = await loadCatalog(); }
+    catch (error) {
+      if (!standaloneItems().length) throw error;
+      catalog = { worksheets: [] };
+    }
     if (!catalog || !Array.isArray(catalog.worksheets)) throw new Error('Catalog is missing its worksheet list');
-    const practiceSets = standaloneItems();
-    state.items = [...practiceSets, ...catalog.worksheets.map(normalizeItem).filter(Boolean)];
+    state.items = learnerLibrary(catalog);
     state.catalog = catalog;
 
-    const count = Number.isFinite(Number(catalog.inventory?.documentCount)) ? Number(catalog.inventory.documentCount) : state.items.length - practiceSets.length;
     const openCount = state.items.filter(isOpenToStudents).length;
-    setText('#sourceTitle', 'Source library ready');
-    setText('#sourceCount', `${count} candidates indexed · ${openCount} practice set${openCount === 1 ? '' : 's'} open`);
+    setText('#sourceTitle', 'Practice library');
+    setText('#sourceCount', `${openCount} playable set${openCount === 1 ? '' : 's'} · review status on each card`);
     $('.sidebar-note')?.classList.remove('is-error');
 
     const subjectSelect = $('#subjectFilter');
@@ -654,10 +1036,17 @@ async function loadAndRender() {
     renderSubjects();
     renderWorksheets();
     renderPracticeProgress();
+    renderAdaptiveProgress();
+    renderProgress();
   } catch (error) {
     console.error(error);
     showLoadError(error);
   }
+}
+
+function learnerLibrary(catalog) {
+  const items = [...standaloneItems(), ...(catalog?.worksheets || []).map(normalizeItem).filter((item) => item && isOpenToStudents(item))];
+  return items.filter((item, index) => items.findIndex((other) => other.content.id === item.content.id) === index);
 }
 
 function init() {
@@ -669,6 +1058,7 @@ function init() {
   applyStudentProfile(admittedStudent);
   state.learnerId = admittedStudent.admissionId;
   renderProgress();
+  renderAdaptiveProgress();
   bindControls();
   trackActiveSection();
   if (storage.get(FOCUS_KEY) === '1') setFocusMode(true);

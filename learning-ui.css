@@ -1,0 +1,73 @@
+/* Shared learning surfaces. Keep the navy/lime brand; use calm, consistent study controls. */
+.app-shell .hero { border-radius: 12px; box-shadow: none; }
+.app-shell .hero h1 { font-family: Inter, "Segoe UI", system-ui, sans-serif; font-size: clamp(30px, 4vw, 46px); line-height: 1.15; letter-spacing: -.02em; }
+.app-shell .mission-card { transform: none; border-radius: 12px; }
+.app-shell .section-heading h2 { font-family: Inter, "Segoe UI", system-ui, sans-serif; font-size: clamp(24px, 3vw, 30px); line-height: 1.3; }
+.app-shell .subject-card, .app-shell .worksheet-card, .app-shell .practice-progress { border-radius: 12px; }
+.app-shell .eyebrow { letter-spacing: .03em; text-transform: none; }
+.learning-workspace, .demo-game-hub, .learning-review {
+  --learning-text: #172033;
+  --learning-muted: #526075;
+  --learning-border: #cbd3e1;
+  --learning-accent: #007a70;
+  color: var(--learning-text);
+  font-family: Inter, "Noto Sans", "Segoe UI", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.5;
+}
+.learning-open main > section:not(.learning-workspace) { display: none; }
+.learning-open .mobile-nav { display: none; }
+.learning-workspace { width: 100%; max-width: 760px; margin: 0 auto; scroll-margin-top: 90px; }
+.learning-workspace .worksheet-view { max-width: none; padding: clamp(16px, 3vw, 32px); background: white; border: 1px solid var(--learning-border); border-radius: 12px; }
+.learning-workspace h2 { margin: 16px 0 8px; font-family: inherit; font-size: clamp(24px, 4vw, 32px); line-height: 1.25; }
+.workspace-toolbar, .worksheet-navigation { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+.workspace-toolbar { padding-bottom: 16px; margin-bottom: 20px; border-bottom: 1px solid var(--learning-border); color: var(--learning-muted); font-size: 14px; }
+.workspace-toolbar button { min-height: 44px; }
+.worksheet-navigation { padding: 16px 0; border-top: 1px solid var(--learning-border); }
+.worksheet-navigation span { font-size: 14px; color: var(--learning-muted); }
+.learning-workspace .question-list { max-height: none; overflow: visible; margin: 24px 0; padding: 0; list-style: none; }
+.learning-workspace .question-list li { margin: 0; padding: 0; }
+.learning-workspace .q-text { font-size: 18px; line-height: 1.55; font-weight: 650; margin-bottom: 20px; }
+.learning-workspace .concept-rescue, .learning-workspace .follow-up-test, .learning-review { padding: clamp(16px, 3vw, 24px); border: 1px solid var(--learning-border); border-radius: 12px; background: #f7f9fc; box-shadow: none; }
+.learning-workspace .rescue-challenge legend, .learning-workspace .follow-up-heading h3, .learning-workspace .rescue-heading h3,
+.demo-game-title, .demo-game-card h5, .demo-game-question legend, .learning-review h3, .demo-game-hub > h3 { font-family: inherit; font-size: clamp(20px, 3vw, 24px); line-height: 1.4; letter-spacing: normal; }
+.learning-workspace .eyebrow, .demo-game-eyebrow, .demo-game-kicker, .learning-kicker { font-size: 13px; font-weight: 700; letter-spacing: .02em; text-transform: none; }
+.learning-workspace .rescue-badge { transform: none; border-radius: 10px; }
+.learning-workspace .rescue-track span { background: var(--learning-accent); }
+.learning-workspace .primary-button, .learning-button { background: var(--navy, #102c4e); color: white; box-shadow: none; }
+.learning-workspace .secondary-button { border: 1px solid var(--learning-border); }
+.learning-workspace button, .demo-game-hub button { white-space: normal; overflow-wrap: anywhere; }
+.learning-workspace button:focus-visible, .demo-game-hub button:focus-visible { outline: 3px solid #6d4aff; outline-offset: 3px; }
+.demo-game-hub { margin: 24px 0; padding: clamp(16px, 3vw, 24px); background: #f7f9fc; border: 1px solid var(--learning-border); border-radius: 12px; }
+.demo-game-header { margin: 0 0 20px; border-radius: 10px; padding: 20px; }
+.demo-game-card { margin-top: 16px; border-color: var(--learning-border); border-radius: 12px; }
+.demo-game-cards > .demo-game-card { margin-top: 0; }
+.demo-game-card h5 { margin-top: 8px; font-size: 20px; }
+.demo-game-route span { background: #e8f2f0; }
+.demo-game-celebration { border-radius: 12px; font-size: 20px; padding: 20px; }
+.demo-game-question legend { font-size: 20px; }
+.demo-game-hub progress { display: block; width: 100%; height: 10px; accent-color: var(--learning-accent); }
+.learning-kicker { margin: 0 0 8px; color: var(--learning-accent); }
+.learning-note { margin: 12px 0; color: var(--learning-muted, #526075); font-size: 14px; overflow-wrap: anywhere; }
+.learning-source-question { margin: 24px 0 12px; font-size: 18px; font-weight: 650; }
+.learning-feedback { padding: 16px; margin: 16px 0; border-left: 3px solid #007a70; background: #e8f3f0; border-radius: 8px; overflow-wrap: anywhere; }
+.learning-question { min-inline-size: 0; padding: 0; margin: 24px 0; border: 0; }
+.learning-question legend { padding: 0; margin-bottom: 16px; font-size: 18px; font-weight: 650; overflow-wrap: anywhere; }
+.learning-question .rescue-options { display: grid; gap: 12px; }
+.learning-question .rescue-option { min-height: 48px; padding: 12px 16px; background: white; color: #172033; border: 1px solid #a6b4c7; border-radius: 10px; text-align: left; cursor: pointer; font: inherit; }
+.learning-question .is-correct { border-color: #177245; background: #e6f3eb; }
+.learning-question .is-wrong { border-color: #b42318; background: #fcecea; }
+.learning-button { min-height: 48px; padding: 12px 16px; margin: 8px 12px 8px 0; border: 0; border-radius: 10px; font: inherit; font-weight: 700; cursor: pointer; }
+.learning-more-reviews { margin-top: 16px; border: 1px solid var(--learning-border); border-radius: 10px; padding: 12px 16px; background: white; }
+.learning-more-reviews summary { min-height: 44px; padding: 10px 0; cursor: pointer; font-weight: 650; }
+.learning-more-reviews summary:focus-visible { outline: 3px solid #6d4aff; outline-offset: 3px; }
+@media (max-width: 540px) {
+  .learning-open main { padding: 16px 12px 32px; }
+  .worksheet-navigation { display: grid; grid-template-columns: 1fr 1fr; }
+  .worksheet-navigation span { grid-row: 1; grid-column: 1 / -1; text-align: center; }
+  .worksheet-navigation button { min-height: 48px; padding: 10px; }
+  .learning-button { display: block; width: 100%; margin-right: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .learning-workspace *, .demo-game-hub * { scroll-behavior: auto; transition: none !important; animation: none !important; }
+}

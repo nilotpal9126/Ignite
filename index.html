@@ -9,6 +9,8 @@
     <link rel="icon" href="./assets/ignite-logo-192.png" type="image/png" />
     <link rel="apple-touch-icon" href="./assets/ignite-logo-192.png" />
     <link rel="stylesheet" href="./landing.css" />
+    <link rel="stylesheet" href="./demo-recovery.css" />
+    <link rel="stylesheet" href="./learning-ui.css" />
   </head>
   <body data-admissions="preview">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -85,6 +87,7 @@
           <p>Six questions, instant explanations, and a clear finish. Take your time—there is no timer or leaderboard.</p>
         </div>
         <div class="demo-panel">
+          <p class="demo-notice" id="demoPreviewNotice" hidden>Example preview: worksheet answers have been prefilled to show the recovery game. These are demonstration results.</p>
           <div class="demo-controls">
             <label>Class<select id="demoClass"><option value="10">Class 10</option><option value="11">Class 11</option></select></label>
             <label>Subject<select id="demoSubject"><option value="Biology">Biology</option><option value="Chemistry">Chemistry</option><option value="Physics">Physics</option></select></label>
@@ -106,9 +109,11 @@
             <h3 id="demoResultTitle" tabindex="-1">Sample complete.</h3>
             <p id="demoScore"></p>
             <p id="demoRecommendation"></p>
+            <section class="demo-game-hub" id="demoRecoveryHub" aria-label="Recovery missions for your mistakes" hidden></section>
             <ul class="demo-review-list" id="demoMistakes"></ul>
-            <p class="demo-privacy">This reflects only these six questions and the supplied sample answer key. It does not diagnose learning gaps, establish mastery or predict exam results. Results are not sent to an owner dashboard.</p>
+            <p class="demo-privacy">This reflects only these six questions and the supplied sample answer key. Where an answer has a learning tag, a recovery mission can offer focused practice. A single wrong answer does not prove its cause or establish mastery. Results are not sent to an owner dashboard.</p>
             <button class="admit-button" id="demoRestart" type="button">Try this sample again</button>
+            <button class="learning-button" id="demoFinish" type="button">Finish for now</button>
           </section>
         </div>
       </section>
@@ -288,6 +293,13 @@
     <script src="./admission.js" defer></script>
     <script src="./data/pilot-worksheets.js" defer></script>
     <script src="./practice.js" defer></script>
+    <script src="./adaptive-engine.js" defer></script>
+    <script src="./learning-path.js" defer></script>
+    <script src="./activity-view.js" defer></script>
+    <script src="./learning-review.js" defer></script>
+    <script src="./assessment-engine.js" defer></script>
+    <script src="./data/assessment-banks.js" defer></script>
+    <script src="./demo-recovery.js" defer></script>
     <script src="./landing-demo.js" defer></script>
   </body>
 </html>

@@ -9,6 +9,7 @@
     <link rel="icon" href="./assets/ignite-logo-192.png" type="image/png" />
     <link rel="apple-touch-icon" href="./assets/ignite-logo-192.png" />
     <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./learning-ui.css" />
   </head>
   <body>
     <noscript><p class="noscript-banner">Project Ignite needs JavaScript to load the worksheet catalog and the practice mission.</p></noscript>
@@ -32,25 +33,107 @@
     <div class="app-shell">
       <nav class="sidebar" aria-label="Primary navigation">
         <a class="nav-item active" href="#home" aria-current="true" title="Home"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10.5 9-7.5 9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg>Home</a>
-        <a class="nav-item" href="#library" title="Source review"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11a3 3 0 0 1 3 3v15a3 3 0 0 0-3-3H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H14v18a3 3 0 0 1 3-3h.5a2.5 2.5 0 0 1 2.5 2.5z"/></svg>Source review</a>
+        <a class="nav-item" href="#library" title="Practice library"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11a3 3 0 0 1 3 3v15a3 3 0 0 0-3-3H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H14v18a3 3 0 0 1 3-3h.5a2.5 2.5 0 0 1 2.5 2.5z"/></svg>Practice library</a>
         <button class="nav-item nav-button" id="missionNav" type="button" title="My mission"><span aria-hidden="true">✓</span>My mission</button>
         <a class="nav-item" href="#progress" title="Progress"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V5"/><path d="M4 20h16"/><path d="m7 15 4-4 3 2 5-6"/><path d="M16 7h3v3"/></svg>Progress</a>
         <button class="nav-item nav-button" id="doubtNav" type="button" title="Ask a doubt"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 15a4 4 0 0 1-4 4H9l-5 3v-7a4 4 0 0 1-1-2.6V8a4 4 0 0 1 4-4h9a4 4 0 0 1 4 4z"/><path d="M9.7 9a2.3 2.3 0 1 1 3.5 2c-.8.5-1.2.9-1.2 2"/><path d="M12 16h.01"/></svg>Ask a doubt</button>
         <button class="nav-item nav-button" id="logoutNav" type="button" title="Log out"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M14 4h5a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-5"/></svg>Log out</button>
         <div class="sidebar-note">
           <span class="status-dot"></span>
-          <p><strong id="sourceTitle">Source library</strong><br /><span id="sourceCount" role="status">Loading catalog…</span></p>
+          <p><strong id="sourceTitle">Practice library</strong><br /><span id="sourceCount" role="status">Loading catalog…</span></p>
         </div>
       </nav>
 
       <main id="main-content" tabindex="-1">
+    <section id="worksheetWorkspace" class="learning-workspace" aria-labelledby="worksheetDialogTitle" hidden>
+      <div class="worksheet-view">
+        <div class="workspace-toolbar"><span>Focused practice</span><button class="text-button" id="saveExitPractice" type="button">Save &amp; exit</button></div>
+        <p class="eyebrow" id="worksheetEyebrow">WORKSHEET</p>
+        <h2 id="worksheetDialogTitle" tabindex="-1">Worksheet</h2>
+        <p class="worksheet-view-meta" id="worksheetMeta"></p>
+        <p class="draft-notice" id="worksheetNotice" role="note" hidden></p>
+        <p class="practice-save-status" id="practiceSaveStatus" role="status"></p>
+        <section id="answerReview" class="learning-review" aria-label="Review and recall" hidden></section>
+        <section class="concept-rescue" id="conceptRescue" aria-labelledby="rescueTitle" hidden>
+          <div class="rescue-heading">
+            <span class="rescue-badge" aria-hidden="true">★</span>
+            <div>
+              <p class="eyebrow">CONCEPT RESCUE</p>
+              <h3 id="rescueTitle" tabindex="-1">Quick recovery mission</h3>
+            </div>
+            <span class="rescue-step" id="rescueStep">1 of 2</span>
+          </div>
+          <p class="draft-notice" id="rescueReviewNotice" role="note"></p>
+          <p class="rescue-diagnosis" id="rescueDiagnosis"></p>
+          <p class="rescue-goal" id="rescueGoal"></p>
+          <div class="rescue-track" aria-hidden="true"><span id="rescueTrackFill"></span></div>
+          <fieldset class="rescue-challenge" id="rescueChallenge">
+            <legend id="rescuePrompt"></legend>
+            <div class="rescue-options" id="rescueOptions"></div>
+          </fieldset>
+          <button class="text-button rescue-hint-button" id="showRescueHint" type="button">Use a hint</button>
+          <p class="rescue-hint" id="rescueHint" role="note" hidden></p>
+          <p class="rescue-feedback" id="rescueFeedback" role="status" hidden></p>
+          <div class="rescue-actions">
+            <button class="text-button" id="dismissRescue" type="button">Return to worksheet</button>
+            <button class="secondary-button" id="startRescueFollowUp" type="button" hidden>Take a short follow-up</button>
+            <button class="primary-button" id="nextRescueStep" type="button" disabled>Try a related question</button>
+          </div>
+        </section>
+        <section class="follow-up-test" id="followUpTest" aria-labelledby="followUpTitle" hidden>
+          <div class="follow-up-heading">
+            <div><p class="eyebrow">YOUR NEXT CHECK</p><h3 id="followUpTitle">A few questions, focused on your mistakes</h3></div>
+            <span class="rescue-step" id="followUpStep"></span>
+          </div>
+          <p class="draft-notice" id="followUpNotice" role="note"></p>
+          <p class="follow-up-coverage" id="followUpCoverage"></p>
+          <p class="practice-save-status" id="followUpSaveStatus" role="status"></p>
+          <progress id="followUpProgress" value="0" max="3" aria-label="Follow-up questions answered"></progress>
+          <fieldset class="rescue-challenge" id="followUpQuestion">
+            <legend id="followUpPrompt" tabindex="-1"></legend>
+            <div class="rescue-options" id="followUpOptions"></div>
+          </fieldset>
+          <p class="rescue-feedback" id="followUpFeedback" role="status" hidden></p>
+          <section class="follow-up-summary" id="followUpSummary" aria-labelledby="followUpResultTitle" hidden>
+            <h4 id="followUpResultTitle" tabindex="-1"></h4>
+            <p id="followUpResultText" role="status"></p>
+            <ul id="followUpReview"></ul>
+          </section>
+          <div class="rescue-actions">
+            <button class="text-button" id="returnFromFollowUp" type="button">Return to worksheet</button>
+            <button class="primary-button" id="nextFollowUpQuestion" type="button" disabled>Next question</button>
+          </div>
+        </section>
+        <section class="practice-summary" id="practiceSummary" aria-labelledby="practiceSummaryTitle" hidden>
+          <h3 id="practiceSummaryTitle" tabindex="-1">Practice complete</h3>
+          <p id="practiceSummaryText" role="status"></p>
+          <p id="followUpAvailability" role="status"></p>
+          <div class="practice-summary-actions">
+            <button class="primary-button" id="startFollowUpTest" type="button" hidden>Take a short follow-up</button>
+            <button class="secondary-button" id="retryMistakes" type="button">Retry mistakes</button>
+            <button class="secondary-button" id="restartPractice" type="button">Start new attempt</button>
+          </div>
+        </section>
+        <p id="practiceResultsHint" class="learning-note" hidden>All questions answered. You can review an answer, retry your mistakes, or finish for now.</p>
+        <ol class="question-list" id="worksheetQuestions"></ol>
+        <nav class="worksheet-navigation" id="worksheetNavigation" aria-label="Practice questions">
+          <button class="secondary-button" id="previousPracticeQuestion" type="button">Previous</button>
+          <span id="practiceQuestionStep" role="status">Question 1</span>
+          <button class="primary-button" id="nextPracticeQuestion" type="button" disabled>Next question</button>
+        </nav>
+        <div class="dialog-actions">
+          <span id="worksheetCount" role="status"></span>
+          <button class="secondary-button" id="finishPractice" type="button">Finish for now</button>
+        </div>
+      </div>
+    </section>
         <section class="hero" id="home" aria-labelledby="welcomeTitle">
           <div class="hero-copy">
-            <p class="eyebrow">TODAY · 12-MINUTE FOCUS</p>
+            <p class="eyebrow">Your next learning step</p>
             <h1 id="welcomeTitle">One clear mission.<br />Then you are done.</h1>
             <p>Practice a focused topic, review one mistake, and leave with a win—without an endless feed.</p>
             <div class="hero-actions">
-              <button class="primary-button" id="startMission" type="button">Start today’s mission <span aria-hidden="true">→</span></button>
+              <button class="primary-button" id="startMission" type="button">Start practice</button>
               <button class="text-button" id="changeMission" type="button">Choose another topic</button>
             </div>
           </div>
@@ -58,41 +141,36 @@
             <div class="mission-ring" aria-hidden="true"><span id="missionPercent">0%</span></div>
             <div>
               <p class="card-kicker">TODAY’S MISSION</p>
-              <h2>Linear equations</h2>
-              <p>Class 8 Mathematics · 3 short steps</p>
+              <h2 id="recommendedTitle">Choose a practice set</h2>
+              <p id="recommendedMeta">Available questions and review status appear here.</p>
               <ol class="mission-steps">
-                <li><span class="step-dot">1</span>Warm up <small>2 min</small></li>
-                <li><span class="step-dot">2</span>Practice <small>8 min</small></li>
-                <li><span class="step-dot">3</span>Review <small>2 min</small></li>
+                <li><span class="step-dot">1</span>Answer a short set</li>
+                <li><span class="step-dot">2</span>Review &amp; recover</li>
+                <li><span class="step-dot">3</span>Check, then finish</li>
               </ol>
             </div>
           </div>
         </section>
 
-        <section class="stats-grid" id="progress" aria-label="Learning progress">
-          <article><span class="stat-icon lime">✓</span><div><strong id="completedCount">0</strong><small>Missions completed</small></div></article>
-          <article><span class="stat-icon blue">◎</span><div><strong id="focusMinutes">0</strong><small>Focused minutes</small></div></article>
-          <article><span class="stat-icon coral">↗</span><div><strong id="masteryScore">0%</strong><small>Demo mastery</small></div></article>
-        </section>
-
-        <section class="practice-progress" aria-label="Sample practice progress">
+        <section id="progress" class="practice-progress" aria-label="Sample practice progress">
           <p><strong id="practiceCompletedCount">0</strong> practice sets finished</p>
           <p><strong id="practiceAccuracy">—</strong> answer accuracy</p>
+          <p><strong id="recoveryCount">0</strong> concept rescues completed</p>
           <small>Latest full attempts · saved on this device · sample scores, not exam marks</small>
         </section>
 
         <section class="section-block" aria-labelledby="subjectsTitle">
           <div class="section-heading">
             <div><p class="eyebrow">EXPLORE</p><h2 id="subjectsTitle">Pick a subject</h2></div>
-            <a href="#library">Review source inventory</a>
+            <a href="#library">Browse practice sets</a>
           </div>
           <div class="subject-grid" id="subjectGrid"></div>
         </section>
 
         <section class="section-block library-section" id="library" aria-labelledby="libraryTitle">
           <div class="section-heading library-heading">
-            <div><p class="eyebrow">INTERNAL CONTENT PIPELINE</p><h2 id="libraryTitle">Source inventory preview</h2></div>
-            <p class="review-warning"><span aria-hidden="true">!</span> Staff-only prototype. Nothing below is published or student-visible.</p>
+            <div><p class="eyebrow">PRACTICE LIBRARY</p><h2 id="libraryTitle">Choose your next practice</h2></div>
+            <p class="review-warning"><span aria-hidden="true">!</span> Original samples await teacher review. Check the status on each set.</p>
           </div>
 
           <div class="filters" aria-label="Worksheet filters">
@@ -121,32 +199,11 @@
 
     <nav class="mobile-nav" aria-label="Mobile navigation">
       <a class="active" href="#home" aria-current="true"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10.5 9-7.5 9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg>Home</a>
-      <a href="#library"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11a3 3 0 0 1 3 3v15a3 3 0 0 0-3-3H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H14v18a3 3 0 0 1 3-3h.5a2.5 2.5 0 0 1 2.5 2.5z"/></svg>Sources</a>
+      <a href="#library"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11a3 3 0 0 1 3 3v15a3 3 0 0 0-3-3H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H14v18a3 3 0 0 1 3-3h.5a2.5 2.5 0 0 1 2.5 2.5z"/></svg>Practice</a>
       <button id="mobileMission" type="button"><span aria-hidden="true">✓</span>Mission</button>
       <a href="#progress"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V5"/><path d="M4 20h16"/><path d="m7 15 4-4 3 2 5-6"/><path d="M16 7h3v3"/></svg>Progress</a>
       <button id="mobileLogout" type="button"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M14 4h5a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-5"/></svg>Log out</button>
     </nav>
-
-    <dialog id="missionDialog" aria-labelledby="missionDialogTitle">
-      <form method="dialog" class="dialog-card">
-        <button class="dialog-close" value="cancel" aria-label="Close mission"><span aria-hidden="true">×</span></button>
-        <p class="eyebrow">FOCUS MODE</p>
-        <h2 id="missionDialogTitle">Linear equations</h2>
-        <p id="missionInstruction">Step 1 of 3 · Take a breath and solve this warm-up mentally.</p>
-        <div class="question-card">
-          <span class="question-label">WARM-UP</span>
-          <p id="missionQuestion">If 3x + 5 = 20, what is x?</p>
-          <div class="answer-options" id="answerOptions">
-            <button type="button" data-answer="3">3</button><button type="button" data-answer="5">5</button><button type="button" data-answer="8">8</button>
-          </div>
-          <p class="feedback" id="answerFeedback" role="status"></p>
-        </div>
-        <div class="dialog-actions">
-          <span id="missionStepStatus">Step 1 of 3</span>
-          <button class="primary-button" id="nextMissionStep" type="button" disabled>Continue</button>
-        </div>
-      </form>
-    </dialog>
 
     <dialog id="doubtDialog" aria-labelledby="doubtDialogTitle">
       <form method="dialog" class="dialog-card booking-card">
@@ -158,30 +215,6 @@
         <label>What are you stuck on?<textarea rows="3" maxlength="500" placeholder="Example: I can solve one-step equations but get confused when x appears on both sides."></textarea></label>
         <label>Preferred slot<select><option>Weekday evening · 20 minutes</option><option>Weekend morning · 20 minutes</option></select></label>
         <button class="primary-button" value="cancel">Finish preview</button>
-      </form>
-    </dialog>
-
-    <dialog id="worksheetDialog" aria-labelledby="worksheetDialogTitle">
-      <form method="dialog" class="dialog-card worksheet-view">
-        <button class="dialog-close" value="cancel" aria-label="Close worksheet"><span aria-hidden="true">×</span></button>
-        <p class="eyebrow" id="worksheetEyebrow">WORKSHEET</p>
-        <h2 id="worksheetDialogTitle">Worksheet</h2>
-        <p class="worksheet-view-meta" id="worksheetMeta"></p>
-        <p class="draft-notice" id="worksheetNotice" role="note" hidden></p>
-        <p class="practice-save-status" id="practiceSaveStatus" role="status"></p>
-        <section class="practice-summary" id="practiceSummary" aria-labelledby="practiceSummaryTitle" hidden>
-          <h3 id="practiceSummaryTitle">Practice complete</h3>
-          <p id="practiceSummaryText" role="status"></p>
-          <div class="practice-summary-actions">
-            <button class="secondary-button" id="retryMistakes" type="button">Retry mistakes</button>
-            <button class="secondary-button" id="restartPractice" type="button">Start new attempt</button>
-          </div>
-        </section>
-        <ol class="question-list" id="worksheetQuestions"></ol>
-        <div class="dialog-actions">
-          <span id="worksheetCount" role="status"></span>
-          <button class="primary-button" value="cancel">Close</button>
-        </div>
       </form>
     </dialog>
 
@@ -198,6 +231,13 @@
     <script src="./api-client.js" defer></script>
     <script src="./data/catalog.js" defer></script>
     <script src="./data/pilot-worksheets.js" defer></script>
+    <script src="./adaptive-engine.js" defer></script>
+    <script src="./learning-path.js" defer></script>
+    <script src="./activity-view.js" defer></script>
+    <script src="./learning-review.js" defer></script>
+    <script src="./assessment-engine.js" defer></script>
+    <script src="./assessment-session.js" defer></script>
+    <script src="./data/assessment-banks.js" defer></script>
     <script src="./practice.js" defer></script>
     <script src="./app.js" defer></script>
   </body>

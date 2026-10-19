@@ -19,7 +19,7 @@
   }
 
   function version(content) {
-    return JSON.stringify(content.questions.map((q) => [q.id, q.text, q.options, q.answerIndex, q.explanation]));
+    return JSON.stringify(content.questions.map((q) => [q.id, q.text, q.options, q.answerIndex, q.explanation, q.adaptive || null]));
   }
 
   function restore(content, raw) {
