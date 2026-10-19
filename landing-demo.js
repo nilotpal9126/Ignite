@@ -8,7 +8,7 @@
     const items = (window.__IGNITE_PILOT_CONTENT__?.items || []).filter((item) =>
       item.visibility === 'demo_sample' && practice?.playable(item)
       && [10, 11].includes(item.classLevel)
-      && ['Biology', 'Chemistry', 'Physics'].includes(item.subject));
+      && ['Biology', 'Chemistry', 'Physics', 'Mathematics'].includes(item.subject));
     let active = null;
     let step = 0;
     let answers = Object.create(null);
@@ -48,6 +48,7 @@
       get('demoStatus').textContent = item
         ? `${item.title} · ${item.questions.length} questions. Ready when you are.`
         : 'Sample practice is unavailable. Please try another selection or reload later.';
+      syncSubjects();
     }
 
     function showQuestion() {
@@ -86,7 +87,10 @@
         return button;
       });
       get('demoOptions').replaceChildren(...buttons);
-      get('demoQuestionText').focus();
+      // Keep one scroll target. Scrolling back to the section after focusing
+      // the question made tile clicks appear unresponsive on some layouts.
+      get('demoQuestionText').focus({ preventScroll: true });
+      get('demoQuestionText').scrollIntoView?.({ block: 'center', behavior: 'instant' });
     }
 
     function start() {
@@ -108,6 +112,7 @@
       get('demoProgress').value = 0;
       get('demoProgress').setAttribute('aria-valuetext', `0 of ${item.questions.length} questions answered`);
       showQuestion();
+      syncSubjects();
     }
 
     function finish() {
@@ -138,20 +143,22 @@
 
     get('demoClass').addEventListener('change', () => { resetSelection(); syncSubjects(); });
     get('demoSubject').addEventListener('change', resetSelection);
-    const subjectButtons = ['Biology', 'Chemistry', 'Physics'].map(subject => {
-      const button = get(`choose${subject}`); if (button) button.dataset.subject = subject; return button;
-    }).filter(Boolean);
+    const subjectButtons = ['Biology', 'Chemistry', 'Physics', 'Mathematics'].flatMap(subject =>
+      [`choose${subject}`, `hero${subject}`].map(id => {
+        const button = get(id); if (button) button.dataset.subject = subject; return button;
+      }).filter(Boolean));
     function syncSubjects() {
       for (const button of subjectButtons) {
-        button.setAttribute('aria-pressed', String(button.dataset.subject === get('demoSubject').value));
+        button.setAttribute('aria-pressed', String(button.dataset.subject === active?.subject));
         button.disabled = !items.some(item => item.subject === button.dataset.subject && item.classLevel === Number(get('demoClass').value));
+        const label = button.querySelector('.subject-action');
+        if (label) label.textContent = `${button.dataset.subject === active?.subject ? 'Restart' : 'Start'} ${button.dataset.subject === 'Mathematics' ? 'Maths' : button.dataset.subject} →`;
       }
     }
     for (const button of subjectButtons) button.addEventListener('click', () => {
       if (!items.some(item => item.subject === button.dataset.subject && item.classLevel === Number(get('demoClass').value))) return;
       get('demoSubject').value = button.dataset.subject;
       resetSelection(); syncSubjects(); start();
-      get('free-demo')?.scrollIntoView?.({ block: 'start' });
     });
     get('demoSubject').addEventListener('change', syncSubjects);
     get('demoStart').addEventListener('click', start);
@@ -179,6 +186,7 @@
           Object.hasOwn(illustrativeMistakes, question.id) ? illustrativeMistakes[question.id] : question.answerIndex]));
         get('demoNotice').textContent = example.notice;
         finish();
+        syncSubjects();
         get('demoPreviewNotice').hidden = false;
         get('demoStatus').textContent = 'Example attempt loaded. Start the recovery mission below, or restart to answer the worksheet yourself.';
         recoveryRoot?.scrollIntoView?.({ block: 'start' });

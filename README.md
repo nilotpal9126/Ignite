@@ -19,8 +19,8 @@ mistake recovery, same-question recall, and a device-local dashboard for existin
 
 `data/catalog.js` (and `catalog.json`) contain **anonymised sample data** (36 generated entries), not
 the real worksheet library. Every entry is marked `inventory_only` / `studentVisible: false`.
-Those inventory entries are excluded from the student practice library. Six original practice sets
-(36 questions) ship separately as labelled teacher-review-pending samples. Only one worksheet
+Those inventory entries are excluded from the student practice library. Eight original practice sets
+(48 questions, Maths and science) ship separately as labelled teacher-review-pending samples. Only one worksheet
 question has targeted recovery mappings. Other mistakes offer recall of the same question, not
 a fabricated diagnosis or a newly generated assessment. Pending follow-up banks are excluded.
 

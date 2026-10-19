@@ -1,7 +1,7 @@
 {
   "schemaVersion": "1.0.0",
   "catalogId": "ignite-sample-catalog-demo",
-  "generatedAt": "2026-10-19T21:32:23.000Z",
+  "generatedAt": "2026-10-19T22:03:21.000Z",
   "source": {
     "rootAlias": "sample-data",
     "readOnly": true,

@@ -4,7 +4,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
     <meta name="theme-color" content="#102c4e" />
-    <meta name="description" content="Try Project Ignite's free science practice demo for Classes 10 and 11. Six unreviewed sample sets with instant explanations. No registration needed." />
+    <meta name="description" content="Try Project Ignite's free Maths and science practice for Classes 10 and 11. Eight unreviewed sample sets with explanations. No registration needed." />
     <title>Project Ignite | Small steps. Stronger foundations.</title>
     <link rel="icon" href="./assets/ignite-logo-192.png" type="image/png" />
     <link rel="apple-touch-icon" href="./assets/ignite-logo-192.png" />
@@ -20,14 +20,13 @@
 
     <header class="landing-header">
       <a class="landing-brand" href="#top" aria-label="Project Ignite home">
-        <img src="./assets/ignite-logo.webp" alt="" width="96" height="96" />
-        <span>Project <strong>Ignite</strong></span>
+        <span class="wordmark-project">PROJECT</span><strong class="wordmark-ignite">IGNITE</strong>
       </a>
       <nav class="landing-nav" aria-label="Landing page navigation">
-        <a href="#how-it-works">How it works</a>
-        <a href="#coverage">Subjects</a>
+        <a href="#coverage"><span class="nav-index" aria-hidden="true">01</span>Subjects</a>
+        <a href="#how-it-works"><span class="nav-index" aria-hidden="true">02</span>How it works</a>
         <span class="admissions-open"><i aria-hidden="true"></i>Early-access demo</span>
-        <a class="nav-cta" id="enrollNav" href="#free-demo">Try free demo</a>
+        <a class="nav-cta" id="enrollNav" href="#free-demo">Let’s practise <span aria-hidden="true">↗</span></a>
         <button class="nav-record open-enrollment" id="viewEnrollmentNav" type="button" hidden>View enrollment</button>
         <button class="nav-login open-login" type="button">Login</button>
       </nav>
@@ -35,29 +34,34 @@
 
     <main id="main-content">
       <section class="landing-hero" id="top" aria-labelledby="landingTitle">
-        <svg class="ignite-watermark" viewBox="0 0 240 300" fill="none" aria-hidden="true" focusable="false"><path d="M137 19c8 57-51 67-35 119 13-7 29-27 31-46 40 29 69 64 69 103a82 82 0 0 1-164 0c0-49 42-74 37-111 19 9 24 20 24 31 3-37 41-58 38-96Z" fill="#75d5ee" fill-opacity=".4" stroke="#75d5ee" stroke-width="3"/><path d="M47 190c24-17 45 20 73 0s49-16 72-4M47 211c26-16 47 21 75 1s48-16 70-5" stroke="#d5f7ec" stroke-width="3" stroke-linecap="round"/><path d="m120 163 5 18 17 5-17 5-5 18-5-18-17-5 17-5 5-18Z" fill="#f9f6d4"/></svg>
         <div class="hero-copy">
-          <p class="eyebrow">SMALL STEPS · STRONGER FOUNDATIONS</p>
-          <h1 id="landingTitle">A little practice.<br />A clearer next step.</h1>
-          <p class="hero-lead">Explore a calmer way to practise science: answer a short set, read the explanations, and see which questions to revisit. Try the early-access experience together before creating an account.</p>
+          <p class="eyebrow">THE PROJECT IGNITE LEARNING LAB · CLASSES 10 + 11</p>
+          <h1 id="landingTitle">A little stuck?<br />Let’s figure<br />it <em>out.</em></h1>
+          <p class="hero-lead">Big ideas start with small attempts. Pick Maths or a science subject, try six questions, and make sense of the answers—one step at a time.</p>
           <div class="hero-actions">
-            <a class="primary-link" href="#free-demo">Try free practice <span aria-hidden="true">→</span></a>
-            <a class="secondary-link" href="#how-it-works">See how it works</a>
+            <a class="primary-link" href="#coverage">Find your subject <span aria-hidden="true">↗</span></a>
+            <a class="secondary-link" href="#free-demo">Try six questions <span aria-hidden="true">→</span></a>
           </div>
           <ul class="trust-list" aria-label="Project Ignite benefits">
             <li><span aria-hidden="true">✓</span> No endless feed</li>
             <li><span aria-hidden="true">✓</span> No registration needed</li>
             <li><span aria-hidden="true">✓</span> Clear explanations</li>
           </ul>
+          <div class="hero-subjects" aria-label="Start a subject sample for the selected class">
+            <span>Start here</span>
+            <button id="heroMathematics" type="button" aria-pressed="false">Maths</button>
+            <button id="heroPhysics" type="button" aria-pressed="false">Physics</button>
+            <button id="heroChemistry" type="button" aria-pressed="false">Chemistry</button>
+            <button id="heroBiology" type="button" aria-pressed="false">Biology</button>
+          </div>
         </div>
 
         <div class="hero-preview" aria-label="Preview of the free sample practice experience">
-          <svg class="paper-watermark" viewBox="0 0 240 300" fill="none" aria-hidden="true" focusable="false"><path d="M137 19c8 57-51 67-35 119 13-7 29-27 31-46 40 29 69 64 69 103a82 82 0 0 1-164 0c0-49 42-74 37-111 19 9 24 20 24 31 3-37 41-58 38-96Z" fill="#75d5ee" fill-opacity=".4" stroke="#75d5ee" stroke-width="3"/><path d="M47 190c24-17 45 20 73 0s49-16 72-4M47 211c26-16 47 21 75 1s48-16 70-5" stroke="#428ba4" stroke-width="3" stroke-linecap="round"/><path d="m120 163 5 18 17 5-17 5-5 18-5-18-17-5 17-5 5-18Z" fill="#fff4c4"/></svg>
           <div class="preview-top"><span>TRY IT TOGETHER</span><strong class="cutout-badge" aria-label="6 questions"><span class="cutout-number" aria-hidden="true">6</span><span class="cutout-word" aria-hidden="true"><i>Q</i><i>U</i><i>E</i><i>S</i><i>T</i><i>I</i><i>O</i><i>N</i><i>S</i></span></strong></div>
-          <h2>Science, one step at a time.</h2>
+          <h2>Less scrolling.<br />More figuring it out.</h2>
           <p>Classes 10 and 11 · sample practice</p>
           <ol>
-            <li><span>1</span><div><strong>Choose</strong><small>Pick a class and science subject</small></div></li>
+            <li><span>1</span><div><strong>Choose</strong><small>Pick a class and one of four subjects</small></div></li>
             <li><span>2</span><div><strong>Practise</strong><small>Answer and read the explanation</small></div></li>
             <li><span>3</span><div><strong>Reflect</strong><small>See what to revisit next</small></div></li>
           </ol>
@@ -66,8 +70,8 @@
       </section>
 
       <section class="proof-strip" aria-label="Platform coverage">
-        <article><strong>6 sets</strong><span>Original science samples</span></article>
-        <article><strong>36 questions</strong><span>With answer explanations</span></article>
+        <article><strong>8 sets</strong><span>Original Maths &amp; science samples</span></article>
+        <article><strong>48 questions</strong><span>With answer explanations</span></article>
         <article><strong>Classes 10 &amp; 11</strong><span>Current sample coverage</span></article>
         <article><strong>Free demo</strong><span>No account or payment</span></article>
       </section>
@@ -79,7 +83,7 @@
           <p>Students can try the questions. Parents can see the feedback. Both can decide whether this style of practice is useful.</p>
         </div>
         <div class="step-grid">
-          <article><span class="step-number">01</span><h3>Choose a sample</h3><p>Pick Class 10 or 11 and Physics, Chemistry or Biology. The demo shows only sets available today.</p></article>
+          <article><span class="step-number">01</span><h3>Choose a sample</h3><p>Pick Class 10 or 11 and Maths, Physics, Chemistry or Biology. The demo shows only sets available today.</p></article>
           <article><span class="step-number">02</span><h3>Practise and review</h3><p>Answer focused questions, receive explanations, and revisit the concepts that need attention.</p></article>
           <article><span class="step-number">03</span><h3>Find a next step</h3><p>See your sample score and the questions worth revisiting. This snapshot is not a measure of overall mastery.</p></article>
         </div>
@@ -95,7 +99,7 @@
           <p class="demo-notice" id="demoPreviewNotice" hidden>Example preview: worksheet answers have been prefilled to show the recovery game. These are demonstration results.</p>
           <div class="demo-controls">
             <label>Class<select id="demoClass"><option value="10">Class 10</option><option value="11">Class 11</option></select></label>
-            <label>Subject<select id="demoSubject"><option value="Biology">Biology</option><option value="Chemistry">Chemistry</option><option value="Physics">Physics</option></select></label>
+            <label>Subject<select id="demoSubject"><option value="Biology">Biology</option><option value="Chemistry">Chemistry</option><option value="Physics">Physics</option><option value="Mathematics">Maths</option></select></label>
             <button class="admit-button" id="demoStart" type="button" disabled>Start free sample</button>
           </div>
           <p class="demo-notice" id="demoNotice">These original sample sets have not yet been independently reviewed by a teacher. Answers may contain errors. They are not exam-ready papers.</p>
@@ -127,14 +131,14 @@
         <div class="coverage-copy">
           <p class="eyebrow">LEARNING COVERAGE</p>
           <h2 id="coverageTitle">What you can try today.</h2>
-          <p>Physics, Chemistry and Biology samples for Classes 10 and 11 are available in the free demo. Independent teacher review and school-board alignment are still pending.</p>
-          <p class="coverage-boundary">Our longer-term aim is all core subjects through Class 10 and Mathematics and Science for Classes 11–12. That is a roadmap, not current course availability.</p>
+          <p>Maths, Physics, Chemistry and Biology samples for Classes 10 and 11 are available in the free demo. Independent teacher review and school-board alignment are still pending.</p>
+          <p class="coverage-boundary">These are short samples, not complete courses. More subjects and Class 12 coverage are on the roadmap, not available today.</p>
         </div>
         <div class="coverage-grid">
           <button class="coverage-subject" id="choosePhysics" data-subject="Physics" type="button" aria-pressed="false"><span class="subject-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><ellipse cx="12" cy="12" rx="9" ry="3.8"/><ellipse cx="12" cy="12" rx="9" ry="3.8" transform="rotate(60 12 12)"/><ellipse cx="12" cy="12" rx="9" ry="3.8" transform="rotate(120 12 12)"/><circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none"/></svg></span><strong>Physics</strong><small>Classes 10 &amp; 11 - sample practice</small><span class="subject-action">Open sample &#8594;</span></button>
           <button class="coverage-subject" id="chooseChemistry" data-subject="Chemistry" type="button" aria-pressed="false"><span class="subject-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M9 3h6M10 3v6l-5 9a2 2 0 0 0 1.7 3h10.6a2 2 0 0 0 1.7-3l-5-9V3M7.5 16h9"/><circle cx="10" cy="18" r=".6"/><circle cx="14" cy="18.5" r=".6"/></svg></span><strong>Chemistry</strong><small>Classes 10 &amp; 11 - sample practice</small><span class="subject-action">Open sample &#8594;</span></button>
           <button class="coverage-subject" id="chooseBiology" data-subject="Biology" type="button" aria-pressed="false"><span class="subject-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><path d="M20 4c-7 0-12 3.5-12 9a5 5 0 0 0 5 5c5.5 0 7-7 7-14Z"/><path d="M4 20c2.5-5 6.5-8 12-10"/></svg></span><strong>Biology</strong><small>Classes 10 &amp; 11 - sample practice</small><span class="subject-action">Open sample &#8594;</span></button>
-          <article class="coverage-planned"><span class="planned-label">Coming later</span><strong>Mathematics &amp; other subjects</strong><small>No practice set available yet. These are not active links.</small></article>
+          <button class="coverage-subject" id="chooseMathematics" data-subject="Mathematics" type="button" aria-pressed="false"><span class="subject-symbol" aria-hidden="true"><svg viewBox="0 0 24 24" focusable="false"><rect x="5" y="3" width="14" height="18" rx="2"/><path d="M8 7h8M8 11h2m4 0h2M8 15h2m4 0h2M8 18h2m4 0h2"/></svg></span><strong>Maths</strong><small>Classes 10 &amp; 11 - sample practice</small><span class="subject-action">Start Maths &#8594;</span></button>
         </div>
       </section>
 
@@ -146,7 +150,7 @@
         </div>
         <div class="faq-list">
           <details><summary>Is Ignite free? Can we try it without an account?</summary><p>This public sample demo is free and needs no registration or payment details. Paid plans, prices and cancellation terms have not been finalized; no paid subscription is offered here.</p></details>
-          <details><summary>Does this follow my child’s school syllabus?</summary><p>Today’s samples cover Physics, Chemistry and Biology for Classes 10 and 11. School-board alignment and independent review are pending. Do not treat the samples as complete syllabus coverage or exam-ready material.</p></details>
+          <details><summary>Does this follow my child’s school syllabus?</summary><p>Today’s samples cover Maths, Physics, Chemistry and Biology for Classes 10 and 11. School-board alignment and independent review are pending. Do not treat the samples as complete syllabus coverage or exam-ready material.</p></details>
           <details><summary>What does the result tell us?</summary><p>It shows answers marked correct against the supplied key in this small sample and lists questions to revisit. It is not an academic diagnosis or a mastery measure. A future reviewed assessment and progress history will need their own validation.</p></details>
           <details><summary>Can we book a teacher or consultation?</summary><p>Not yet. Teacher-assisted learning is planned, but verified mentor profiles, availability, fees and safeguarding arrangements are not published. Booking and payment are unavailable in this demo. The classroom illustration in the prototype is not a real teacher profile.</p></details>
           <details><summary>Do we need to share our child’s details?</summary><p>No. The public demo needs no name or contact information. Its answers are kept only in this page’s memory and clear on reload. New student admissions are paused while account and privacy checks are completed; do not enter real children’s details into prototype forms.</p></details>
