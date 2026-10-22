@@ -27,7 +27,9 @@ async function fixture() {
 
 test('deployment generator separates website and servers, copies identical rules and refuses overwrites', async () => {
   const input = await fixture();
-  const result = await prepareDeployment({ ...input, files: ['index.html', '.env', 'integrations/enrollment/Code.gs'] });
+  // A tracked, previous release must not become a stale self-checksum in the next one.
+  await writeFile(path.join(input.root, 'release.json'), '{"oldRelease":true}');
+  const result = await prepareDeployment({ ...input, files: ['index.html', 'release.json', '.env', 'integrations/enrollment/Code.gs'] });
   assert.equal(result.publicConfigurationReady, false);
   const site = await readdir(path.join(input.output, 'website'));
   assert.equal(site.includes('.env'), false);
@@ -38,6 +40,8 @@ test('deployment generator separates website and servers, copies identical rules
   assert.match(await readFile(path.join(input.output, 'cloudflare/worker.mjs'), 'utf8'), /import '\.\/enrollment-validation\.js'/);
   const manifest = JSON.parse(await readFile(path.join(input.output, 'deployment-manifest.json'), 'utf8'));
   const siteRelease = JSON.parse(await readFile(path.join(input.output, 'website/release.json'), 'utf8'));
+  assert.equal(Object.hasOwn(siteRelease.files, 'release.json'), false);
+  assert.equal(result.websiteFiles, site.length);
   assert.equal(siteRelease.enquiries, 'not_configured');
   assert.equal(siteRelease.files['enrollment.js'], manifest.files['website/enrollment.js']);
   assert.equal(manifest.serverSecretsIncluded, false);

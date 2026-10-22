@@ -47,7 +47,8 @@ export async function prepareDeployment({ root = defaultRoot, output, files } = 
     throw new Error(`Choose a new output directory; existing output is never overwritten (${error.code}).`);
   }
   const tracked = files || execFileSync('git', ['-c', `safe.directory=${root.replaceAll('\\', '/')}`, '-C', root, 'ls-files', '-z'], { encoding: 'utf8' }).split('\0').filter(Boolean);
-  const candidates = [...new Set([...tracked, ...publicFiles])].filter(file => safeStaticPath.test(file));
+  // release.json is generated below; never copy/hash the previous release into itself.
+  const candidates = [...new Set([...tracked, ...publicFiles])].filter(file => safeStaticPath.test(file) && file !== 'release.json');
   const checksums = {};
   const put = async (relative, bytes) => {
     const destination = path.join(output, relative);
