@@ -8,7 +8,8 @@
     const items = (window.__IGNITE_PILOT_CONTENT__?.items || []).filter((item) =>
       item.visibility === 'demo_sample' && practice?.playable(item)
       && [10, 11].includes(item.classLevel)
-      && ['Biology', 'Chemistry', 'Physics', 'Mathematics'].includes(item.subject));
+      && ['Biology', 'Chemistry', 'Physics', 'Mathematics'].includes(item.subject))
+      .map((item) => window.IgniteTrialDiagrams?.adapt(item) || item);
     let active = null;
     let step = 0;
     let answers = Object.create(null);
@@ -60,12 +61,18 @@
       delete get('demoFeedback').dataset.correct;
       get('demoNext').disabled = true;
       get('demoNext').textContent = step + 1 === active.questions.length ? 'See my practice snapshot' : 'Next question';
+      get('demoOptions').classList.toggle('has-diagrams', Boolean(question.diagramOptions));
       const buttons = question.options.map((option, index) => {
         const button = document.createElement('button');
         button.type = 'button';
         button.className = 'demo-option';
         const label = document.createElement('span'); label.className = 'demo-choice-letter'; label.textContent = 'ABCD'[index];
-        const value = document.createElement('span'); value.className = 'demo-choice-value'; write(value, option);
+        const value = document.createElement('span'); value.className = 'demo-choice-value';
+        const diagram = window.IgniteTrialDiagrams?.render(question.diagramOptions?.[index]);
+        if (diagram) {
+          const caption = document.createElement('span'); caption.className = 'demo-diagram-caption'; caption.textContent = option;
+          value.append(diagram, caption);
+        } else write(value, option);
         button.append(label, value);
         button.setAttribute('aria-pressed', 'false');
         button.addEventListener('click', () => {

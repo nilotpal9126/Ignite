@@ -25,7 +25,7 @@ test('rejects junk, arbitrary class/board/state, formula/markup, bad phones/emai
     ['studentName', '12345'], ['studentName', 'aaaaaa'], ['studentName', 'asdf'],
     ['school', '<script>'], ['school', '=IMPORTXML(1)'], ['studentClass', '99'],
     ['board', 'made-up'], ['state', 'made-up'], ['district', '00000'],
-    ['preferredLocation', 'x'.repeat(101)], ['phone', '9999999999'], ['phone', '9876543210'],
+    ['phone', '9999999999'], ['phone', '9876543210'],
     ['phone', '1234567890'], ['phone', '6980123456abc'], ['email', 'broken@'],
     ['consent', false], ['consent', 'true'],
   ]) assert.ok(rules.validate({ ...sample(), [key]: value }).errors[key], `${key}: ${value}`);
@@ -33,6 +33,27 @@ test('rejects junk, arbitrary class/board/state, formula/markup, bad phones/emai
   assert.equal(rules.validate([]).valid, false);
   assert.ok(rules.validate({ ...sample(), board: 'Other' }).errors.otherBoard);
   assert.ok(rules.validate({ ...sample(), sameWhatsapp: false, whatsapp: '123' }).errors.whatsapp);
+});
+
+test('named boards are required for state, regional and other boards on both tiers', () => {
+  for (const board of ['State board', 'Regional board', 'Other']) {
+    assert.ok(rules.validate({ ...sample(), board }).errors.otherBoard);
+    const result = rules.validate({ ...sample(), board, otherBoard: 'West Bengal Board of Secondary Education' });
+    assert.equal(result.valid, true);
+    assert.equal(result.data.otherBoard, 'West Bengal Board of Secondary Education');
+  }
+  assert.equal(rules.validate({ ...sample(), otherBoard: 'unused value' }).data.otherBoard, '');
+});
+
+test('preferred neighbourhood is required only for Siliguri and is discarded elsewhere', () => {
+  assert.equal(rules.validate({ ...sample(), preferredLocation: '' }).valid, true);
+  assert.equal(rules.validate(sample()).data.preferredLocation, '');
+  for (const city of ['Siliguri', ' siliguri ', 'SILIGURI']) {
+    assert.ok(rules.validate({ ...sample(), city, preferredLocation: '' }).errors.preferredLocation);
+    assert.ok(rules.validate({ ...sample(), city, preferredLocation: 'x'.repeat(101) }).errors.preferredLocation);
+    assert.equal(rules.validate({ ...sample(), city, preferredLocation: 'Pradhan Nagar' }).valid, true);
+  }
+  assert.equal(rules.isSiliguri('Sili-guri'), false);
 });
 
 test('dedup normalization ignores case/spacing/punctuation, permits siblings and does not expose unknown fields', () => {
@@ -96,6 +117,19 @@ test('Sheet rejects invalid submissions and unknown callers without adding rows'
   assert.equal(sheet.send({ ...sample(), requestId: randomUUID() }, 'wrong-secret').ok, false);
   assert.equal(sheet.send({ ...sample(), requestId: randomUUID(), phone: '123' }).ok, false);
   assert.equal(sheet.rows.length, 0);
+});
+
+test('Sheet enforces named boards and Siliguri-only area even when browser checks are bypassed', () => {
+  const sheet = sheetHarness();
+  const data = { ...sample(), requestId: randomUUID(), board: 'Regional board', city: 'Siliguri', preferredLocation: '' };
+  assert.equal(sheet.send(data).ok, false);
+  assert.equal(sheet.send({ ...data, otherBoard: 'West Bengal Board', preferredLocation: '' }).ok, false);
+  assert.equal(sheet.rows.length, 0);
+  assert.equal(sheet.send({ ...data, otherBoard: 'West Bengal Board', preferredLocation: 'Pradhan Nagar' }).ok, true);
+  assert.equal(sheet.rows[1][7], 'West Bengal Board (Regional board)');
+  assert.equal(sheet.rows[1][11], 'Pradhan Nagar');
+  assert.equal(sheet.send({ ...sample(), studentName: 'Anil Das', requestId: randomUUID(), preferredLocation: 'should not be stored' }).ok, true);
+  assert.equal(sheet.rows[2][11], '');
 });
 
 test('busy Sheet lock returns a retryable failure without writing or claiming success', () => {
@@ -201,5 +235,54 @@ test('Worker enforces origin, validation, server Turnstile check and a confirmed
       ? new Response(JSON.stringify({ success: true, action: 'enrollment', hostname: 'ignite.example' }))
       : new Response('not a receipt');
     assert.equal((await worker.fetch(request(data), env)).status, 503);
+  } finally { globalThis.fetch = nativeFetch; }
+});
+
+test('Worker rejects malformed or oversized requests before any external service call', async () => {
+  const nativeFetch = globalThis.fetch;
+  const env = { ALLOWED_ORIGIN: 'https://ignite.example', SHEETS_WEB_APP_URL: 'https://script.google.com/macros/s/synthetic/exec',
+    SHEETS_AUTH_SECRET: 'synthetic-secret', TURNSTILE_SECRET_KEY: 'synthetic-turnstile' };
+  const data = { ...sample(), requestId: randomUUID(), turnstileToken: 'synthetic-token' };
+  let calls = 0;
+  const request = (body, type = 'application/json') => new Request('https://api.example/enrollments', {
+    method: 'POST', headers: { Origin: env.ALLOWED_ORIGIN, 'Content-Type': type }, body,
+  });
+  try {
+    globalThis.fetch = async () => { calls++; throw new Error('No external calls expected'); };
+    for (const [body, type, status] of [
+      [JSON.stringify(data), 'text/plain', 415], ['{', 'application/json', 400],
+      ['[]', 'application/json', 400], [JSON.stringify({ ...data, website: 'spam' }), 'application/json', 400],
+      [JSON.stringify({ ...data, requestId: 'not-a-uuid' }), 'application/json', 400],
+      [JSON.stringify({ ...data, turnstileToken: '' }), 'application/json', 403],
+      [JSON.stringify({ ...data, board: 'State board', otherBoard: '' }), 'application/json', 422],
+      [JSON.stringify({ ...data, city: 'Siliguri', preferredLocation: '' }), 'application/json', 422],
+    ]) assert.equal((await worker.fetch(request(body, type), env)).status, status);
+    const streamed = new Request('https://api.example/enrollments', {
+      method: 'POST', headers: { Origin: env.ALLOWED_ORIGIN, 'Content-Type': 'application/json' }, duplex: 'half',
+      body: new ReadableStream({ start(controller) { controller.enqueue(new Uint8Array(8192)); controller.enqueue(new Uint8Array(8193)); controller.close(); } }),
+    });
+    assert.equal((await worker.fetch(streamed, env)).status, 413);
+    assert.equal(calls, 0);
+  } finally { globalThis.fetch = nativeFetch; }
+});
+
+test('Worker rejects successful-looking Turnstile tokens for another hostname or action', async () => {
+  const nativeFetch = globalThis.fetch;
+  const env = { ALLOWED_ORIGIN: 'https://ignite.example', SHEETS_WEB_APP_URL: 'https://script.google.com/macros/s/synthetic/exec',
+    SHEETS_AUTH_SECRET: 'synthetic-secret', TURNSTILE_SECRET_KEY: 'synthetic-turnstile' };
+  try {
+    for (const verification of [
+      { success: true, action: 'signin', hostname: 'ignite.example' },
+      { success: true, action: 'enrollment', hostname: 'other.example' },
+    ]) {
+      globalThis.fetch = async (url) => {
+        assert.ok(String(url).includes('siteverify'), 'a rejected challenge must never reach the Sheet');
+        return new Response(JSON.stringify(verification));
+      };
+      const request = new Request('https://api.example/enrollments', { method: 'POST',
+        headers: { Origin: env.ALLOWED_ORIGIN, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...sample(), requestId: randomUUID(), turnstileToken: 'synthetic-token' }) });
+      assert.equal((await worker.fetch(request, env)).status, 403);
+    }
   } finally { globalThis.fetch = nativeFetch; }
 });

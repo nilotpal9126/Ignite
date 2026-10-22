@@ -50,7 +50,7 @@ function doPost(event) {
     var data = result.data;
     var reference = 'IGN-' + Utilities.getUuid().replace(/-/g, '').slice(0, 12).toUpperCase();
     var values = [new Date().toISOString(), reference, requestId, key, data.studentName,
-      data.studentClass, data.school, data.board === 'Other' ? data.otherBoard : data.board,
+      data.studentClass, data.school, globalThis.IgniteEnrollmentRules.requiresBoardName(data.board) ? data.otherBoard + ' (' + data.board + ')' : data.board,
       data.state, data.district, data.city, data.preferredLocation, data.guardianName,
       '+91' + data.phone, '+91' + data.whatsapp, data.email, 'Yes',
       data.whatsappOptIn ? 'Yes' : 'No', 'ignite-enquiry-v1', 'New'];

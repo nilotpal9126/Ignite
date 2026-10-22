@@ -8,7 +8,7 @@ import vm from 'node:vm';
 const ownDirectory = path.dirname(fileURLToPath(import.meta.url));
 const defaultRoot = path.resolve(ownDirectory, '../..');
 const publicFiles = ['enrollment-config.js', 'enrollment-validation.js', 'enrollment.css', 'enrollment.js',
-  'firebase-session.js', 'account-ui.js', 'account.css'];
+  'firebase-session.js', 'account-ui.js', 'account.css', 'trial-diagrams.js'];
 const safeStaticPath = /^(?:[^/]+\.(?:html|css|js)|(?:assets|data|game)\/[^\r\n]+\.(?:js|json|png|webp|svg|woff2|txt))$/i;
 const digest = (bytes) => createHash('sha256').update(bytes).digest('hex');
 

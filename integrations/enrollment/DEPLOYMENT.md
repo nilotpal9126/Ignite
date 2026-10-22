@@ -68,6 +68,20 @@ Add the official WhatsApp Channel invite URL when available.
 Do not put the Sheet ID, shared secret or Turnstile secret key in the website. Empty public
 settings keep submission disabled; the quiz still works.
 
+### Enquiry field rules (October 2026)
+
+Student name, class, school, board, state / UT, district, city, guardian name, mobile,
+WhatsApp number, email and guardian consent are required. State board, Regional board and
+Other require a typed board name. A preferred neighbourhood is shown and required **only
+when the city is Siliguri**, ignoring case and surrounding whitespace. Other cities' area
+values are discarded server-side. No full home address is requested.
+
+The same-number checkbox copies the validated mobile into WhatsApp without asking the
+guardian to type it twice. Separate WhatsApp numbers are validated independently. These
+checks reject malformed and common placeholder values; they do not prove ownership of a
+number, a school's existence or a person's identity. That requires additional verification.
+Deploy updated `Rules.gs`, `Code.gs` and Worker validation together with the website.
+
 To check your repository settings before generating the final bundle:
 
 ```powershell

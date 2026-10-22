@@ -40,7 +40,7 @@
         ${select('state', 'State / union territory', options(rules.states, 'Choose state / UT'))}
         ${field('district', 'District', 'type="text" minlength="2" maxlength="80" disabled')}
         ${field('city', 'City / town', 'type="text" autocomplete="address-level2" minlength="2" maxlength="80" disabled')}
-        ${field('preferredLocation', 'Preferred area / neighbourhood', 'type="text" minlength="2" maxlength="100" disabled', false, 'An area within your city, rather than your full home address.')}
+        <div id="enroll-preferred-area" hidden>${field('preferredLocation', 'Preferred area in Siliguri', 'type="text" minlength="2" maxlength="100" disabled', false, 'For Siliguri only. Enter a neighbourhood, not your full home address.')}</div>
       </div></fieldset>
       <fieldset data-enroll-step="2" hidden><legend>How can we reach you?</legend><p class="enroll-step-copy">Use the parent or guardian’s contact details.</p><p class="enroll-summary" id="enroll-summary"></p><div class="enroll-grid">
         ${field('guardianName', 'Parent / guardian name', 'type="text" autocomplete="section-guardian name" minlength="2" maxlength="80"', true)}
@@ -117,7 +117,9 @@
     status.textContent = '';
     if (step === 2) {
       const data = collect();
-      dialog.querySelector('#enroll-summary').textContent = `${data.studentName} · Class ${data.studentClass} · ${data.school} · ${data.board === 'Other' ? data.otherBoard : data.board} | ${data.preferredLocation}, ${data.city}, ${data.state}`;
+      const board = rules.requiresBoardName(data.board) ? `${data.otherBoard} (${data.board})` : data.board;
+      const location = [rules.isSiliguri(data.city) ? data.preferredLocation : '', data.city, data.state].filter(Boolean).join(', ');
+      dialog.querySelector('#enroll-summary').textContent = `${data.studentName} · Class ${data.studentClass} · ${data.school} · ${board} | ${location}`;
       prepareVerification();
     }
     if (focus) { steps[step].querySelector('legend').tabIndex = -1; steps[step].querySelector('legend').focus(); }
@@ -174,7 +176,15 @@
   function locationFields() {
     control('district').disabled = !control('state').value;
     control('city').disabled = control('district').disabled || control('district').value.trim().length < 2;
-    control('preferredLocation').disabled = control('city').disabled || control('city').value.trim().length < 2;
+    const showArea = !control('city').disabled && rules.isSiliguri(control('city').value);
+    dialog.querySelector('#enroll-preferred-area').hidden = !showArea;
+    control('preferredLocation').disabled = !showArea;
+    control('preferredLocation').required = showArea;
+    if (!showArea) {
+      control('preferredLocation').value = '';
+      control('preferredLocation').removeAttribute('aria-invalid');
+      dialog.querySelector('#enroll-preferredLocation-error').textContent = '';
+    }
   }
   form.addEventListener('input', (event) => {
     const input = event.target;
@@ -191,9 +201,9 @@
     ['city', 'preferredLocation'].forEach((name) => { control(name).value = ''; });
     locationFields();
   });
-  control('city').addEventListener('change', () => { control('preferredLocation').value = ''; locationFields(); });
+  control('city').addEventListener('change', locationFields);
   function optionalFields() {
-    const other = control('board').value === 'Other';
+    const other = rules.requiresBoardName(control('board').value);
     dialog.querySelector('#enroll-other-board').hidden = !other;
     control('otherBoard').required = other;
     control('otherBoard').disabled = !other;
@@ -205,6 +215,7 @@
   control('board').addEventListener('change', optionalFields);
   control('sameWhatsapp').addEventListener('change', optionalFields);
   optionalFields();
+  locationFields();
 
   form.addEventListener('submit', async (event) => {
     event.preventDefault();

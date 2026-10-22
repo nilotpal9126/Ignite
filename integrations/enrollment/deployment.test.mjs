@@ -12,7 +12,7 @@ async function fixture() {
   const root = path.join(temp, 'source');
   await mkdir(path.join(root, 'integrations/enrollment'), { recursive: true });
   await writeFile(path.join(root, 'index.html'), '<link rel="stylesheet" href="./enrollment.css"><script src="./enrollment.js"></script>');
-  for (const file of ['enrollment-config.js', 'enrollment-validation.js', 'enrollment.css', 'enrollment.js', 'firebase-session.js', 'account-ui.js', 'account.css']) {
+  for (const file of ['enrollment-config.js', 'enrollment-validation.js', 'enrollment.css', 'enrollment.js', 'firebase-session.js', 'account-ui.js', 'account.css', 'trial-diagrams.js']) {
     await copyFile(path.resolve(source, '../..', file), path.join(root, file));
   }
   for (const file of ['Code.gs', 'appsscript.json', 'worker.mjs', 'wrangler.jsonc', '.dev.vars.example', 'DEPLOYMENT.md']) {

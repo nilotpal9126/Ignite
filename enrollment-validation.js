@@ -11,7 +11,7 @@
     'Puducherry', 'Punjab', 'Rajasthan', 'Sikkim', 'Tamil Nadu', 'Telangana',
     'Tripura', 'Uttar Pradesh', 'Uttarakhand', 'West Bengal',
   ]);
-  const boards = Object.freeze(['CBSE', 'CISCE', 'State board', 'NIOS', 'IB', 'Cambridge', 'Other']);
+  const boards = Object.freeze(['CBSE', 'CISCE', 'State board', 'Regional board', 'NIOS', 'IB', 'Cambridge', 'Other']);
   const fields = Object.freeze([
     'studentName', 'studentClass', 'school', 'board', 'otherBoard', 'state',
     'district', 'city', 'preferredLocation', 'guardianName', 'phone',
@@ -19,6 +19,8 @@
   ]);
   const clean = (value) => typeof value === 'string' ? value.normalize('NFKC').trim().replace(/\s+/gu, ' ') : '';
   const fold = (value) => clean(value).toLowerCase().replace(/[^\p{L}\p{N}]/gu, '');
+  const requiresBoardName = (board) => ['State board', 'Regional board', 'Other'].includes(board);
+  const isSiliguri = (city) => clean(city).toLowerCase() === 'siliguri';
   const placeholders = new Set(['test', 'testing', 'testschool', 'dummy', 'dummyschool',
     'sample', 'asdf', 'asdfgh', 'qwerty', 'abc', 'abcd', 'abcdef', 'xyz', 'na',
     'none', 'unknown', 'studentname', 'schoolname', 'yourname', 'guardianname']);
@@ -54,12 +56,13 @@
     text('school', 'the school\u2019s name', 3, 120, placePattern);
     if (!/^(?:[1-9]|1[0-2])$/.test(data.studentClass)) errors.studentClass = 'Choose a class from the list.';
     if (!boards.includes(data.board)) errors.board = 'Choose a school board.';
-    if (data.board === 'Other') text('otherBoard', 'the school board\u2019s name', 2, 80, placePattern);
+    if (requiresBoardName(data.board)) text('otherBoard', 'the school board\u2019s name', 2, 80, placePattern);
     else data.otherBoard = '';
     if (!states.includes(data.state)) errors.state = 'Choose a state or union territory.';
     text('district', 'the district name', 2, 80, placePattern);
     text('city', 'the city or town name', 2, 80, placePattern);
-    text('preferredLocation', 'a preferred area or neighbourhood', 2, 100, placePattern);
+    if (isSiliguri(data.city)) text('preferredLocation', 'a preferred area or neighbourhood in Siliguri', 2, 100, placePattern);
+    else data.preferredLocation = '';
     data.phone = phone(data.phone);
     data.whatsapp = data.sameWhatsapp ? data.phone : phone(data.whatsapp);
     if (!validPhone(data.phone)) errors.phone = 'Enter a valid Indian mobile number; avoid repeated or sample numbers.';
@@ -75,7 +78,7 @@
   function duplicateKey(data) {
     return [phone(data.phone), fold(data.studentName), data.studentClass, fold(data.school)].join('|');
   }
-  const rules = Object.freeze({ states, boards, fields, clean, validate, duplicateKey });
+  const rules = Object.freeze({ states, boards, fields, clean, requiresBoardName, isSiliguri, validate, duplicateKey });
   root.IgniteEnrollmentRules = rules;
   if (typeof module !== 'undefined' && module.exports) module.exports = rules;
 })(globalThis);
