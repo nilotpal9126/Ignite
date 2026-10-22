@@ -24,18 +24,31 @@ function loadAdmittedStudent() {
 }
 
 function applyStudentProfile(student) {
-  state.studentClass = Number(student.studentClass);
+  const classLevel = Number(student.studentClass);
+  state.studentClass = classLevel >= 1 && classLevel <= 12 ? classLevel : null;
   const name = String(student.studentName).trim();
   const firstName = name.split(/\s+/)[0] || 'Student';
   const initials = name.split(/\s+/).slice(0, 2).map((part) => part[0]).join('').toUpperCase() || 'ST';
   setText('.profile-copy strong', firstName);
-  setText('.profile-copy small', `Class ${student.studentClass}`);
+  setText('.profile-copy small', state.studentClass ? `Class ${state.studentClass}` : 'Practice account');
   setText('.avatar', initials);
-  $('.profile-button')?.setAttribute('aria-label', `Student profile: ${name}, Class ${student.studentClass}`);
+  $('.profile-button')?.setAttribute('aria-label', `Student profile: ${name}${state.studentClass ? `, Class ${state.studentClass}` : ''}`);
   document.title = `${firstName}'s Dashboard | Project Ignite`;
 }
 
-function logOut() {
+async function logOut() {
+  if (window.__IGNITE_PLATFORM__?.identity?.enabled) {
+    try { await window.IgniteIdentity.signOut(); }
+    catch {
+      const warning = document.querySelector('#accountSignoutStatus') || Object.assign(document.createElement('p'), {
+        id: 'accountSignoutStatus', className: 'account-load-status',
+      });
+      warning.setAttribute('role', 'status');
+      warning.textContent = 'Sign-out could not finish. Check your connection and try again.';
+      document.querySelector('.app-shell').before(warning);
+      return;
+    }
+  }
   storage.removeSession(SESSION_KEY);
   window.location.assign('./index.html#login');
 }
@@ -1094,11 +1107,39 @@ function learnerLibrary(catalog) {
   return items.filter((item, index) => items.findIndex((other) => other.content.id === item.content.id) === index);
 }
 
-function init() {
-  const admittedStudent = loadAdmittedStudent();
-  if (!admittedStudent || storage.getSession(SESSION_KEY) !== admittedStudent.admissionId) {
-    window.location.replace(admittedStudent ? './index.html#login' : './index.html#admission');
-    return;
+async function init() {
+  let admittedStudent;
+  if (window.__IGNITE_PLATFORM__?.identity?.enabled) {
+    document.body.classList.add('account-checking');
+    const loading = Object.assign(document.createElement('p'), {
+      className: 'account-load-status', textContent: 'Loading your account…',
+    });
+    loading.setAttribute('role', 'status');
+    document.querySelector('.app-shell').before(loading);
+    try {
+      if (!window.IgniteIdentity) throw new Error('Account sign-in could not load.');
+      await window.IgniteIdentity.ready();
+      const user = window.IgniteIdentity.session();
+      const learner = window.IgniteIdentity.learner();
+      if (!user || !learner) { window.location.replace('./index.html#login'); return; }
+      admittedStudent = { studentName: learner.studentName, studentClass: learner.classLevel, admissionId: learner.id };
+      window.IgniteIdentity.onChange(value => {
+        if (!value?.emailVerified || value.uid !== user.uid) window.location.replace('./index.html#login');
+      });
+      loading.remove();
+      document.body.classList.remove('account-checking');
+    } catch (error) {
+      loading.textContent = `${error.message || 'Account sign-in could not load.'} `;
+      const retry = Object.assign(document.createElement('a'), { href: './index.html#login', textContent: 'Return to sign in' });
+      loading.append(retry);
+      return;
+    }
+  } else {
+    admittedStudent = loadAdmittedStudent();
+    if (!admittedStudent || storage.getSession(SESSION_KEY) !== admittedStudent.admissionId) {
+      window.location.replace(admittedStudent ? './index.html#login' : './index.html#admission');
+      return;
+    }
   }
   applyStudentProfile(admittedStudent);
   state.learnerId = admittedStudent.admissionId;

@@ -14,6 +14,8 @@
     <link rel="preload" href="./assets/fonts/satoshi-variable.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="preload" href="./assets/fonts/cabinet-grotesk-variable.woff2" as="font" type="font/woff2" crossorigin />
     <link rel="stylesheet" href="./notice-board.css" />
+    <link rel="stylesheet" href="./enrollment.css" />
+    <link rel="stylesheet" href="./account.css" />
   </head>
   <body data-admissions="preview">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -26,7 +28,7 @@
         <a href="#coverage"><span class="nav-index" aria-hidden="true">01</span>Subjects</a>
         <a href="#how-it-works"><span class="nav-index" aria-hidden="true">02</span>How it works</a>
         <span class="admissions-open"><i aria-hidden="true"></i>Early-access demo</span>
-        <a class="nav-cta" id="enrollNav" href="#free-demo">Let’s practise <span aria-hidden="true">↗</span></a>
+        <a class="nav-cta" id="enrollNav" href="#enroll" data-open-enroll>Enroll Now! <span aria-hidden="true">↗</span></a>
         <button class="nav-record open-enrollment" id="viewEnrollmentNav" type="button" hidden>View enrollment</button>
         <button class="nav-login open-login" type="button">Login</button>
       </nav>
@@ -123,6 +125,7 @@
             <p class="demo-privacy">This reflects only these six questions and the supplied sample answer key. Where an answer has a learning tag, a recovery mission can offer focused practice. A single wrong answer does not prove its cause or establish mastery. Results are not sent to an owner dashboard.</p>
             <button class="admit-button" id="demoRestart" type="button">Try this sample again</button>
             <button class="learning-button" id="demoFinish" type="button">Finish for now</button>
+            <div class="enroll-result"><a class="enroll-trigger" href="#enroll" data-open-enroll>Enroll Now! <span aria-hidden="true">↗</span></a></div>
           </section>
         </div>
       </section>
@@ -153,18 +156,18 @@
           <details><summary>Does this follow my child’s school syllabus?</summary><p>Today’s samples cover Maths, Physics, Chemistry and Biology for Classes 10 and 11. School-board alignment and independent review are pending. Do not treat the samples as complete syllabus coverage or exam-ready material.</p></details>
           <details><summary>What does the result tell us?</summary><p>It shows answers marked correct against the supplied key in this small sample and lists questions to revisit. It is not an academic diagnosis or a mastery measure. A future reviewed assessment and progress history will need their own validation.</p></details>
           <details><summary>Can we book a teacher or consultation?</summary><p>Not yet. Teacher-assisted learning is planned, but verified mentor profiles, availability, fees and safeguarding arrangements are not published. Booking and payment are unavailable in this demo. The classroom illustration in the prototype is not a real teacher profile.</p></details>
-          <details><summary>Do we need to share our child’s details?</summary><p>No. The public demo needs no name or contact information. Its answers are kept only in this page’s memory and clear on reload. New student admissions are paused while account and privacy checks are completed; do not enter real children’s details into prototype forms.</p></details>
+          <details><summary>Do we need to share our child’s details?</summary><p>The free quiz needs no name or contact information. Enrolment enquiries are a separate, optional step for a parent or guardian. The form explains whether submissions are open before you send anything.</p></details>
           <details><summary>Is short practice a replacement for school or tuition?</summary><p>This is a supplementary practice experience, not a replacement for teaching or a guarantee of better marks. Try it alongside the learning support your child already receives and judge whether the explanations are useful.</p></details>
         </div>
       </section>
 
       <section class="admission-section" id="admission" aria-labelledby="admissionTitle">
         <div class="admission-intro">
-          <p class="eyebrow">EARLY ACCESS · EXISTING ACCOUNTS</p>
-          <h2 id="admissionTitle">Explore first. Enrolment comes later.</h2>
-          <p>The free demo is open. New student admissions are paused while we complete independent content review, account access and data-protection checks. No payment is taken.</p>
-          <div class="privacy-note" id="admissionPrivacy"><strong>Do not enter real children's details.</strong> This is an early-access demonstration, not a production admission service. Existing prototype users can still sign in.</div>
-          <a class="primary-link" href="#free-demo">Try the free demo</a>
+          <p class="eyebrow">YOUR NEXT CHAPTER</p>
+          <h2 id="admissionTitle">Let’s find your next step.</h2>
+          <p>Share the student’s class, school and preferred learning area. Our enrolment form brings everything together in one place.</p>
+          <div class="privacy-note" id="admissionPrivacy">A parent or guardian can submit an enquiry when enrolment opens. Use Login to create or open a learning account with your email. No payment is taken here.</div>
+          <a class="primary-link" href="#enroll" data-open-enroll>Enroll Now! <span aria-hidden="true">↗</span></a>
         </div>
 
         <section class="guardian-gate" id="guardianGate" aria-labelledby="guardianGateTitle" hidden>
@@ -266,7 +269,7 @@
         <label>PIN<input id="loginPin" type="password" minlength="4" maxlength="6" pattern="[0-9]{4,6}" inputmode="numeric" autocomplete="current-password" required /></label>
         <button class="admit-button" type="submit">Log in <span aria-hidden="true">→</span></button>
         <p class="form-status" id="loginStatus" role="status" aria-live="polite"></p>
-        <p class="login-help">Just exploring? <a href="#free-demo" id="loginToEnroll">Try the free demo</a>. New admissions are paused.</p>
+        <p class="login-help">New to Ignite? <a href="#enroll" data-open-enroll>Enroll Now!</a> Or <a href="#free-demo" id="loginToEnroll">try the free demo</a>.</p>
       </form>
     </dialog>
 
@@ -296,10 +299,15 @@
       <div class="footer-links"><a href="#free-demo">Free demo</a><a href="#questions">FAQs</a><button class="open-enrollment" id="viewEnrollmentFooter" type="button" hidden>View enrollment</button><button class="open-login" type="button">Login</button></div>
     </footer>
 
-    <script src="./platform-config.js" defer></script>
-    <script src="./firebase-auth.js" defer></script>
+    <script src="./platform-config.js?v=auth-20261022" defer></script>
+    <script src="./firebase-session.js" defer></script>
+    <script src="./enrollment-config.js" defer></script>
+    <script src="./enrollment-validation.js" defer></script>
+    <script src="./enrollment.js" defer></script>
+    <script src="./firebase-auth.js?v=auth-20261022" defer></script>
+    <script src="./account-ui.js" defer></script>
     <script src="./api-client.js" defer></script>
-    <script src="./admission.js" defer></script>
+    <script src="./admission.js?v=auth-20261022" defer></script>
     <script src="./data/pilot-worksheets.js" defer></script>
     <script src="./practice.js" defer></script>
     <script src="./science-text.js" defer></script>

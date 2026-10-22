@@ -1,0 +1,27 @@
+.firebase-account-dialog { border: 2px solid #10243e; border-radius: 8px; }
+html:has(.firebase-account-dialog[open]) { overflow: hidden; }
+.firebase-account-card { background: #fffdf7; border-top: 7px solid #dff04f; }
+.firebase-account-card h2 { padding-right: 40px; font-size: clamp(28px, 5vw, 38px); line-height: 1.1; }
+.firebase-account-card h2:focus { outline: none; }
+.firebase-account-card h3 { font-size: 23px; margin: 22px 0 12px; }
+.firebase-account-card .dialog-close { border: 1px solid #bcb4a6; border-radius: 5px; background: transparent; }
+.firebase-account-card form input { border-radius: 5px; }
+.firebase-account-card .admit-button, .firebase-account-card .primary-link { min-height: 48px; border: 1px solid #10243e; border-radius: 5px; box-shadow: 3px 3px 0 #10243e; }
+.auth-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin: 24px 0; }
+.auth-tabs button, .auth-secondary { min-height: 44px; padding: 8px 12px; color: #10243e; background: transparent; border: 1px solid #bcb4a6; border-radius: 5px; font: inherit; font-weight: 800; cursor: pointer; }
+.auth-tabs [aria-pressed="true"] { background: #edf1d4; border-color: #10243e; }
+.auth-text-button { display: block; min-height: 44px; padding: 10px 0; color: #174b72; background: transparent; border: 0; font: inherit; font-size: 13px; font-weight: 750; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.auth-hint { margin: 8px 0 16px; color: #53657a; font-size: 12px; font-weight: 450; }
+.firebase-account-card .auth-consent { display: flex; align-items: start; gap: 10px; font-weight: 450; }
+.firebase-account-card .auth-consent input { width: 18px; min-height: 18px; height: 18px; flex: none; margin: 2px 0 0; accent-color: #405515; }
+.auth-email { overflow-wrap: anywhere; }
+.auth-stack { display: grid; gap: 12px; }
+.firebase-account-card [disabled] { opacity: .6; cursor: wait; }
+.firebase-account-card .form-status { color: #405026; }
+.firebase-account-card .form-status:empty { display: none; }
+.firebase-account-card .form-status[data-state="error"] { color: #a12d25; }
+.firebase-account-card button:focus-visible, .firebase-account-card input:focus-visible { outline: 3px solid #a4492f; outline-offset: 3px; }
+.account-load-status { margin: 20px; padding: 16px; background: #eef1d8; border-left: 3px solid #91a528; color: #10243e; }
+.account-checking .app-shell { visibility: hidden; }
+.game-topbar { height: auto; min-height: 72px; flex-wrap: wrap; gap: 10px; padding-top: 10px; padding-bottom: 10px; }
+.game-topbar .topbar-actions { flex-wrap: wrap; justify-content: flex-end; }

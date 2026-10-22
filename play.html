@@ -10,6 +10,8 @@
     <link rel="apple-touch-icon" href="./assets/ignite-logo-192.png" />
     <link rel="stylesheet" href="./styles.css" />
     <link rel="stylesheet" href="./game.css" />
+    <link rel="stylesheet" href="./enrollment.css" />
+    <link rel="stylesheet" href="./account.css" />
   </head>
   <body class="game-page">
     <noscript><p class="noscript-banner">Ignite Play needs JavaScript.</p></noscript>
@@ -20,6 +22,8 @@
         <span>Project <strong>Ignite</strong></span>
       </a>
       <div class="topbar-actions">
+        <a class="icon-button" id="gameAccountLink" href="./index.html?next=play#login">Sign in</a>
+        <a class="enroll-trigger" href="./index.html#enroll" data-open-enroll>Enroll Now!</a>
         <span class="streak-chip" id="streakChip" title="Day streak"><span aria-hidden="true">🔥</span> <strong id="streakDays">0</strong><span class="sr-only"> day streak</span></span>
         <a class="icon-button" href="./dashboard.html" aria-label="Back to dashboard"><span aria-hidden="true">←</span><span class="desktop-label">Dashboard</span></a>
       </div>
@@ -121,6 +125,7 @@
             <button class="text-button" type="button" id="backToMap">Back to the trail</button>
           </div>
           <p class="break-card" id="breakCard" hidden>That is three rounds in a row. Well done. Take a short break: stand up, drink some water, rest your eyes.</p>
+          <div class="enroll-result"><a class="enroll-trigger" href="./index.html#enroll" data-open-enroll>Enroll Now! <span aria-hidden="true">↗</span></a></div>
           <details class="notice"><summary>About these questions</summary><p id="resultNotice"></p></details>
         </article>
         <section class="review-list" id="reviewSection" aria-labelledby="reviewTitle">
@@ -142,8 +147,14 @@
     <div class="burst" id="burst" aria-hidden="true"></div>
 
     <script src="./data/pilot-worksheets.js" defer></script>
+    <script src="./platform-config.js?v=auth-20261022" defer></script>
+    <script src="./firebase-session.js" defer></script>
+    <script src="./firebase-auth.js?v=auth-20261022" defer></script>
+    <script src="./enrollment-config.js" defer></script>
+    <script src="./enrollment-validation.js" defer></script>
+    <script src="./enrollment.js" defer></script>
     <script src="./practice.js" defer></script>
     <script src="./game/core.js" defer></script>
-    <script src="./game.js" defer></script>
+    <script src="./game.js?v=auth-20261022" defer></script>
   </body>
 </html>

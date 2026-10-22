@@ -7,3 +7,13 @@ node_modules/
 .idea/
 *.backup.js
 *.bak
+
+# Deployment credentials / generated local artifacts
+.dev.vars
+.dev.vars.*
+!.dev.vars.example
+.env
+.env.*
+!.env.example
+.wrangler/
+ignite-deployment-*/

@@ -1,17 +1,18 @@
 # Project Ignite
 
 A static, buildless sample preview of the Project Ignite learning platform: anonymous practice,
-mistake recovery, same-question recall, and a device-local dashboard for existing prototype accounts.
+mistake recovery, same-question recall, and account-isolated practice in the current browser.
 
 > **Sample preview, not an approved learning product.** New admissions are paused. Anonymous
-> answers stay in page memory; dashboard attempts stay in that browser. No production account,
-> payment or cloud learning-history service is enabled by this release. Do not enter real child data.
+> answers stay in page memory; dashboard attempts stay in that browser. Firebase email accounts
+> support sign-in, while admissions intake and cloud learning-history activation remain separate.
+> No payment is enabled by this release.
 
 ## Pages
 
 | Page | Purpose |
 |---|---|
-| `index.html` | Anonymous sample practice and existing prototype login; new admissions paused |
+| `index.html` | Anonymous sample practice, Firebase email sign-in and enrolment enquiries |
 | `dashboard.html` | Real practice sets, one-question workspace, recovery and device-local progress |
 | `play.html` | Ignite Play: chapter trails, Daily Spark, boss rounds, trophies and saved progress |
 | `admin.html` | Owner portal (device-local prototype) |
@@ -33,6 +34,26 @@ a fabricated diagnosis or a newly generated assessment. Pending follow-up banks 
   account for *their own* browser. Real authentication needs a backend.
 - Do not enter real children's personal data on a public demo until a proper backend, privacy
   notice and consent flow exist.
+
+## Enrolment component
+
+`Enroll Now!` opens a branded form from the landing page, student login, dashboard and game
+results. It collects student/school/board, location preference and guardian contact details.
+The Sheet integration is prepared but **not connected**: submissions stay disabled until the
+owner's endpoint and Turnstile site key are configured. See
+[`integrations/enrollment/README.md`](integrations/enrollment/README.md) for deployment,
+duplicate matching and the distinction between input validation and contact verification.
+The [deployment guide](integrations/enrollment/DEPLOYMENT.md) includes a generator for a
+website + Apps Script + Worker bundle, a configuration check, and the current multi-student
+login setup: Sheets stores enquiries; Firebase handles verified email accounts.
+
+## Firebase accounts
+
+Firebase email/password accounts now replace the single-profile prototype login when enabled
+in `platform-config.js`. Email verification, reset and sign-out use the Firebase SDK. Each
+verified account uses its own UID for browser-local progress; separate accounts can sign in
+on separate devices/tabs. Progress is not synchronized across devices. See the
+[Firebase setup guide](integrations/firebase/README.md) for provider settings and owner testing.
 
 ## Run locally
 

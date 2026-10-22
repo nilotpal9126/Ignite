@@ -2,7 +2,7 @@
 
 // Ignite Play: chapter trails, boss rounds, Fix-it rounds and the Daily Spark. Rules live in game/core.js;
 // this file draws the screens. Progress stays in this browser under the admission ID (no names are stored).
-(function ignitePlay() {
+(async function ignitePlay() {
   const core = window.IgniteGameCore;
   const STUDENT_KEY = 'ignite-pilot-student-v1';
   const SESSION_KEY = 'ignite-levels-session-v1';
@@ -30,7 +30,17 @@
   const plural = (n, word) => `${n} ${word}${n === 1 ? '' : 's'}`;
 
   /* ---------- learner and progress ---------- */
+  const firebaseMode = window.__IGNITE_PLATFORM__?.identity?.enabled === true;
+  let identityUnavailable = false;
+  if (firebaseMode) {
+    try { await window.IgniteIdentity.ready(); }
+    catch { identityUnavailable = true; }
+  }
   function learner() {
+    if (firebaseMode) {
+      const account = window.IgniteIdentity?.learner();
+      return account ? { id: account.id, classLevel: Number(account.classLevel) || NaN } : { id: 'guest', classLevel: NaN };
+    }
     try {
       const student = JSON.parse(store.get(STUDENT_KEY) || 'null');
       if (student?.admissionId) return { id: String(student.admissionId), classLevel: Number(student.studentClass) };
@@ -38,6 +48,16 @@
     return { id: 'guest', classLevel: NaN };
   }
   const me = learner();
+  const ROUND_SESSION_KEY = `${SESSION_KEY}:${encodeURIComponent(me.id)}`;
+  const accountLink = $('gameAccountLink');
+  if (accountLink) accountLink.textContent = firebaseMode && window.IgniteIdentity?.session() ? 'Account' : 'Sign in';
+  if (firebaseMode && !identityUnavailable) {
+    const uid = window.IgniteIdentity.session()?.uid || null;
+    window.IgniteIdentity.onChange(value => {
+      const nextUid = value?.emailVerified ? value.uid : null;
+      if (nextUid !== uid) window.location.reload();
+    });
+  }
   const KEY = `ignite-levels-v2:${encodeURIComponent(me.id)}`;
   const OLD_KEY = `ignite-levels-v1:${encodeURIComponent(me.id)}`;
 
@@ -52,6 +72,11 @@
   }
   const progress = load();
   function save() {
+    if (identityUnavailable) {
+      $('saveStatus').hidden = false;
+      $('saveStatus').textContent = 'Account sign-in could not load. You can play, but this session cannot save progress. Check your connection and sign in again.';
+      return;
+    }
     const failed = !store.set(KEY, JSON.stringify(progress));
     $('saveStatus').hidden = !failed;
     $('saveStatus').textContent = failed ? 'This browser could not save progress. You can keep playing in this tab.' : '';
@@ -355,9 +380,9 @@
     const result = core.settle(progress, done, tracks, today());
     done.result = result;
     save();
-    const played = done.kind === 'repair' ? Number(store.getSession(SESSION_KEY) || 0)
-      : Number(store.getSession(SESSION_KEY) || 0) + 1;
-    store.setSession(SESSION_KEY, String(played));
+    const played = done.kind === 'repair' ? Number(store.getSession(ROUND_SESSION_KEY) || 0)
+      : Number(store.getSession(ROUND_SESSION_KEY) || 0) + 1;
+    store.setSession(ROUND_SESSION_KEY, String(played));
 
     const { correct, total, stars } = result;
     const where = done.kind === 'daily' ? 'DAILY SPARK' : done.kind === 'repair' ? 'FIX-IT ROUND'

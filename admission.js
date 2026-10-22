@@ -634,6 +634,11 @@ function bindLogin() {
 }
 
 function init() {
+  if (window.__IGNITE_PLATFORM__?.identity?.enabled) {
+    // Firebase account UI owns login. The separate enquiry form owns Sheets intake.
+    pauseNewAdmissions($('#admissionForm'));
+    return;
+  }
   bindDialog();
   bindEnrollmentRecord();
   bindQuickPaste();
