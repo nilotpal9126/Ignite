@@ -339,6 +339,16 @@ body.focus-mode main { max-width: 1100px; width: 100%; margin: 0 auto; padding-b
 .practice-progress { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 24px; margin: 18px 0; padding: 16px; background: white; border: 1px solid var(--line); border-radius: var(--radius-md); }
 .practice-progress p { margin: 0; }
 .practice-progress small { flex-basis: 100%; color: var(--ink-soft); }
+.levels-spotlight { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; align-items: center; gap: 22px; margin: 0 0 42px; padding: 22px 24px; color: white; background: linear-gradient(120deg, var(--navy), #174c6c); border-radius: var(--radius-lg); box-shadow: var(--shadow); }
+.levels-copy .eyebrow { color: var(--lime); }
+.levels-copy h2 { margin: 3px 0 7px; font-family: Georgia, serif; font-size: clamp(24px, 3vw, 32px); font-weight: 600; }
+.levels-copy > p:last-child { max-width: 590px; margin: 0; color: #d9e4ed; }
+.levels-summary { display: flex; gap: 10px; }
+.levels-summary p { min-width: 70px; margin: 0; padding: 10px 12px; text-align: center; background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.14); border-radius: 13px; }
+.levels-summary strong, .levels-summary small { display: block; }
+.levels-summary strong { color: var(--lime); font-size: 22px; }
+.levels-summary small { color: #d9e4ed; font-size: 11px; text-transform: uppercase; letter-spacing: .04em; }
+.levels-button { display: inline-flex; align-items: center; justify-content: center; gap: 9px; color: var(--navy); text-decoration: none; white-space: nowrap; }
 .practice-save-status { margin: 0 0 12px; font-size: 13px; color: var(--ink-soft); }
 .practice-summary { margin-bottom: 16px; padding: 16px; border: 1px solid #bfe6d3; background: #eff8f1; border-radius: 14px; }
 .practice-summary h3 { margin: 0 0 8px; }
@@ -392,4 +402,10 @@ body.focus-mode main { max-width: 1100px; width: 100%; margin: 0 auto; padding-b
 @media (max-width: 480px) {
   .practice-summary-actions { flex-direction: column; }
   .practice-summary-actions button { width: 100%; }
+}
+@media (max-width: 900px) {
+  .levels-spotlight { grid-template-columns: 1fr; gap: 16px; padding: 22px 18px; }
+  .levels-summary { width: 100%; }
+  .levels-summary p { flex: 1; min-width: 0; }
+  .levels-button { width: 100%; }
 }

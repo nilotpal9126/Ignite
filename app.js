@@ -209,6 +209,25 @@ function recommendedPractice() {
   }) || choices[0] || null;
 }
 
+function renderLevelsProgress() {
+  const fallback = { xp: 0, levels: {}, badges: {} };
+  let saved = fallback;
+  try {
+    const learner = encodeURIComponent(state.learnerId || 'guest');
+    for (const key of [`ignite-levels-v2:${learner}`, `ignite-levels-v1:${learner}`]) {
+      const candidate = JSON.parse(storage.get(key) || 'null');
+      if (candidate && typeof candidate === 'object') { saved = candidate; break; }
+    }
+  } catch { /* A corrupt game record displays as fresh progress. */ }
+  const levels = saved.levels && typeof saved.levels === 'object' ? Object.values(saved.levels) : [];
+  const badges = saved.badges && typeof saved.badges === 'object' ? Object.keys(saved.badges) : [];
+  const stars = levels.reduce((sum, level) => sum + (Number.isFinite(level?.stars) ? Math.max(0, level.stars) : 0), 0);
+  const xp = Number.isFinite(saved.xp) ? Math.max(0, saved.xp) : 0;
+  setText('#levelsXpCount', xp);
+  setText('#levelsStarCount', stars);
+  setText('#levelsBadgeCount', badges.length);
+}
+
 /* ---------- subjects ---------- */
 function renderSubjects() {
   const grid = $('#subjectGrid');
@@ -297,7 +316,11 @@ function renderWorksheets() {
     const button = fragment.querySelector('.worksheet-footer button');
     if (isOpenToStudents(item)) {
       const tier = item.content.visibility;
-      fragment.querySelector('.review-state').textContent = tier === 'student' ? 'Published' : tier === 'demo_sample' ? 'Sample · unreviewed' : 'Draft · staff preview';
+      const aiReviewed = item.content.review?.answerKey === 'ai_reviewed'
+        && item.content.review?.independentCheck === 'second_model_agreed';
+      fragment.querySelector('.review-state').textContent = tier === 'student' ? 'Published'
+        : tier === 'demo_sample' ? aiReviewed ? 'AI-reviewed · teacher review pending' : 'Sample · unreviewed'
+        : 'Draft · staff preview';
       const answers = window.IgnitePractice.restore(item.content, storage.get(window.IgnitePractice.key(state.learnerId, item.content.id)));
       const savedScore = window.IgnitePractice.score(item.content.questions, answers);
       button.textContent = savedScore.complete ? 'Review results' : savedScore.answered ? 'Resume practice' : 'Start practice';
@@ -363,7 +386,11 @@ function openWorksheet(item) {
   $('#worksheetQuestions').hidden = false;
   $('#worksheetCount').hidden = false;
   const isDraft = content.visibility !== 'student';
-  setText('#worksheetEyebrow', content.visibility === 'demo_sample' ? 'SAMPLE PRACTICE · UNREVIEWED' : isDraft ? 'DRAFT · STAFF PREVIEW' : 'WORKSHEET');
+  const aiReviewed = content.review?.answerKey === 'ai_reviewed'
+    && content.review?.independentCheck === 'second_model_agreed';
+  setText('#worksheetEyebrow', content.visibility === 'demo_sample'
+    ? aiReviewed ? 'AI-REVIEWED PRACTICE · TEACHER REVIEW PENDING' : 'SAMPLE PRACTICE · UNREVIEWED'
+    : isDraft ? 'DRAFT · STAFF PREVIEW' : 'WORKSHEET');
   setText('#worksheetDialogTitle', content.title || item.title);
   setText('#worksheetMeta', [`Class ${content.classLevel}`, content.subject, content.chapter].filter(Boolean).join(' · '));
   const notice = $('#worksheetNotice');
@@ -1077,6 +1104,7 @@ function init() {
   state.learnerId = admittedStudent.admissionId;
   renderProgress();
   renderAdaptiveProgress();
+  renderLevelsProgress();
   bindControls();
   trackActiveSection();
   if (storage.get(FOCUS_KEY) === '1') setFocusMode(true);

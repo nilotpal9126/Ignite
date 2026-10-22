@@ -35,6 +35,7 @@
     <div class="app-shell">
       <nav class="sidebar" aria-label="Primary navigation">
         <a class="nav-item active" href="#home" aria-current="true" title="Home"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10.5 9-7.5 9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg>Home</a>
+        <a class="nav-item" href="./play.html" title="Play levels"><span aria-hidden="true">★</span>Play levels</a>
         <a class="nav-item" href="#library" title="Practice library"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11a3 3 0 0 1 3 3v15a3 3 0 0 0-3-3H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H14v18a3 3 0 0 1 3-3h.5a2.5 2.5 0 0 1 2.5 2.5z"/></svg>Practice library</a>
         <button class="nav-item nav-button" id="missionNav" type="button" title="My mission"><span aria-hidden="true">✓</span>My mission</button>
         <a class="nav-item" href="#progress" title="Progress"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V5"/><path d="M4 20h16"/><path d="m7 15 4-4 3 2 5-6"/><path d="M16 7h3v3"/></svg>Progress</a>
@@ -161,6 +162,22 @@
           <small>Latest full attempts · saved on this device · sample scores, not exam marks</small>
         </section>
 
+        <section class="levels-spotlight" aria-labelledby="levelsSpotlightTitle">
+          <div class="levels-copy">
+            <p class="eyebrow">NEW · SHORT CHAPTER ROUNDS</p>
+            <h2 id="levelsSpotlightTitle">Turn practice into progress.</h2>
+            <p>Clear bite-sized levels, improve your best score, and unlock stars and badges as you learn.</p>
+          </div>
+          <div class="levels-summary" aria-label="Ignite Play progress saved on this device">
+            <p><strong id="levelsXpCount">0</strong><small>XP</small></p>
+            <p><strong id="levelsStarCount">0</strong><small>stars</small></p>
+            <p><strong id="levelsBadgeCount">0</strong><small>badges</small></p>
+          </div>
+          <a class="primary-button levels-button" href="./play.html">
+            Play levels <span aria-hidden="true">→</span>
+          </a>
+        </section>
+
         <section class="section-block" aria-labelledby="subjectsTitle">
           <div class="section-heading">
             <div><p class="eyebrow">EXPLORE</p><h2 id="subjectsTitle">Pick a subject</h2></div>
@@ -172,7 +189,7 @@
         <section class="section-block library-section" id="library" aria-labelledby="libraryTitle">
           <div class="section-heading library-heading">
             <div><p class="eyebrow">PRACTICE LIBRARY</p><h2 id="libraryTitle" tabindex="-1">Choose your next practice</h2></div>
-            <p class="review-warning"><span aria-hidden="true">!</span> Original samples await teacher review. Check the status on each set.</p>
+            <p class="review-warning"><span aria-hidden="true">!</span> Original samples await teacher review; AI-reviewed sets are labelled separately. Check each set's status.</p>
           </div>
 
           <div class="filters" aria-label="Worksheet filters">
@@ -203,7 +220,7 @@
       <a class="active" href="#home" aria-current="true"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 10.5 9-7.5 9 7.5"/><path d="M5 9.5V21h14V9.5"/><path d="M9 21v-6h6v6"/></svg>Home</a>
       <a href="#library"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H11a3 3 0 0 1 3 3v15a3 3 0 0 0-3-3H6.5A2.5 2.5 0 0 0 4 20.5z"/><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H14v18a3 3 0 0 1 3-3h.5a2.5 2.5 0 0 1 2.5 2.5z"/></svg>Practice</a>
       <button id="mobileMission" type="button"><span aria-hidden="true">✓</span>Mission</button>
-      <a href="#progress"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20V5"/><path d="M4 20h16"/><path d="m7 15 4-4 3 2 5-6"/><path d="M16 7h3v3"/></svg>Progress</a>
+      <a href="./play.html"><span aria-hidden="true">★</span>Play</a>
       <button id="mobileLogout" type="button"><svg class="nav-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M10 17l5-5-5-5"/><path d="M15 12H3"/><path d="M14 4h5a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-5"/></svg>Log out</button>
     </nav>
 

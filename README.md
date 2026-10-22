@@ -13,6 +13,7 @@ mistake recovery, same-question recall, and a device-local dashboard for existin
 |---|---|
 | `index.html` | Anonymous sample practice and existing prototype login; new admissions paused |
 | `dashboard.html` | Real practice sets, one-question workspace, recovery and device-local progress |
+| `play.html` | Ignite Play: chapter trails, Daily Spark, boss rounds, trophies and saved progress |
 | `admin.html` | Owner portal (device-local prototype) |
 
 ## About the data
@@ -20,7 +21,9 @@ mistake recovery, same-question recall, and a device-local dashboard for existin
 `data/catalog.js` (and `catalog.json`) contain **anonymised sample data** (36 generated entries), not
 the real worksheet library. Every entry is marked `inventory_only` / `studentVisible: false`.
 Those inventory entries are excluded from the student practice library. Eight original practice sets
-(48 questions, Maths and science) ship separately as labelled teacher-review-pending samples. Only one worksheet
+(48 questions, Maths and science) ship as labelled teacher-review-pending samples. Ignite Play also includes
+73 AI-reviewed practice sets whose answers were independently checked by a second model; teacher review is still pending.
+Only one original worksheet
 question has targeted recovery mappings. Other mistakes offer recall of the same question, not
 a fabricated diagnosis or a newly generated assessment. Pending follow-up banks are excluded.
 

@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="theme-color" content="#102c4e" />
+    <meta name="description" content="Project Ignite game: chapter trails, boss rounds, Daily Spark and trophies." />
+    <title>Ignite Play | Project Ignite</title>
+    <link rel="icon" href="./assets/ignite-logo-192.png" type="image/png" />
+    <link rel="apple-touch-icon" href="./assets/ignite-logo-192.png" />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="stylesheet" href="./game.css" />
+  </head>
+  <body class="game-page">
+    <noscript><p class="noscript-banner">Ignite Play needs JavaScript.</p></noscript>
+    <a class="skip-link" href="#game">Skip to main content</a>
+    <header class="topbar game-topbar">
+      <a class="brand" href="./index.html" aria-label="Project Ignite landing page">
+        <span class="brand-mark" aria-hidden="true"><img src="./assets/ignite-logo.webp" alt="" width="96" height="96" /></span>
+        <span>Project <strong>Ignite</strong></span>
+      </a>
+      <div class="topbar-actions">
+        <span class="streak-chip" id="streakChip" title="Day streak"><span aria-hidden="true">🔥</span> <strong id="streakDays">0</strong><span class="sr-only"> day streak</span></span>
+        <a class="icon-button" href="./dashboard.html" aria-label="Back to dashboard"><span aria-hidden="true">←</span><span class="desktop-label">Dashboard</span></a>
+      </div>
+    </header>
+
+    <main id="game" class="game-shell" tabindex="-1">
+      <!-- HOME -->
+      <section id="homeView" aria-labelledby="homeTitle">
+        <section class="player-card" aria-label="Your progress">
+          <div class="rank-badge" aria-hidden="true" id="rankIcon">✦</div>
+          <div class="player-copy">
+            <p class="eyebrow" id="rankName">SPARK</p>
+            <div class="xp-bar" role="progressbar" aria-label="Progress to the next rank" aria-valuemin="0" aria-valuemax="100" id="xpBar"><span id="xpFill"></span></div>
+            <small id="xpText">0 XP</small>
+          </div>
+          <button class="player-stats" type="button" id="openTrophies" aria-label="Open trophy shelf">
+            <span><strong id="starTotal">0</strong><small>stars</small></span>
+            <span><strong id="trophyTotal">0</strong><small>trophies</small></span>
+          </button>
+        </section>
+
+        <div class="home-cards">
+          <button class="daily-card" type="button" id="dailyCard">
+            <span class="daily-icon" aria-hidden="true">⚡</span>
+            <span class="daily-copy"><strong>Daily Spark</strong><small id="dailyStatus">5 quick questions · about 2 minutes</small></span>
+            <span class="daily-go" aria-hidden="true">→</span>
+          </button>
+          <button class="continue-card" type="button" id="continueCard" hidden>
+            <span class="eyebrow">CONTINUE</span><strong id="continueTitle"></strong><small id="continueMeta"></small>
+          </button>
+        </div>
+
+        <h1 id="homeTitle" tabindex="-1">Pick a chapter</h1>
+        <div class="chip-row" role="group" aria-label="Class" id="classChips"></div>
+        <div class="chip-row" role="group" aria-label="Subject" id="subjectChips"></div>
+        <p class="availability-note" id="availabilityNotice" role="status" hidden></p>
+        <div class="chapter-grid" id="trackList"></div>
+        <p class="game-note" id="saveStatus" role="status" hidden></p>
+        <p class="game-note">Chapter questions were reviewed by an AI (Claude) with agreement from a second AI model;
+          the original sample sets are unreviewed. A teacher has not checked them yet. Scores are practice only and
+          stay on this device.</p>
+      </section>
+
+      <!-- CHAPTER TRAIL -->
+      <section id="trailView" hidden aria-labelledby="trailTitle">
+        <button class="text-button back-link" type="button" id="trailBack">← Chapters</button>
+        <div class="trail-head">
+          <p class="eyebrow" id="trailEyebrow"></p>
+          <h1 id="trailTitle" tabindex="-1"></h1>
+          <p class="trail-meta" id="trailMeta"></p>
+        </div>
+        <div class="trail" id="trailNodes"></div>
+        <p class="game-note" id="trailHint"></p>
+      </section>
+
+      <!-- PLAY -->
+      <section id="playView" hidden aria-labelledby="playTitle">
+        <div class="play-top">
+          <button class="close-button" type="button" id="quitLevel" aria-label="Leave this round">✕</button>
+          <div class="level-progress" aria-hidden="true"><span id="levelFill"></span></div>
+          <p class="streak" id="streak" aria-live="polite"></p>
+        </div>
+        <p class="play-meta" id="playMeta"></p>
+        <div class="boss-bar" id="bossBar" hidden>
+          <span class="boss-face" aria-hidden="true">♛</span>
+          <div class="boss-copy"><small id="bossLabel">Chapter boss</small>
+            <div class="boss-hp" role="progressbar" aria-label="Boss energy" aria-valuemin="0" aria-valuemax="100" id="bossHp"><span id="bossFill"></span></div></div>
+        </div>
+        <article class="play-card">
+          <p class="eyebrow" id="playCount"></p>
+          <h2 id="playTitle" tabindex="-1"></h2>
+          <div class="play-options" id="playOptions" role="group" aria-label="Choices"></div>
+          <div class="play-tools">
+            <button class="clue-button" type="button" id="clueButton">50:50 clue</button>
+            <details class="notice"><summary id="noticeSummary">AI-reviewed · teacher check pending</summary><p id="playNotice"></p></details>
+          </div>
+        </article>
+        <div class="answer-sheet" id="answerSheet" hidden>
+          <div class="sheet-inner">
+            <p class="sheet-title" id="sheetTitle" role="status" aria-live="polite"></p>
+            <p class="sheet-text" id="playFeedback"></p>
+            <button class="primary-button" type="button" id="nextQuestion">Continue</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- RESULTS -->
+      <section id="resultView" hidden aria-labelledby="resultTitle">
+        <article class="result-card">
+          <p class="eyebrow" id="resultLevel"></p>
+          <div class="result-emblem" id="resultEmblem" aria-hidden="true"></div>
+          <h2 id="resultTitle" tabindex="-1"></h2>
+          <p id="resultText" role="status"></p>
+          <ul class="reward-list" id="rewardList"></ul>
+          <div class="result-actions">
+            <button class="primary-button" type="button" id="fixMistakes">Fix my mistakes</button>
+            <button class="primary-button" type="button" id="nextLevel">Next stop</button>
+            <button class="secondary-button" type="button" id="replayLevel">Replay</button>
+            <button class="text-button" type="button" id="backToMap">Back to the trail</button>
+          </div>
+          <p class="break-card" id="breakCard" hidden>That is three rounds in a row. Well done. Take a short break: stand up, drink some water, rest your eyes.</p>
+          <details class="notice"><summary>About these questions</summary><p id="resultNotice"></p></details>
+        </article>
+        <section class="review-list" id="reviewSection" aria-labelledby="reviewTitle">
+          <h3 id="reviewTitle">Questions to look at again</h3>
+          <ol id="reviewList"></ol>
+        </section>
+      </section>
+
+      <!-- TROPHIES -->
+      <section id="trophyView" hidden aria-labelledby="trophyTitle">
+        <button class="text-button back-link" type="button" id="trophyBack">← Chapters</button>
+        <h1 id="trophyTitle" tabindex="-1">Trophy shelf</h1>
+        <p class="trail-meta" id="trophyMeta"></p>
+        <div class="shelf" id="trophyShelf"></div>
+        <h2 class="shelf-heading">Badges</h2>
+        <ul class="badge-grid" id="badgeList"></ul>
+      </section>
+    </main>
+    <div class="burst" id="burst" aria-hidden="true"></div>
+
+    <script src="./data/pilot-worksheets.js" defer></script>
+    <script src="./practice.js" defer></script>
+    <script src="./game/core.js" defer></script>
+    <script src="./game.js" defer></script>
+  </body>
+</html>
