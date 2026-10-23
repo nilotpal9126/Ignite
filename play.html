@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="./game.css" />
     <link rel="stylesheet" href="./enrollment.css" />
     <link rel="stylesheet" href="./account.css" />
+    <link rel="stylesheet" href="./board.css" />
   </head>
   <body class="game-page">
     <noscript><p class="noscript-banner">Ignite Play needs JavaScript.</p></noscript>
@@ -56,6 +57,7 @@
           </button>
         </div>
 
+        <div id="boardBar"></div>
         <h1 id="homeTitle" tabindex="-1">Pick a chapter</h1>
         <div class="chip-row" role="group" aria-label="Class" id="classChips"></div>
         <div class="chip-row" role="group" aria-label="Subject" id="subjectChips"></div>
@@ -147,6 +149,7 @@
     <div class="burst" id="burst" aria-hidden="true"></div>
 
     <script src="./data/pilot-worksheets.js" defer></script>
+    <script src="./board.js" defer></script>
     <script src="./platform-config.js?v=auth-20261022" defer></script>
     <script src="./firebase-session.js" defer></script>
     <script src="./firebase-auth.js?v=auth-20261022" defer></script>

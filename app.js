@@ -331,8 +331,9 @@ function renderWorksheets() {
       const tier = item.content.visibility;
       const aiReviewed = item.content.review?.answerKey === 'ai_reviewed'
         && item.content.review?.independentCheck === 'second_model_agreed';
+      const teamReviewed = item.content.review?.ownerReviewed === true;
       fragment.querySelector('.review-state').textContent = tier === 'student' ? 'Published'
-        : tier === 'demo_sample' ? aiReviewed ? 'AI-reviewed · teacher review pending' : 'Sample · unreviewed'
+        : tier === 'demo_sample' ? teamReviewed ? 'Reviewed by the Project Ignite team' : aiReviewed ? 'AI-reviewed · teacher review pending' : 'Sample · unreviewed'
         : 'Draft · staff preview';
       const answers = window.IgnitePractice.restore(item.content, storage.get(window.IgnitePractice.key(state.learnerId, item.content.id)));
       const savedScore = window.IgnitePractice.score(item.content.questions, answers);
@@ -402,7 +403,8 @@ function openWorksheet(item) {
   const aiReviewed = content.review?.answerKey === 'ai_reviewed'
     && content.review?.independentCheck === 'second_model_agreed';
   setText('#worksheetEyebrow', content.visibility === 'demo_sample'
-    ? aiReviewed ? 'AI-REVIEWED PRACTICE · TEACHER REVIEW PENDING' : 'SAMPLE PRACTICE · UNREVIEWED'
+    ? content.review?.ownerReviewed === true ? 'PRACTICE · REVIEWED BY THE PROJECT IGNITE TEAM'
+      : aiReviewed ? 'AI-REVIEWED PRACTICE · TEACHER REVIEW PENDING' : 'SAMPLE PRACTICE · UNREVIEWED'
     : isDraft ? 'DRAFT · STAFF PREVIEW' : 'WORKSHEET');
   setText('#worksheetDialogTitle', content.title || item.title);
   setText('#worksheetMeta', [`Class ${content.classLevel}`, content.subject, content.chapter].filter(Boolean).join(' · '));
@@ -1142,6 +1144,9 @@ async function init() {
     }
   }
   applyStudentProfile(admittedStudent);
+  window.IgniteBoard?.bind(admittedStudent.admissionId);
+  window.IgniteBoard?.mountGate(() => admittedStudent.admissionId);
+  window.IgniteBoard?.mountBar(document.getElementById('boardBar'), () => admittedStudent.admissionId);
   state.learnerId = admittedStudent.admissionId;
   renderProgress();
   renderAdaptiveProgress();

@@ -1,0 +1,19 @@
+/* Board choice: a small bar inside pages, and a blocking question where a board is needed first. */
+.board-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; margin: 0 0 14px; padding: 10px 12px; border: 1px solid var(--line, #dce4e8); border-radius: 14px; background: #fff; }
+.board-label { font-size: 12px; font-weight: 900; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-soft, #53657a); }
+.board-choices { display: flex; flex-wrap: wrap; gap: 8px; }
+.board-choice { display: grid; gap: 0; min-height: 44px; padding: 6px 16px; text-align: left; border: 2px solid var(--line, #dce4e8); border-radius: 12px; background: #fff; color: var(--ink, #10243e); cursor: pointer; }
+.board-choice strong { font-size: 16px; line-height: 1.2; }
+.board-choice small { font-size: 11px; color: var(--ink-soft, #53657a); }
+.board-choice[aria-pressed="true"] { border-color: var(--navy, #102c4e); background: var(--navy, #102c4e); color: #fff; }
+.board-choice[aria-pressed="true"] small { color: #cfe0ee; }
+.board-choice:hover:not([aria-pressed="true"]) { border-color: var(--navy-2, #174b72); }
+.board-prompt { flex-basis: 100%; margin: 0; font-weight: 700; color: var(--navy, #102c4e); }
+.board-note { flex-basis: 100%; margin: 0; font-size: 12px; color: var(--ink-soft, #53657a); }
+.board-gate { position: fixed; inset: 0; z-index: 200; display: grid; place-items: center; padding: 16px; background: rgba(16, 44, 78, .72); }
+.board-gate-panel { width: min(100%, 460px); padding: 22px 20px; border-radius: 20px; background: #fff; box-shadow: 0 24px 60px rgba(0, 0, 0, .3); }
+.board-gate-panel h2 { margin: 0 0 6px; font-family: Georgia, serif; font-size: 24px; }
+.board-gate-panel p { margin: 0 0 14px; }
+.board-gate-panel .board-note { margin-top: 14px; }
+.board-choices.is-large .board-choice { flex: 1 1 140px; padding: 12px 16px; }
+.board-choices.is-large .board-choice strong { font-size: 20px; }

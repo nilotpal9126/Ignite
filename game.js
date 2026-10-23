@@ -48,6 +48,9 @@
     return { id: 'guest', classLevel: NaN };
   }
   const me = learner();
+  window.IgniteBoard?.bind(me.id);
+  window.IgniteBoard?.mountGate(() => me.id);
+  window.IgniteBoard?.mountBar(document.getElementById('boardBar'), () => me.id);
   const ROUND_SESSION_KEY = `${SESSION_KEY}:${encodeURIComponent(me.id)}`;
   const accountLink = $('gameAccountLink');
   if (accountLink) accountLink.textContent = firebaseMode && window.IgniteIdentity?.session() ? 'Account' : 'Sign in';
@@ -82,7 +85,8 @@
     $('saveStatus').textContent = failed ? 'This browser could not save progress. You can keep playing in this tab.' : '';
   }
 
-  const tracks = core.buildTracks(window.__IGNITE_PILOT_CONTENT__?.items, window.IgnitePractice?.playable);
+  // The free-trial sets are for visitors before sign-in; signed-in learners play the chapter levels.
+  const tracks = core.buildTracks((window.__IGNITE_PILOT_CONTENT__?.items || []).filter((set) => !set.trial), window.IgnitePractice?.playable);
   const byQuestion = core.questionIndex(tracks);
   const trackById = (id) => tracks.find((t) => t.id === id) || null;
   const today = () => core.todayKey();
@@ -268,6 +272,7 @@
     return 'This round mixes chapters. Chapter questions were reviewed by an AI (Claude) with a second AI model agreeing; original sample sets are unreviewed. Not yet checked by a teacher.';
   }
   function summaryFor(notice) {
+    if (/reviewed by the Project Ignite team/.test(notice)) return 'Reviewed by the Project Ignite team';
     return /second AI model/.test(notice) ? 'AI-reviewed · teacher check pending' : 'Sample questions · not yet teacher-checked';
   }
 

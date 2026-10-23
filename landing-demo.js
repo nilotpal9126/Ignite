@@ -5,9 +5,10 @@
   function initDemo() {
     const get = (id) => document.getElementById(id);
     const practice = window.IgnitePractice;
+    window.IgniteBoard?.mountBar(get('boardBar'));
     const items = (window.__IGNITE_PILOT_CONTENT__?.items || []).filter((item) =>
       item.visibility === 'demo_sample' && practice?.playable(item)
-      && [10, 11].includes(item.classLevel)
+      && [9, 10, 11].includes(item.classLevel)
       && ['Biology', 'Chemistry', 'Physics', 'Mathematics'].includes(item.subject))
       .map((item) => window.IgniteTrialDiagrams?.adapt(item) || item);
     let active = null;

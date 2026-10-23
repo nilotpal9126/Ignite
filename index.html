@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="./notice-board.css" />
     <link rel="stylesheet" href="./enrollment.css" />
     <link rel="stylesheet" href="./account.css" />
+    <link rel="stylesheet" href="./board.css" />
   </head>
   <body data-admissions="preview">
     <a class="skip-link" href="#main-content">Skip to main content</a>
@@ -99,8 +100,9 @@
         </div>
         <div class="demo-panel">
           <p class="demo-notice" id="demoPreviewNotice" hidden>Example preview: worksheet answers have been prefilled to show the recovery game. These are demonstration results.</p>
+          <div id="boardBar"></div>
           <div class="demo-controls">
-            <label>Class<select id="demoClass"><option value="10">Class 10</option><option value="11">Class 11</option></select></label>
+            <label>Class<select id="demoClass"><option value="9">Class 9</option><option value="10" selected>Class 10</option><option value="11">Class 11</option></select></label>
             <label>Subject<select id="demoSubject"><option value="Biology">Biology</option><option value="Chemistry">Chemistry</option><option value="Physics">Physics</option><option value="Mathematics">Maths</option></select></label>
             <button class="admit-button" id="demoStart" type="button" disabled>Start free sample</button>
           </div>
@@ -309,6 +311,7 @@
     <script src="./api-client.js" defer></script>
     <script src="./admission.js?v=auth-20261022" defer></script>
     <script src="./data/pilot-worksheets.js" defer></script>
+    <script src="./board.js" defer></script>
     <script src="./practice.js" defer></script>
     <script src="./science-text.js" defer></script>
     <script src="./adaptive-engine.js" defer></script>

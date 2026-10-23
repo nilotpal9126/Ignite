@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="./notice-board.css" />
     <link rel="stylesheet" href="./enrollment.css" />
     <link rel="stylesheet" href="./account.css" />
+    <link rel="stylesheet" href="./board.css" />
   </head>
   <body>
     <noscript><p class="noscript-banner">Project Ignite needs JavaScript to load the worksheet catalog and the practice mission.</p></noscript>
@@ -51,6 +52,7 @@
       </nav>
 
       <main id="main-content" tabindex="-1">
+        <div id="boardBar"></div>
     <section id="worksheetWorkspace" class="learning-workspace" aria-labelledby="worksheetDialogTitle" hidden>
       <div class="worksheet-view">
         <div class="workspace-toolbar"><span>Focused practice</span><button class="text-button" id="saveExitPractice" type="button">Save &amp; exit</button></div>
@@ -258,6 +260,7 @@
     <script src="./api-client.js" defer></script>
     <script src="./data/catalog.js" defer></script>
     <script src="./data/pilot-worksheets.js" defer></script>
+    <script src="./board.js" defer></script>
     <script src="./adaptive-engine.js" defer></script>
     <script src="./science-text.js" defer></script>
     <script src="./learning-path.js" defer></script>
