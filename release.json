@@ -1,7 +1,7 @@
 {
   "schemaVersion": "ignite-public-release/1",
-  "releaseId": "ignite-enrollment-20261023182852006",
-  "builtAt": "2026-10-23T18:28:52.006Z",
+  "releaseId": "ignite-enrollment-20261023193816821",
+  "builtAt": "2026-10-23T19:38:16.821Z",
   "mode": "sample_preview",
   "admissions": "paused",
   "enquiries": "not_configured",
@@ -35,7 +35,7 @@
     "data/assessment-banks.js": "8c11709a9ee988fd0048ac9b4b56fe76818123bb0dcfae9a1bbfdfb0c0358afc",
     "data/catalog.js": "8732932e10903c26e109d3d1f5d2ed1661f3b80ee092fa332efa4fb5cced1f7b",
     "data/catalog.json": "defa497f9f72b78f599e8fffec4fa2579a76ded7a5648e7d28c29c8474bfd505",
-    "data/pilot-worksheets.js": "769a0b4f8b2c4b4ab30541c86932c24b23937569243ac8e91882a098920b5cdf",
+    "data/pilot-worksheets.js": "4d548b550ce56b63ecbd20ea22eb57313ddbefc967ab96036874ec6760c7120c",
     "demo-recovery.css": "2f3905fabd01728a73676f9d8e8f68438b7fceb53008b09ae9c6718e2b3b78a8",
     "demo-recovery.js": "eb259a491611d92f1cd1d81e8fdd81909a7ea41a39763529d513dd78cf88c9ff",
     "enrollment-config.js": "afe3e970d3228d565e5d9ff21715aa87fa2a293d04cb65e989f4a77c382f51d8",
