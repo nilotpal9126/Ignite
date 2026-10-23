@@ -212,6 +212,7 @@
     $('trailTitle').textContent = track.title;
     const trophy = progress.trophies[track.id];
     $('trailMeta').textContent = `${trackStars(track)}/${track.levels.length * 3} stars${trophy ? ` · ${TROPHY_ICON[trophy]} ${trophy} trophy` : ''}`;
+    window.IgniteStudios?.mountTrail($('chapterStudio'),track);
     const stops = track.levels.length + (track.hasBoss ? 1 : 0);
     const next = nextStop(track);
     const ROW = 118;

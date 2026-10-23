@@ -1,0 +1,20 @@
+{
+  "schemaVersion": "ignite-labs/1",
+  "files": [
+    "labs/ignite-biology-labs/Genetics-Heredity-Lab.html",
+    "labs/ignite-biology-labs/Excretory-Nephron-Lab.html",
+    "labs/ignite-chemistry-labs/Chemical-Bonding-3D-Lab.html",
+    "labs/station-helios-student/Force-Moments-Lab.html",
+    "labs/station-helios-student/Station-Helios.html",
+    "labs/station-helios-student/index.html",
+    "labs/ignite-subject-labs/Ignite-Subject-Worlds.html"
+  ],
+  "studios": 4,
+  "classLevel": 10,
+  "board": "ICSE",
+  "playgroundBoards": [
+    "CBSE",
+    "ICSE"
+  ],
+  "practiceRecords": "session-only"
+}

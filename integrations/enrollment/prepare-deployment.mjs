@@ -9,7 +9,7 @@ const ownDirectory = path.dirname(fileURLToPath(import.meta.url));
 const defaultRoot = path.resolve(ownDirectory, '../..');
 const publicFiles = ['enrollment-config.js', 'enrollment-validation.js', 'enrollment.css', 'enrollment.js',
   'firebase-session.js', 'account-ui.js', 'account.css', 'trial-diagrams.js'];
-const safeStaticPath = /^(?:[^/]+\.(?:html|css|js)|(?:assets|data|game)\/[^\r\n]+\.(?:js|json|png|webp|svg|woff2|txt))$/i;
+const safeStaticPath = /^(?:[^/]+\.(?:html|css|js)|labs-manifest\.json|labs\/[A-Za-z0-9_./-]+\.(?:html|css|js)|(?:assets|data|game)\/[^\r\n]+\.(?:js|json|png|webp|svg|woff2|txt))$/i;
 const digest = (bytes) => createHash('sha256').update(bytes).digest('hex');
 
 export async function inspectConfiguration(root) {
@@ -48,7 +48,16 @@ export async function prepareDeployment({ root = defaultRoot, output, files } = 
   }
   const tracked = files || execFileSync('git', ['-c', `safe.directory=${root.replaceAll('\\', '/')}`, '-C', root, 'ls-files', '-z'], { encoding: 'utf8' }).split('\0').filter(Boolean);
   // release.json is generated below; never copy/hash the previous release into itself.
-  const candidates = [...new Set([...tracked, ...publicFiles])].filter(file => safeStaticPath.test(file) && file !== 'release.json');
+  const labsFiles = [];
+  let labsManifest;
+  try { labsManifest = JSON.parse(await readFile(path.join(root, 'labs-manifest.json'), 'utf8')); }
+  catch (error) { if (error.code !== 'ENOENT') throw error; }
+  if (labsManifest) {
+    if (labsManifest.schemaVersion !== 'ignite-labs/1' || !Array.isArray(labsManifest.files)
+      || labsManifest.files.some(file => typeof file !== 'string' || !file.startsWith('labs/') || file.split('/').some(part => part === '..') || !safeStaticPath.test(file))) throw new Error('Invalid labs manifest.');
+    labsFiles.push('labs-manifest.json', 'labs.html', 'labs.css', 'labs.js', 'labs-registry.js', 'lab-context.js', 'studios-link.js', ...labsManifest.files);
+  }
+  const candidates = [...new Set([...tracked, ...publicFiles, ...labsFiles])].filter(file => safeStaticPath.test(file) && file !== 'release.json');
   const checksums = {};
   const put = async (relative, bytes) => {
     const destination = path.join(output, relative);

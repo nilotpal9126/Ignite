@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="./enrollment.css" />
     <link rel="stylesheet" href="./account.css" />
     <link rel="stylesheet" href="./board.css" />
+    <link rel="stylesheet" href="./labs.css" />
   </head>
   <body class="game-page">
     <noscript><p class="noscript-banner">Ignite Play needs JavaScript.</p></noscript>
@@ -57,6 +58,11 @@
           </button>
         </div>
 
+        <section class="studio-feature studio-feature--play" aria-labelledby="playStudiosTitle">
+          <div><p class="eyebrow">CLASS 10 · INTERACTIVE LABS</p><h2 id="playStudiosTitle">Explore it before you answer.</h2><p>Investigate the concept with movable diagrams and 3D structures, then return to your chapter rounds.</p></div>
+          <a href="./labs.html">Open the labs <span aria-hidden="true">↗</span></a>
+        </section>
+
         <div id="boardBar"></div>
         <h1 id="homeTitle" tabindex="-1">Pick a chapter</h1>
         <div class="chip-row" role="group" aria-label="Class" id="classChips"></div>
@@ -76,6 +82,7 @@
           <p class="eyebrow" id="trailEyebrow"></p>
           <h1 id="trailTitle" tabindex="-1"></h1>
           <p class="trail-meta" id="trailMeta"></p>
+          <div id="chapterStudio" class="chapter-studio" hidden></div>
         </div>
         <div class="trail" id="trailNodes"></div>
         <p class="game-note" id="trailHint"></p>
@@ -150,6 +157,8 @@
 
     <script src="./data/pilot-worksheets.js" defer></script>
     <script src="./board.js" defer></script>
+    <script src="./labs-registry.js" defer></script>
+    <script src="./studios-link.js" defer></script>
     <script src="./platform-config.js?v=auth-20261022" defer></script>
     <script src="./firebase-session.js" defer></script>
     <script src="./firebase-auth.js?v=auth-20261022" defer></script>

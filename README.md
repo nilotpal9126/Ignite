@@ -15,7 +15,18 @@ mistake recovery, same-question recall, and account-isolated practice in the cur
 | `index.html` | Anonymous sample practice, Firebase email sign-in and enrolment enquiries |
 | `dashboard.html` | Real practice sets, one-question workspace, recovery and device-local progress |
 | `play.html` | Ignite Play: chapter trails, Daily Spark, boss rounds, trophies and saved progress |
+| `labs.html` | Board-aware Class 10 interactive studios and wider concept playground |
 | `admin.html` | Owner portal (device-local prototype) |
+
+## Interactive labs
+
+The landing page, student dashboard and Ignite Play home link to `labs.html`. Matching ICSE Class 10 chapter trails can also link directly to their studio. `labs-registry.js` contains the explicit board/class/subject/chapter mappings.
+
+The expanded Force, Genetics, Kidney and Chemistry studios currently follow ICSE Class 10. CBSE learners are directed to CBSE activities in the wider Subject Worlds playground. The website's existing school-board preference is reused; direct links to ICSE studios redirect CBSE learners to their selected-board hub. This is content filtering, not access control over public HTML files.
+
+Studio results remain session practice inside each lab; they do not modify worksheet attempts, Ignite Play XP or trophies. Public labs do not require sign-in. Each studio has site return links, and its teaching assumptions remain accessible. The 3D shapes are schematic models rather than scans or quantum orbital simulations.
+
+Generated pages live under `labs/`; `labs-manifest.json` identifies them for release packaging. Source modules and the reproducible integration/build scripts live in the development workspace's `ignite-biology-labs`, `ignite-chemistry-labs`, `station-helios-student` and `dev_tools` folders. Do not edit generated lab pages directly.
 
 ## About the data
 

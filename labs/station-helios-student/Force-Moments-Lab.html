@@ -1,0 +1,1402 @@
+<!doctype html>
+<html lang="en" data-ignite-context-pending>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Eight interactive ICSE Class 10 textbook challenges for moments, couples, metre rules and equilibrium.">
+  <title>Ignite · ICSE Physics: Turning Effect of Forces & Equilibrium Lab</title>
+  <style>
+    :root {
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      color-scheme: dark;
+      --bg: #0c161d;
+      --panel: #14242d;
+      --surface: #1a3039;
+      --ink: #edf4f0;
+      --muted: #aac0c6;
+      --line: #344b53;
+      --mint: #8ae4bd;
+      --gold: #f8cb7a;
+      --blue: #a6c7ff;
+      --red: #ffb1a0;
+      --accent: var(--mint);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: radial-gradient(ellipse at 15% 0, #294c3b66, transparent 40%), var(--bg);
+      color: var(--ink);
+      line-height: 1.5;
+    }
+    button, input, select { font: inherit; }
+    button, summary { cursor: pointer; }
+    button {
+      min-height: 40px;
+      background: var(--surface);
+      color: var(--ink);
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 8px 12px;
+      transition: border-color 0.15s, background 0.15s;
+    }
+    button:disabled { opacity: .4; cursor: default; }
+    button:hover:not(:disabled) { border-color: var(--muted); }
+    button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visible, select:focus-visible {
+      outline: 3px solid var(--gold);
+      outline-offset: 2px;
+    }
+    [hidden] { display: none !important; }
+    header {
+      max-width: 1540px;
+      margin: auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid var(--line);
+      padding: 18px 30px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-decoration: none;
+      color: var(--ink);
+    }
+    .brand > span {
+      display: grid;
+      place-items: center;
+      background: var(--mint);
+      color: #133625;
+      width: 38px;
+      height: 38px;
+      border-radius: 12px;
+      font-size: 24px;
+    }
+    .brand small {
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: .09em;
+    }
+    .header-actions { display: flex; align-items: center; gap: 16px; }
+    .lab-back {
+      border: 1px solid var(--line);
+      border-radius: 9px;
+      color: var(--ink);
+      font-size: 11px;
+      padding: 7px 10px;
+      text-decoration: none;
+    }
+    .lab-back:hover { border-color: var(--mint); color: var(--mint); }
+    .offline { font-size: 11px; color: var(--muted); }
+    main { max-width: 1540px; margin: auto; padding: 26px 30px; }
+    .intro {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 25px;
+      margin-bottom: 22px;
+    }
+    .eyebrow {
+      font-size: 10px;
+      letter-spacing: .12em;
+      color: var(--accent);
+      font-weight: 750;
+      margin: 0 0 6px;
+      text-transform: uppercase;
+    }
+    h1 {
+      font-size: clamp(24px, 3vw, 38px);
+      letter-spacing: -.03em;
+      margin: 0;
+      line-height: 1.15;
+    }
+    .intro p:last-child { font-size: 13px; color: var(--muted); margin: 8px 0 0; }
+    .count {
+      max-width: 240px;
+      font-size: 12px;
+      color: var(--muted);
+      text-align: right;
+    }
+    .count strong { color: var(--mint); font-size: 26px; display: block; }
+    .shell {
+      display: grid;
+      grid-template-columns: 270px minmax(0, 1fr);
+      gap: 20px;
+      align-items: start;
+    }
+    .chapter-panel {
+      background: #12222a;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 15px;
+      position: sticky;
+      top: 16px;
+    }
+    #missions { display: grid; gap: 7px; margin-top: 8px; }
+    .chapter {
+      display: block;
+      width: 100%;
+      text-align: left;
+      background: transparent;
+      border-color: transparent;
+      padding: 10px 11px;
+    }
+    .chapter small {
+      display: block;
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: .04em;
+      margin-bottom: 2px;
+    }
+    .chapter b {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      line-height: 1.4;
+    }
+    .chapter[aria-current=page] {
+      background: #254637;
+      border-color: #6ea887;
+    }
+    .chapter[aria-current=page] b { color: var(--mint); }
+    .chapter .badge {
+      display: inline-block;
+      font-size: 9px;
+      padding: 1px 6px;
+      border-radius: 6px;
+      background: #19333d;
+      color: var(--gold);
+      margin-top: 4px;
+    }
+    .chapter.solved .badge {
+      background: #1e4634;
+      color: var(--mint);
+    }
+    .workspace {
+      min-width: 0;
+      border: 1px solid var(--line);
+      border-radius: 20px;
+      overflow: hidden;
+      background: var(--panel);
+    }
+    .work-heading {
+      padding: 20px 24px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+    h2 {
+      font-size: 24px;
+      line-height: 1.2;
+      margin: 0;
+      letter-spacing: -.02em;
+      font-weight: 650;
+    }
+    .problem-box {
+      margin-top: 10px;
+      padding: 12px 15px;
+      background: #0f1d24;
+      border-left: 3px solid var(--gold);
+      border-radius: 8px;
+      font-size: 13px;
+      color: #dceae4;
+      max-width: 880px;
+    }
+    .lab-layout {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 360px;
+    }
+    .scene-panel {
+      background: radial-gradient(ellipse, #24454a55, transparent 75%), #101f27;
+      padding: 18px;
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
+    .scene-heading {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      color: var(--muted);
+      font-size: 11px;
+    }
+    #scene {
+      display: block;
+      width: 100%;
+      height: auto;
+      aspect-ratio: 720 / 390;
+      background: #0c1820;
+      border: 1px solid #243b44;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    #scene text { font-family: 'Segoe UI', system-ui, sans-serif; }
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 9px;
+    }
+    .metric {
+      padding: 11px 13px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #192e36;
+    }
+    .metric small {
+      font-size: 10px;
+      color: var(--muted);
+      display: block;
+    }
+    .metric strong {
+      font-size: 15px;
+      font-weight: 650;
+      color: var(--ink);
+    }
+    .coach {
+      padding: 20px;
+      border-left: 1px solid var(--line);
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      background: #13222a;
+    }
+    h3 { font-size: 15px; line-height: 1.4; font-weight: 650; margin: 0; color: var(--mint); }
+    .control-group { display: grid; gap: 9px; }
+    .control {
+      display: block;
+      padding: 10px 12px;
+      border: 1px solid #456859;
+      background: #23463744;
+      border-radius: 11px;
+    }
+    .control-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 8px;
+      font-size: 11.5px;
+    }
+    .control output {
+      color: var(--mint);
+      font-weight: 650;
+    }
+    .control input[type=range] {
+      width: 100%;
+      height: 22px;
+      accent-color: var(--mint);
+      margin: 6px 0 0;
+    }
+    .control select {
+      width: 100%;
+      min-height: 35px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #0d1e26;
+      color: var(--ink);
+      padding: 5px 8px;
+      font-size: 11.5px;
+      margin-top: 6px;
+    }
+    .quiz-section {
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+      display: grid;
+      gap: 11px;
+    }
+    .q-card {
+      background: #182b34;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      padding: 10px 12px;
+      font-size: 12px;
+    }
+    .q-card label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: #e4f0ec;
+    }
+    .q-card select, .q-card input[type=number] {
+      width: 100%;
+      padding: 7px 9px;
+      border-radius: 7px;
+      border: 1px solid var(--line);
+      background: #0d1b22;
+      color: var(--ink);
+      font-size: 12px;
+    }
+    .q-card.correct { border-color: var(--mint); background: #1c392e; }
+    .q-card.wrong { border-color: var(--red); background: #3a2525; }
+    .primary {
+      background: var(--mint);
+      border: 0;
+      color: #123023;
+      font-weight: 750;
+      width: 100%;
+    }
+    .help {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+    }
+    .help button { font-size: 11px; padding: 7px 9px; background: #192e36; }
+    .result {
+      margin: 0 20px 18px;
+      padding: 15px 18px;
+      border: 1px solid #758f7e;
+      border-radius: 13px;
+      background: #244335;
+    }
+    .result[data-success=false] {
+      background: #3b2d29;
+      border-color: #a87e6b;
+    }
+    .result h4 { margin: 0 0 5px; font-size: 14px; }
+    .result p { font-size: 12px; color: #d6e3df; margin: 0; }
+    .science {
+      margin: 0 22px 16px;
+      padding: 10px 16px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      background: #101e26;
+    }
+    summary { font-size: 12.5px; font-weight: 650; padding: 6px 0; color: var(--gold); }
+    .equation {
+      background: #0b161c;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 11px 14px;
+      font: 12.5px/1.7 Consolas, monospace;
+      color: var(--mint);
+      margin: 8px 0;
+    }
+    .mission-nav {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 16px 24px;
+      border-top: 1px solid var(--line);
+    }
+    @media(max-width: 1150px) {
+      .shell { grid-template-columns: 1fr; }
+      .chapter-panel { position: static; }
+      #missions { grid-template-columns: repeat(auto-fill, minmax(210px, 1fr)); }
+      .lab-layout { grid-template-columns: 1fr; }
+      .coach { border-left: 0; border-top: 1px solid var(--line); }
+    }
+    @media(max-width: 680px) {
+      header { align-items: flex-start; padding: 14px 16px; }
+      .brand { gap: 9px; font-size: 13px; letter-spacing: .08em; }
+      .brand > span { width: 34px; height: 34px; font-size: 22px; }
+      .brand small { display: block; font-size: 7px; }
+      .header-actions { align-items: flex-end; flex-direction: column-reverse; gap: 5px; }
+      .offline { font-size: 8px; }
+      .lab-back { font-size: 10px; padding: 5px 8px; }
+      main { padding: 20px 12px; }
+      .intro { align-items: flex-start; }
+      .intro .count { min-width: 82px; }
+      .intro .count strong { font-size: 21px; }
+      .chapter-panel { padding: 11px; }
+      #missions { grid-template-columns: 1fr 1fr; }
+      .chapter { padding: 8px; }
+      .chapter b { font-size: 10px; }
+      .work-heading, .scene-panel, .coach { padding: 16px 14px; }
+      .scene-heading { align-items: flex-start; flex-direction: column; }
+      .metrics { grid-template-columns: 1fr 1fr; }
+      .metric { padding: 9px; }
+      .metric strong { font-size: 14px; }
+      .science { margin: 0 12px 14px; padding: 8px 11px; }
+      .mission-nav { flex-wrap: wrap; padding: 13px 12px; }
+      .mission-nav span { flex-basis: 100%; order: 3; text-align: center; }
+    }
+  </style>
+<link rel="stylesheet" href="../../labs.css"></head>
+<body>
+<header>
+  <a href="./index.html#beam" class="brand">
+    <span>✳</span> IGNITE <small>ICSE CLASS 10 PHYSICS · FORCE & EQUILIBRIUM</small>
+  </a>
+  <div class="header-actions">
+    <a class="lab-back" href="./index.html#beam">← Station Helios</a>
+    <span class="offline">Interactive Textbook Problem Lab · Offline Ready</span>
+  </div>
+</header>
+
+<main>
+  <section class="intro">
+    <div>
+      <p class="eyebrow">CHAPTER 1 · TURNING EFFECT OF FORCES & EQUILIBRIUM</p>
+      <h1>Solve by Experimenting: Moments, Couples & Metre Rules</h1>
+      <p>Adjust forces, pivots, and hanging weights in the live physics simulator, then verify the textbook questions.</p>
+    </div>
+    <div class="count">
+      <strong id="scoreDisplay">0 / 8</strong>
+      Textbook Missions Mastered
+    </div>
+  </section>
+
+  <div class="shell">
+    <aside class="chapter-panel">
+      <p class="eyebrow">TEXTBOOK MISSIONS</p>
+      <nav id="missions" aria-label="Textbook Missions"></nav>
+    </aside>
+
+    <section class="workspace" id="workspace">
+      <div class="work-heading">
+        <div>
+          <p class="eyebrow" id="missionTag"></p>
+          <h2 id="missionTitle"></h2>
+          <div class="problem-box" id="problemStatement"></div>
+        </div>
+      </div>
+
+      <div class="lab-layout">
+        <div class="scene-panel">
+          <div class="scene-heading">
+            <span id="sceneSubtitle">LIVE INTERACTIVE VECTOR & EQUILIBRIUM DIAGRAM</span>
+            <span>Clockwise (−) · Anticlockwise (+)</span>
+          </div>
+          <svg id="scene" viewBox="0 0 720 390" role="img" aria-label="Interactive physics diagram">
+            <g id="drawing"></g>
+          </svg>
+          <div id="metrics" class="metrics" aria-label="Live measurements"></div>
+        </div>
+
+        <aside class="coach">
+          <div>
+            <p class="eyebrow">STEP 1 · CONFIGURE LAB SIMULATION</p>
+            <h3 id="simGoal"></h3>
+          </div>
+          <div id="controls" class="control-group"></div>
+
+          <div class="quiz-section">
+            <p class="eyebrow" style="margin:0">STEP 2 · SOLVE THE TEXTBOOK QUESTIONS</p>
+            <div id="quizContainer" style="display:grid;gap:9px"></div>
+          </div>
+
+          <button id="checkBtn" class="primary">Verify Simulation & Answers ↗</button>
+          <div class="help">
+            <button id="resetBtn" type="button">Reset Lab</button>
+            <button id="demoBtn" type="button">Auto-Set Textbook Values</button>
+          </div>
+        </aside>
+      </div>
+
+      <section id="resultBox" class="result" hidden aria-live="polite">
+        <h4 id="resultTitle"></h4>
+        <p id="resultBody"></p>
+      </section>
+
+      <details class="science" open>
+        <summary>Concept Rule, Formula Breakdown & Textbook Derivation</summary>
+        <div id="equationBox" class="equation"></div>
+        <p id="explanationBox" style="font-size:12.5px;color:var(--muted);margin:6px 0 0"></p>
+      </details>
+
+      <footer class="mission-nav">
+        <button id="prevBtn" type="button">← Previous Problem</button>
+        <span id="navStatus" style="font-size:11px;color:var(--muted)"></span>
+        <button id="nextBtn" type="button">Next Problem →</button>
+      </footer>
+    </section>
+  </div>
+</main>
+
+<script>
+'use strict';
+(function() {
+  const mint = '#8ae4bd', blue = '#a6c7ff', gold = '#f8cb7a', red = '#ffb1a0', muted = '#aac0c6';
+  const esc = s => String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const fmt = (x, d = 2) => Number.isFinite(x) ? Number(x.toFixed(d)) : '—';
+  const rad = d => d * Math.PI / 180;
+  const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+
+  // SVG Drawing Helpers
+  const line = (x1, y1, x2, y2, c = mint, w = 3, dash = false) =>
+    `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="${w}"${dash ? ' stroke-dasharray="6 5"' : ''}/>`;
+  const text = (x, y, s, c = '#eaf3ef', size = 15, anchor = 'middle', weight = '600') =>
+    `<text x="${x}" y="${y}" fill="${c}" font-size="${size}" font-weight="${weight}" text-anchor="${anchor}">${esc(s)}</text>`;
+  const dot = (x, y, r = 6, c = mint) =>
+    `<circle cx="${x}" cy="${y}" r="${r}" fill="${c}" stroke="#0c1820" stroke-width="2"/>`;
+  const box = (x, y, w, h, c = '#243b44', stroke = '#77949a', rx = 8) =>
+    `<rect x="${x}" y="${y}" width="${w}" height="${h}" rx="${rx}" fill="${c}" stroke="${stroke}" stroke-width="2"/>`;
+  const arrow = (x1, y1, x2, y2, c = gold, w = 3) => {
+    const a = Math.atan2(y2 - y1, x2 - x1);
+    const head = 11;
+    return line(x1, y1, x2, y2, c, w) +
+      `<polygon points="${x2},${y2} ${x2 - head * Math.cos(a - 0.42)},${y2 - head * Math.sin(a - 0.42)} ${x2 - head * Math.cos(a + 0.42)},${y2 - head * Math.sin(a + 0.42)}" fill="${c}"/>`;
+  };
+  const pivotTriangle = (cx, cy, size = 18, c = mint) =>
+    `<polygon points="${cx},${cy} ${cx - size*0.75},${cy + size} ${cx + size*0.75},${cy + size}" fill="#1b3830" stroke="${c}" stroke-width="2.5"/>`;
+
+  const arcArrow = (cx, cy, r, cw = true, label = '') => {
+    const startA = cw ? -Math.PI * 0.65 : -Math.PI * 0.35;
+    const endA = cw ? Math.PI * 0.15 : -Math.PI * 1.15;
+    const x1 = cx + r * Math.cos(startA), y1 = cy + r * Math.sin(startA);
+    const x2 = cx + r * Math.cos(endA), y2 = cy + r * Math.sin(endA);
+    const sweep = cw ? 1 : 0;
+    const col = cw ? gold : mint;
+    const tang = endA + (cw ? Math.PI / 2 : -Math.PI / 2);
+    return `<path d="M${x1} ${y1} A${r} ${r} 0 0 ${sweep} ${x2} ${y2}" fill="none" stroke="${col}" stroke-width="2.5" stroke-dasharray="4 3"/>` +
+      `<polygon points="${x2},${y2} ${x2 - 9*Math.cos(tang - 0.45)},${y2 - 9*Math.sin(tang - 0.45)} ${x2 - 9*Math.cos(tang + 0.45)},${y2 - 9*Math.sin(tang + 0.45)}" fill="${col}"/>` +
+      (label ? text(cx, cy + r + 22, label, col, 13) : '');
+  };
+
+  // All 8 Textbook Missions
+  const MISSIONS = [
+    {
+      id: 'fig-1-25',
+      tag: 'PROBLEM 14 · FIG. 1.25',
+      title: '1. Three Coplanar Forces About Point O',
+      problem: 'A, B and C are three forces each of magnitude 4 N acting in the plane of paper as shown in Fig. 1.25. Point O lies in the same plane with perpendicular distances d_A = 0.9 m, d_B = 0.8 m, and d_C = 0.6 m. Find the least moment, greatest moment, sense of rotation, and resultant torque about O.',
+      simGoal: 'Set Forces A, B, and C to 4 N each (or explore how changing each force alters the net moment about O).',
+      controls: [
+        { key: 'FA', label: 'Force A magnitude', min: 1, max: 8, step: 0.5, init: 4, sol: 4, unit: 'N' },
+        { key: 'FB', label: 'Force B magnitude', min: 1, max: 8, step: 0.5, init: 4, sol: 4, unit: 'N' },
+        { key: 'FC', label: 'Force C magnitude', min: 1, max: 8, step: 0.5, init: 4, sol: 4, unit: 'N' }
+      ],
+      questions: [
+        { key: 'q1', label: '(i) Which force has the LEAST moment about O?', type: 'select', options: [
+          ['', 'Select answer…'],
+          ['A', 'Force A (perpendicular distance 0.9 m)'],
+          ['B', 'Force B (perpendicular distance 0.8 m)'],
+          ['C', 'Force C (shortest perpendicular distance 0.6 m from O)']
+        ], ans: 'C' },
+        { key: 'q2', label: '(ii) Which force has the GREATEST moment about O?', type: 'select', options: [
+          ['', 'Select answer…'],
+          ['A', 'Force A (largest perpendicular distance 0.9 m from O)'],
+          ['B', 'Force B (perpendicular distance 0.8 m)'],
+          ['C', 'Force C (perpendicular distance 0.6 m)']
+        ], ans: 'A' },
+        { key: 'q3', label: '(iii) Which forces produce Clockwise vs. Anticlockwise moments?', type: 'select', options: [
+          ['', 'Select answer…'],
+          ['AB_cw_C_acw', 'Clockwise: A and B | Anticlockwise: C'],
+          ['AC_cw_B_acw', 'Clockwise: A and C | Anticlockwise: B'],
+          ['BC_cw_A_acw', 'Clockwise: B and C | Anticlockwise: A']
+        ], ans: 'AB_cw_C_acw' },
+        { key: 'q4', label: '(iv) What is the resultant torque about point O (when F = 4 N)?', type: 'select', options: [
+          ['', 'Select answer…'],
+          ['4.4_cw', '4.4 N·m (clockwise)'],
+          ['4.4_acw', '4.4 N·m (anticlockwise)'],
+          ['9.2_cw', '9.2 N·m (clockwise)']
+        ], ans: '4.4_cw' }
+      ],
+      compute(p) {
+        const dA = 0.9, dB = 0.8, dC = 0.6;
+        const tauA = -p.FA * dA; // Clockwise (-)
+        const tauB = -p.FB * dB; // Clockwise (-)
+        const tauC = +p.FC * dC; // Anticlockwise (+)
+        const net = tauA + tauB + tauC;
+
+        const ox = 370, oy = 195;
+        // Force B: horizontal line above O at y = oy - 95, pointing right (CW about O)
+        // Force A: tilted line on left of O, pointing up-left (CW about O)
+        // Force C: tilted line on bottom-right of O, pointing up-right (ACW about O)
+        let svg = '';
+        // Grid background circle
+        svg += `<circle cx="${ox}" cy="${oy}" r="145" fill="#122630" stroke="#26434f" stroke-width="1.5"/>`;
+
+        // Force B (top horizontal, pointing right)
+        const by = oy - 96;
+        svg += line(ox, oy, ox, by, muted, 2, true);
+        svg += text(ox + 34, (oy + by)/2 + 5, '0.8 m', '#d0e4dc', 13);
+        svg += arrow(ox - 135, by, ox + 145, by, gold, 3.5);
+        svg += text(ox + 125, by - 12, `B (${p.FB} N · CW)`, gold, 15);
+
+        // Force A (left inclined line, foot of perpendicular from O at angle 192 deg)
+        const angA = rad(192);
+        const fxA = ox + 108 * Math.cos(angA), fyA = oy + 108 * Math.sin(angA);
+        const dirA = angA + Math.PI / 2; // pointing up-left (CW)
+        svg += line(ox, oy, fxA, fyA, muted, 2, true);
+        svg += text((ox + fxA)/2 - 8, (oy + fyA)/2 - 8, '0.9 m', '#d0e4dc', 13);
+        svg += arrow(fxA - 115 * Math.cos(dirA), fyA - 115 * Math.sin(dirA), fxA + 125 * Math.cos(dirA), fyA + 125 * Math.sin(dirA), gold, 3.5);
+        svg += text(fxA - 95 * Math.cos(dirA) - 22, fyA - 95 * Math.sin(dirA), `A (${p.FA} N · CW)`, gold, 15);
+
+        // Force C (bottom-right inclined line, foot of perpendicular at angle 42 deg)
+        const angC = rad(42);
+        const fxC = ox + 72 * Math.cos(angC), fyC = oy + 72 * Math.sin(angC);
+        const dirC = angC - Math.PI / 2; // pointing up-right (ACW)
+        svg += line(ox, oy, fxC, fyC, muted, 2, true);
+        svg += text((ox + fxC)/2 - 18, (oy + fyC)/2 + 18, '0.6 m', '#d0e4dc', 13);
+        svg += arrow(fxC - 115 * Math.cos(dirC), fyC - 115 * Math.sin(dirC), fxC + 125 * Math.cos(dirC), fyC + 125 * Math.sin(dirC), mint, 3.5);
+        svg += text(fxC + 100 * Math.cos(dirC) + 25, fyC + 100 * Math.sin(dirC) + 18, `C (${p.FC} N · ACW)`, mint, 15);
+
+        // Pivot O
+        svg += dot(ox, oy, 7, blue) + text(ox + 16, oy + 6, 'O', blue, 17);
+        svg += arcArrow(ox, oy, 36, net <= 0, net === 0 ? 'Balanced' : `Net: ${fmt(Math.abs(net))} N·m (${net < 0 ? 'CW' : 'ACW'})`);
+
+        return {
+          svg,
+          simPass: p.FA === 4 && p.FB === 4 && p.FC === 4,
+          metrics: [
+            ['Moment of A (CW)', `${fmt(Math.abs(tauA))} N·m`],
+            ['Moment of B (CW)', `${fmt(Math.abs(tauB))} N·m`],
+            ['Moment of C (ACW)', `${fmt(tauC)} N·m`],
+            ['Resultant Torque', `${fmt(Math.abs(net))} N·m ${net < 0 ? '(CW)' : net > 0 ? '(ACW)' : ''}`]
+          ],
+          equation: `τ_A = −(4 × 0.9) = −3.6 N·m (CW)  |  τ_B = −(4 × 0.8) = −3.2 N·m (CW)  |  τ_C = +(4 × 0.6) = +2.4 N·m (ACW)\nResultant τ = −3.6 − 3.2 + 2.4 = −4.4 N·m = 4.4 N·m (clockwise)`,
+          explanation: 'Since all three forces have equal magnitude (4 N), the moment is directly proportional to the perpendicular distance from O (τ = F × d). Force C has the shortest arm (0.6 m → least moment), while Force A has the longest arm (0.9 m → greatest moment).'
+        };
+      }
+    },
+    {
+      id: 'fig-1-27',
+      tag: 'PROBLEM 6 · FIG. 1.27',
+      title: '2. Wheel & Axle: Moment About Centre O vs. Point A',
+      problem: 'A wheel of diameter 2 m is shown in Fig. 1.27 with axle at O. A tangential force F = 2 N is applied at top point B towards the right. Calculate the moment of force about (i) the centre O, and (ii) the bottom point A.',
+      simGoal: 'Set Diameter = 2 m and Force F = 2 N, then toggle the Pivot Point between O and A to observe how the perpendicular moment arm doubles.',
+      controls: [
+        { key: 'F', label: 'Applied Force F at B', min: 1, max: 6, step: 0.5, init: 2, sol: 2, unit: 'N' },
+        { key: 'D', label: 'Wheel Diameter', min: 1, max: 4, step: 0.5, init: 2, sol: 2, unit: 'm' },
+        { key: 'pivot', label: 'Active Reference Pivot', type: 'select', options: [[0, 'Centre O (r = D/2)'], [1, 'Bottom Point A (arm = D)']], init: 0, sol: 1 }
+      ],
+      questions: [
+        { key: 'q1', label: '(i) Moment of force F = 2 N about the centre O:', type: 'select', options: [
+          ['', 'Select answer…'],
+          ['2_cw', '2 N·m (clockwise)'],
+          ['2_acw', '2 N·m (anticlockwise)'],
+          ['4_cw', '4 N·m (clockwise)']
+        ], ans: '2_cw' },
+        { key: 'q2', label: '(ii) Moment of force F = 2 N about the bottom point A:', type: 'select', options: [
+          ['', 'Select answer…'],
+          ['2_cw', '2 N·m (clockwise)'],
+          ['4_cw', '4 N·m (clockwise)'],
+          ['4_acw', '4 N·m (anticlockwise)']
+        ], ans: '4_cw' }
+      ],
+      compute(p) {
+        const r = p.D / 2;
+        const tauO = p.F * r;
+        const tauA = p.F * p.D;
+        const cx = 360, cy = 195, R = clamp(p.D * 48, 55, 115);
+        const by = cy - R, ay = cy + R;
+        const activeY = p.pivot === 0 ? cy : ay;
+        const activeArm = p.pivot === 0 ? r : p.D;
+
+        let svg = `<circle cx="${cx}" cy="${cy}" r="${R}" fill="#172d38" stroke="${blue}" stroke-width="3"/>`;
+        // Vertical diameter line BA
+        svg += line(cx, by, cx, ay, '#496a75', 2, true);
+        // Highlight active moment arm
+        svg += line(cx, by, cx, activeY, mint, 4);
+        svg += text(cx + 58, (by + activeY) / 2 + 5, `arm = ${fmt(activeArm)} m`, mint, 14);
+
+        // Force arrow at B pointing right
+        svg += arrow(cx - 110, by, cx + 120, by, gold, 4);
+        svg += text(cx - 145, by + 5, `F = ${fmt(p.F)} N`, gold, 15);
+
+        // Points B, O, A
+        svg += dot(cx, by, 6, gold) + text(cx, by - 14, 'B', gold, 15);
+        svg += dot(cx, cy, p.pivot === 0 ? 8 : 5, p.pivot === 0 ? mint : blue) + text(cx - 20, cy + 5, 'O', blue, 15);
+        svg += dot(cx, ay, p.pivot === 1 ? 8 : 5, p.pivot === 1 ? mint : blue) + text(cx, ay + 24, 'A', blue, 15);
+
+        svg += arcArrow(cx, activeY, 34, true, `τ = ${fmt(p.F * activeArm)} N·m (CW)`);
+
+        return {
+          svg,
+          simPass: p.F === 2 && p.D === 2,
+          metrics: [
+            ['Radius OB (about O)', `${fmt(r)} m`],
+            ['Moment about O', `${fmt(tauO)} N·m (CW)`],
+            ['Diameter AB (about A)', `${fmt(p.D)} m`],
+            ['Moment about A', `${fmt(tauA)} N·m (CW)`]
+          ],
+          equation: `(i) About O: τ_O = F × OB = ${p.F} N × ${fmt(r)} m = ${fmt(tauO)} N·m (clockwise)\n(ii) About A: τ_A = F × AB = ${p.F} N × ${fmt(p.D)} m = ${fmt(tauA)} N·m (clockwise)`,
+          explanation: 'Because the force F is applied tangentially at the top point B, the radius OB (1 m) and the full diameter AB (2 m) are both perpendicular to the line of action of F. Shifting the pivot from O to A doubles the lever arm, doubling the clockwise torque.'
+        };
+      }
+    },
+    {
+      id: 'fig-1-28',
+      tag: 'PROBLEM 6(b) · FIG. 1.28',
+      title: '3. Two Downward Forces on an Asymmetric Pivoted Rod',
+      problem: 'Fig. 1.28 shows two downward forces F₁ = 5 N and F₂ = 3 N acting at points A and B of a rod pivoted at O, such that OA = 2 m and OB = 4 m. Calculate: (i) moment of F₁ about O, (ii) moment of F₂ about O, and (iii) total moment of the two forces about O.',
+      simGoal: 'Set F₁ = 5 N at OA = 2 m and F₂ = 3 N at OB = 4 m to observe the competing anticlockwise and clockwise torques.',
+      controls: [
+        { key: 'F1', label: 'Left Downward Force F₁ at A', min: 1, max: 10, step: 1, init: 5, sol: 5, unit: 'N' },
+        { key: 'OA', label: 'Left Arm OA', min: 1, max: 4, step: 0.5, init: 2, sol: 2, unit: 'm' },
+        { key: 'F2', label: 'Right Downward Force F₂ at B', min: 1, max: 10, step: 1, init: 3, sol: 3, unit: 'N' },
+        { key: 'OB', label: 'Right Arm OB', min: 1, max: 5, step: 0.5, init: 4, sol: 4, unit: 'm' }
+      ],
+      questions: [
+        { key: 'q1', label: '(i) Moment of force F₁ (5 N at 2 m) about O:', type: 'select', options: [
+          ['', 'Select answer…'],
+          ['10_acw', '10 N·m (anticlockwise)'],
+          ['10_cw', '10 N·m (clockwise)'],
+          ['15_acw', '15 N·m (anticlockwise)']
+        ], ans: '10_acw' },
+        { key: 'q2', label: '(ii) Moment of force F₂ (3 N at 4 m) about O:', type: 'select', options: [
+          ['', 'Select answer…'],
+          ['12_acw', '12 N·m (anticlockwise)'],
+          ['12_cw', '12 N·m (clockwise)'],
+          ['7_cw', '7 N·m (clockwise)']
+        ], ans: '12_cw' },
+        { key: 'q3', label: '(iii) Total resultant moment of the two forces about O:', type: 'select', options: [
+          ['', 'Select answer…'],
+          ['2_cw', '2 N·m (clockwise)'],
+          ['2_acw', '2 N·m (anticlockwise)'],
+          ['22_cw', '22 N·m (clockwise)']
+        ], ans: '2_cw' }
+      ],
+      compute(p) {
+        const tau1 = p.F1 * p.OA; // ACW (+)
+        const tau2 = p.F2 * p.OB; // CW (-)
+        const net = tau1 - tau2;
+        const tilt = clamp((tau2 - tau1) * 1.4, -12, 12);
+
+        const ox = 290, oy = 165, scale = 65;
+        const ax = ox - p.OA * scale * Math.cos(rad(tilt)), ay = oy - p.OA * scale * Math.sin(rad(tilt));
+        const bx = ox + p.OB * scale * Math.cos(rad(tilt)), by = oy + p.OB * scale * Math.sin(rad(tilt));
+
+        let svg = pivotTriangle(ox, oy, 24, mint);
+        svg += line(ax, ay, bx, by, blue, 6);
+        svg += dot(ox, oy, 6, mint) + text(ox, oy - 16, 'O', mint, 16);
+
+        // Left Force F1
+        svg += arrow(ax, ay, ax, ay + 65 + p.F1 * 6, mint, 3.5);
+        svg += text(ax, ay - 12, 'A', '#fff', 15);
+        svg += text((ox + ax)/2, (oy + ay)/2 - 12, `${p.OA} m`, '#d0e4dc', 13);
+        svg += text(ax, ay + 88 + p.F1 * 6, `F₁ = ${p.F1} N`, mint, 15);
+
+        // Right Force F2
+        svg += arrow(bx, by, bx, by + 65 + p.F2 * 6, gold, 3.5);
+        svg += text(bx, by - 12, 'B', '#fff', 15);
+        svg += text((ox + bx)/2, (oy + by)/2 - 12, `${p.OB} m`, '#d0e4dc', 13);
+        svg += text(bx, by + 88 + p.F2 * 6, `F₂ = ${p.F2} N`, gold, 15);
+
+        svg += text(360, 345, net === 0 ? 'Rod is in rotational equilibrium!' : `Rod tilts ${net < 0 ? 'CLOCKWISE' : 'ANTICLOCKWISE'} by net moment ${fmt(Math.abs(net))} N·m`, net === 0 ? mint : gold, 15);
+
+        return {
+          svg,
+          simPass: p.F1 === 5 && p.OA === 2 && p.F2 === 3 && p.OB === 4,
+          metrics: [
+            ['Moment of F₁ (ACW)', `${fmt(tau1)} N·m`],
+            ['Moment of F₂ (CW)', `${fmt(tau2)} N·m`],
+            ['Resultant Moment', `${fmt(Math.abs(net))} N·m ${net < 0 ? '(CW)' : net > 0 ? '(ACW)' : '(Balanced)'}`]
+          ],
+          equation: `(i) τ₁ = F₁ × OA = ${p.F1} × ${p.OA} = ${fmt(tau1)} N·m (anticlockwise)\n(ii) τ₂ = F₂ × OB = ${p.F2} × ${p.OB} = ${fmt(tau2)} N·m (clockwise)\n(iii) Total Moment = ${fmt(tau2)} (CW) − ${fmt(tau1)} (ACW) = ${fmt(Math.abs(net))} N·m (${net < 0 ? 'clockwise' : 'anticlockwise'})`,
+          explanation: 'Even though F₂ (3 N) is smaller than F₁ (5 N), its distance from the pivot O is twice as large (4 m vs 2 m), giving it a larger clockwise moment (12 N·m > 10 N·m).'
+        };
+      }
+    },
+    {
+      id: 'fig-1-29-couples',
+      tag: 'PROBLEMS 6(c) & 7 · FIG. 1.29',
+      title: '4. Moment of a Couple: Steering Wheel & Uniform Rod',
+      problem: 'Q7: A steering wheel of diameter 0.5 m is rotated anticlockwise by applying two forces each of magnitude 5 N. Calculate the moment of the couple. | Fig. 1.29: Two equal and opposite vertical forces of magnitude 10 N act at ends A and B of a 4 m uniform rod pivoted at O. Find the couple moment.',
+      simGoal: 'Explore both textbook couple configurations (Steering Wheel and 4 m Rod) to verify that Moment of Couple = Either Force × Couple Arm.',
+      controls: [
+        { key: 'mode', label: 'Textbook Scenario', type: 'select', options: [[0, 'Q7: Steering Wheel (d = 0.5 m, F = 5 N ACW)'], [1, 'Fig. 1.29: 4 m Uniform Rod (d = 4 m, F = 10 N CW)']], init: 0, sol: 0 },
+        { key: 'F', label: 'Magnitude of Each Force', min: 2, max: 15, step: 1, init: 5, sol: 5, unit: 'N' },
+        { key: 'd', label: 'Couple Arm (Diameter / Length AB)', min: 0.5, max: 5, step: 0.5, init: 0.5, sol: 0.5, unit: 'm' }
+      ],
+      questions: [
+        { key: 'q1', label: 'Q7: Moment of couple on the 0.5 m steering wheel with two 5 N forces:', type: 'select', options: [
+          ['', 'Select answer…'],
+          ['1.25', '1.25 N·m (anticlockwise)'],
+          ['2.5', '2.5 N·m (anticlockwise)'],
+          ['5.0', '5.0 N·m (anticlockwise)']
+        ], ans: '2.5' },
+        { key: 'q2', label: 'Fig. 1.29: Moment of the two 10 N forces at ends of the 4 m rod:', type: 'select', options: [
+          ['', 'Select answer…'],
+          ['20_cw', '20 N·m (clockwise)'],
+          ['40_cw', '40 N·m (clockwise)'],
+          ['0', '0 N·m (forces cancel out)']
+        ], ans: '40_cw' }
+      ],
+      compute(p) {
+        const moment = p.F * p.d;
+        const cx = 360, cy = 185;
+        let svg = '';
+        if (p.mode === 0) {
+          const R = clamp(p.d * 120, 55, 115);
+          svg += `<circle cx="${cx}" cy="${cy}" r="${R}" fill="#162c36" stroke="${mint}" stroke-width="5"/>`;
+          svg += `<circle cx="${cx}" cy="${cy}" r="16" fill="#243b44" stroke="${blue}" stroke-width="2"/>`;
+          svg += line(cx - R, cy, cx + R, cy, '#50727c', 3, true);
+          // Tangential ACW forces: left side down, right side up
+          svg += arrow(cx - R, cy - 10, cx - R, cy + 75, mint, 4);
+          svg += arrow(cx + R, cy + 10, cx + R, cy - 75, mint, 4);
+          svg += text(cx - R - 45, cy + 40, `${p.F} N`, mint, 15);
+          svg += text(cx + R + 45, cy - 40, `${p.F} N`, mint, 15);
+          svg += text(cx, cy - 10, `d = ${fmt(p.d)} m`, '#fff', 14);
+          svg += arcArrow(cx, cy, 38, false, `Couple = ${fmt(moment)} N·m (ACW)`);
+        } else {
+          const half = clamp(p.d * 52, 70, 220);
+          svg += line(cx - half, cy, cx + half, cy, blue, 6);
+          svg += dot(cx, cy, 7, mint) + text(cx, cy + 25, 'O', mint, 15);
+          // Left A upwards (CW), Right B downwards (CW)
+          svg += arrow(cx - half, cy, cx - half, cy - 85, gold, 4);
+          svg += arrow(cx + half, cy, cx + half, cy + 85, gold, 4);
+          svg += text(cx - half, cy + 24, 'A', '#fff', 15);
+          svg += text(cx + half, cy - 14, 'B', '#fff', 15);
+          svg += text(cx - half, cy - 96, `${p.F} N`, gold, 15);
+          svg += text(cx + half, cy + 105, `${p.F} N`, gold, 15);
+          svg += text(cx, cy - 18, `AB = ${fmt(p.d)} m`, '#d0e4dc', 14);
+          svg += arcArrow(cx, cy, 42, true, `Couple = ${fmt(moment)} N·m (CW)`);
+        }
+
+        return {
+          svg,
+          simPass: (p.mode === 0 && p.F === 5 && p.d === 0.5) || (p.mode === 1 && p.F === 10 && p.d === 4),
+          metrics: [
+            ['Net Linear Force', '0 N (Equal & Opposite)'],
+            ['Each Force (F)', `${fmt(p.F)} N`],
+            ['Couple Arm (d)', `${fmt(p.d)} m`],
+            ['Moment of Couple', `${fmt(moment)} N·m (${p.mode === 0 ? 'ACW' : 'CW'})`]
+          ],
+          equation: `Moment of Couple = Either Force (F) × Perpendicular distance between forces (d)\nQ7 Steering Wheel: τ = 5 N × 0.5 m = 2.5 N·m (ACW)  |  Fig. 1.29 Rod: τ = 10 N × 4 m = 40 N·m (CW)`,
+          explanation: 'Two equal and opposite parallel forces not acting along the same line form a couple. Their net translational force is zero, but both forces turn the object in the SAME rotational direction, producing pure torque τ = F × d.'
+        };
+      }
+    },
+    {
+      id: 'fig-1-31-midpoint',
+      tag: 'PROBLEMS 8 & 10 · FIG. 1.31',
+      title: '5. Balancing a Uniform Metre Rule Pivoted at Mid-Point O',
+      problem: 'Q8: A uniform metre rule is pivoted at its mid-point (50 cm). A weight of 50 gf is suspended at one end (50 cm from O). Where should 100 gf be suspended to keep it horizontal? | Q10 (Fig. 1.31): A weight of 40 gf is placed at 40 cm to the left of O. How can you balance the bar with a weight of 80 gf?',
+      simGoal: 'Slide the right-hand counterweight distance d₂ until the metre rule balances horizontally (Net Moment = 0).',
+      controls: [
+        { key: 'W1', label: 'Left Weight W₁', min: 20, max: 100, step: 10, init: 40, sol: 40, unit: 'gf' },
+        { key: 'd1', label: 'Left Distance from O (d₁)', min: 10, max: 50, step: 5, init: 40, sol: 40, unit: 'cm' },
+        { key: 'W2', label: 'Right Counterweight W₂', min: 20, max: 120, step: 10, init: 80, sol: 80, unit: 'gf' },
+        { key: 'd2', label: 'Right Distance from O (d₂)', min: 5, max: 50, step: 5, init: 35, sol: 20, unit: 'cm' }
+      ],
+      questions: [
+        { key: 'q1', label: 'Q8: Distance from O (and from the other end) to suspend 100 gf against 50 gf at one end (50 cm from O):', type: 'select', options: [
+          ['', 'Select answer…'],
+          ['25', '25 cm from O (which is 25 cm from the other end)'],
+          ['40', '40 cm from O'],
+          ['50', 'At the other end (50 cm from O)']
+        ], ans: '25' },
+        { key: 'q2', label: 'Q10 (Fig. 1.31): Where should the 80 gf weight be placed to balance 40 gf at 40 cm left of O?', type: 'select', options: [
+          ['', 'Select answer…'],
+          ['10_right', '10 cm to the right of point O'],
+          ['20_right', '20 cm to the right of point O'],
+          ['40_right', '40 cm to the right of point O']
+        ], ans: '20_right' }
+      ],
+      compute(p) {
+        const acw = p.W1 * p.d1;
+        const cw = p.W2 * p.d2;
+        const net = acw - cw;
+        const tilt = clamp((cw - acw) / 180, -11, 11);
+
+        const ox = 360, oy = 185, scale = 5.2; // 100 cm = 520 px
+        let svg = pivotTriangle(ox, oy + 7, 26, mint);
+        svg += `<g transform="rotate(${tilt} ${ox} ${oy})">`;
+        svg += box(ox - 260, oy - 9, 520, 16, '#26424d', '#88a6b0', 4);
+        for (let cm = -50; cm <= 50; cm += 10) {
+          const tx = ox + cm * scale;
+          svg += line(tx, oy - 9, tx, oy - 2, '#9ab4bc', 1.5);
+          svg += text(tx, oy + 22, `${Math.abs(cm)}`, '#9ab4bc', 10);
+        }
+        // Left weight block
+        const lx = ox - p.d1 * scale;
+        svg += box(lx - 18, oy - 35, 36, 26, '#396150', mint, 4);
+        svg += text(lx, oy - 18, `${p.W1}gf`, mint, 11);
+        svg += arrow(lx, oy + 7, lx, oy + 58, mint, 3);
+
+        // Right weight block
+        const rx = ox + p.d2 * scale;
+        svg += box(rx - 18, oy - 35, 36, 26, '#524329', gold, 4);
+        svg += text(rx, oy - 18, `${p.W2}gf`, gold, 11);
+        svg += arrow(rx, oy + 7, rx, oy + 58, gold, 3);
+        svg += `</g>`;
+        svg += text(ox, oy - 52, 'O (Mid-point 50 cm mark)', blue, 13);
+        svg += text(360, 345, net === 0 ? '✓ Equilibrium achieved: Anticlockwise Moment = Clockwise Moment' : `Unbalanced by ${fmt(Math.abs(net), 0)} gf·cm (${net > 0 ? 'Tilts Left / ACW' : 'Tilts Right / CW'})`, net === 0 ? mint : gold, 15);
+
+        return {
+          svg,
+          simPass: net === 0,
+          metrics: [
+            ['Anticlockwise (W₁×d₁)', `${fmt(acw, 0)} gf·cm`],
+            ['Clockwise (W₂×d₂)', `${fmt(cw, 0)} gf·cm`],
+            ['Net Moment', `${fmt(Math.abs(net), 0)} gf·cm`],
+            ['Status', net === 0 ? 'Horizontal Equilibrium' : 'Tilted']
+          ],
+          equation: `Principle of Moments: W₁ × d₁ = W₂ × d₂\nQ8: 50 × 50 = 100 × d₂ ⇒ d₂ = 25 cm  |  Q10 (Fig. 1.31): 40 × 40 = 80 × d₂ ⇒ d₂ = 20 cm right of O`,
+          explanation: 'By the Principle of Moments, doubling the balancing weight (from 40 gf to 80 gf, or 50 gf to 100 gf) requires halving its distance from the fulcrum O to produce the exact same moment.'
+        };
+      }
+    },
+    {
+      id: 'q9-q17-offcentre',
+      tag: 'PROBLEMS 9 & 17 · CENTRE OF GRAVITY',
+      title: '6. Uniform Metre Rule on an Off-Centre Knife-Edge',
+      problem: 'Q9: A uniform metre rule balances horizontally on a knife edge at the 58 cm mark when a weight of 20 gf is suspended from one end (100 cm mark). What is the weight of the rule? | Q17: A uniform metre rule of mass 100 g balances on a fulcrum at 40 cm by suspending unknown mass m at the 20 cm mark. Find m, and how to balance it if m moves to 10 cm.',
+      simGoal: 'Switch between Q9 (Fulcrum at 58 cm) and Q17 (Fulcrum at 40 cm) and tune the suspended mass to achieve horizontal balance.',
+      controls: [
+        { key: 'fulcrum', label: 'Knife-Edge Fulcrum Mark', type: 'select', options: [[58, 'Q9: 58 cm mark (20 gf at 100 cm end)'], [40, 'Q17(i): 40 cm mark (m at 20 cm mark)'], [40.1, 'Q17(iv): 40 cm mark (50 g at 10 cm + 50 g stabilizer)']], init: 58, sol: 58 },
+        { key: 'Wrule', label: 'Weight/Mass of Metre Rule (at 50 cm)', min: 50, max: 150, step: 5, init: 105, sol: 105, unit: 'gf' },
+        { key: 'm', label: 'Suspended Weight / Mass (m)', min: 10, max: 100, step: 5, init: 20, sol: 20, unit: 'gf' },
+        { key: 'stabMark', label: 'Q17(iv) Extra 50 g Stabilizer Mark', min: 40, max: 80, step: 5, init: 50, sol: 50, unit: 'cm' }
+      ],
+      questions: [
+        { key: 'q1', label: 'Q9: Weight of the metre rule when 20 gf at the 100 cm end balances it about the 58 cm mark:', type: 'select', options: [
+          ['', 'Select answer…'],
+          ['84', '84 gf'],
+          ['105', '105 gf'],
+          ['120', '120 gf']
+        ], ans: '105' },
+        { key: 'q2', label: 'Q17(i): Value of unknown mass m at 20 cm mark that balances the 100 g rule about the 40 cm mark:', type: 'select', options: [
+          ['', 'Select answer…'],
+          ['25', '25 g'],
+          ['50', '50 g'],
+          ['100', '100 g']
+        ], ans: '50' },
+        { key: 'q3', label: 'Q17(ii)–(iii): When m = 50 g is moved to the 10 cm mark, what is the resultant moment about 40 cm?', type: 'select', options: [
+          ['', 'Select answer…'],
+          ['500_acw', '500 gf·cm (anticlockwise, tilts toward mass m)'],
+          ['500_cw', '500 gf·cm (clockwise, tilts away from m)'],
+          ['1000_acw', '1000 gf·cm (anticlockwise)']
+        ], ans: '500_acw' },
+        { key: 'q4', label: 'Q17(iv): At which mark should another mass of 50 g be suspended to restore balance?', type: 'select', options: [
+          ['', 'Select answer…'],
+          ['45', 'At the 45 cm mark'],
+          ['50', 'At the 50 cm mark (10 cm to the right of fulcrum)'],
+          ['60', 'At the 60 cm mark']
+        ], ans: '50' }
+      ],
+      compute(p) {
+        const fMark = Math.round(p.fulcrum);
+        let acw = 0, cw = 0, desc = '';
+        if (p.fulcrum === 58) {
+          // Q9: Rule CG at 50 cm is 8 cm LEFT of 58 cm (ACW). Weight m at 100 cm is 42 cm RIGHT of 58 cm (CW).
+          acw = p.Wrule * (58 - 50);
+          cw = p.m * (100 - 58);
+          desc = `Q9 Mode: Rule CG at 50 cm (arm = 8 cm left) vs ${p.m} gf at 100 cm mark (arm = 42 cm right)`;
+        } else if (p.fulcrum === 40) {
+          // Q17(i): Mass m at 20 cm is 20 cm LEFT of 40 cm (ACW). Rule CG (100 g) at 50 cm is 10 cm RIGHT of 40 cm (CW).
+          acw = p.m * (40 - 20);
+          cw = p.Wrule * (50 - 40);
+          desc = `Q17(i) Mode: Mass m=${p.m} g at 20 cm (arm = 20 cm left) vs Rule ${p.Wrule} g at 50 cm (arm = 10 cm right)`;
+        } else {
+          // Q17(iv): m=50g moved to 10 cm (arm = 30 cm left). Rule 100g at 50 cm + extra 50g at stabMark
+          acw = 50 * (40 - 10);
+          cw = 100 * (50 - 40) + 50 * (p.stabMark - 40);
+          desc = `Q17(iv) Mode: 50 g at 10 cm mark (ACW = 1500) vs Rule 100 g at 50 cm + 50 g at ${p.stabMark} cm mark`;
+        }
+        const net = acw - cw;
+        const tilt = clamp((cw - acw) / 150, -10, 10);
+
+        const x0 = 100, y0 = 185, scale = 5.2; // 0 to 100 cm
+        const fx = x0 + fMark * scale;
+
+        let svg = pivotTriangle(fx, y0 + 7, 26, mint);
+        svg += `<g transform="rotate(${tilt} ${fx} ${y0})">`;
+        svg += box(x0, y0 - 9, 520, 16, '#26424d', '#88a6b0', 4);
+        for (let cm = 0; cm <= 100; cm += 10) {
+          const tx = x0 + cm * scale;
+          svg += line(tx, y0 - 9, tx, y0 - 2, '#9ab4bc', 1.5);
+          svg += text(tx, y0 + 22, `${cm}`, '#9ab4bc', 10);
+        }
+        // Centre of gravity arrow at 50 cm
+        const cgx = x0 + 50 * scale;
+        svg += dot(cgx, y0, 5, blue);
+        svg += arrow(cgx, y0 + 7, cgx, y0 + 68, blue, 3.5);
+        svg += text(cgx, y0 + 86, `W_rule (${p.fulcrum === 40.1 ? 100 : p.Wrule} gf at 50 cm)`, blue, 12);
+
+        if (p.fulcrum === 58) {
+          const mx = x0 + 100 * scale;
+          svg += arrow(mx, y0 + 7, mx, y0 + 68, gold, 3.5);
+          svg += text(mx - 20, y0 - 16, `${p.m} gf (at 100 cm)`, gold, 13);
+        } else if (p.fulcrum === 40) {
+          const mx = x0 + 20 * scale;
+          svg += arrow(mx, y0 + 7, mx, y0 + 68, mint, 3.5);
+          svg += text(mx, y0 - 16, `m = ${p.m} g (20 cm)`, mint, 13);
+        } else {
+          const mx = x0 + 10 * scale;
+          svg += arrow(mx, y0 + 7, mx, y0 + 68, mint, 3.5);
+          svg += text(mx + 10, y0 - 16, `50 g (10 cm)`, mint, 12);
+          const sx = x0 + p.stabMark * scale;
+          svg += arrow(sx, y0 + 7, sx, y0 + 58, gold, 3.5);
+          svg += text(sx, y0 - 16, `50 g (${p.stabMark} cm)`, gold, 12);
+        }
+        svg += `</g>`;
+        svg += text(fx, y0 + 48, `Fulcrum (${fMark} cm)`, mint, 13);
+        svg += text(360, 348, desc, '#d0e4dc', 13);
+
+        return {
+          svg,
+          simPass: Math.abs(net) < 1e-5,
+          metrics: [
+            ['Fulcrum Position', `${fMark} cm mark`],
+            ['Anticlockwise Moment', `${fmt(acw, 0)} gf·cm`],
+            ['Clockwise Moment', `${fmt(cw, 0)} gf·cm`],
+            ['Resultant Moment', `${fmt(Math.abs(net), 0)} gf·cm ${net === 0 ? '(Balanced)' : net > 0 ? '(ACW)' : '(CW)'}`]
+          ],
+          equation: `Q9: W × (58 − 50) = 20 × (100 − 58) ⇒ 8W = 840 ⇒ W = 105 gf\nQ17: m × (40 − 20) = 100 × (50 − 40) ⇒ 20m = 1000 ⇒ m = 50 g  |  At 10 cm: Net = 50×30 − 100×10 = 500 gf·cm (ACW)`,
+          explanation: 'The entire weight of a uniform metre rule acts downward through its geometric centre of gravity at the 50 cm mark. When the knife-edge is shifted away from 50 cm, the rule’s own weight produces a moment about the fulcrum.'
+        };
+      }
+    },
+    {
+      id: 'fig-1-33-multiweight',
+      tag: 'PROBLEM 14 · FIG. 1.33',
+      title: '7. Balancing a Multi-Weight Metre Rule (Fig. 1.33)',
+      problem: 'Fig. 1.33 shows a uniform metre rule weighing 100 gf, pivoted at its centre O. Two weights 150 gf and 250 gf hang from points A and B such that OA = 40 cm (left) and OB = 20 cm (right). Calculate: (i) total ACW moment, (ii) total CW moment, (iii) difference of moments, and (iv) distance from O where a 100 gf weight should be placed to balance the rule.',
+      simGoal: 'Toggle the 100 gf balancing weight ON and slide its position until the metre rule becomes completely level.',
+      controls: [
+        { key: 'add100', label: '100 gf Balancing Weight', type: 'select', options: [[0, 'Removed (Inspect Initial Imbalance)'], [1, 'Placed on Right Side of O']], init: 0, sol: 1 },
+        { key: 'dist100', label: 'Distance of 100 gf Weight right of O', min: 5, max: 45, step: 5, init: 25, sol: 10, unit: 'cm' }
+      ],
+      questions: [
+        { key: 'q1', label: '(i) Total anticlockwise moment about O (150 gf at 40 cm left):', type: 'select', options: [
+          ['', 'Select answer…'],
+          ['5000', '5000 gf·cm'],
+          ['6000', '6000 gf·cm'],
+          ['4000', '4000 gf·cm']
+        ], ans: '6000' },
+        { key: 'q2', label: '(ii) Initial clockwise moment about O (250 gf at 20 cm right):', type: 'select', options: [
+          ['', 'Select answer…'],
+          ['5000', '5000 gf·cm'],
+          ['6000', '6000 gf·cm'],
+          ['2500', '2500 gf·cm']
+        ], ans: '5000' },
+        { key: 'q3', label: '(iii) Difference between anticlockwise and clockwise moments:', type: 'select', options: [
+          ['', 'Select answer…'],
+          ['500', '500 gf·cm'],
+          ['1000', '1000 gf·cm (excess anticlockwise)'],
+          ['1500', '1500 gf·cm']
+        ], ans: '1000' },
+        { key: 'q4', label: '(iv) Where should the 100 gf weight be placed to balance the rule?', type: 'select', options: [
+          ['', 'Select answer…'],
+          ['10_right', '10 cm on the right side of O'],
+          ['10_left', '10 cm on the left side of O'],
+          ['20_right', '20 cm on the right side of O']
+        ], ans: '10_right' }
+      ],
+      compute(p) {
+        const acw = 150 * 40; // 6000 gf cm
+        const cwBase = 250 * 20; // 5000 gf cm
+        const cwExtra = p.add100 ? 100 * p.dist100 : 0;
+        const cwTotal = cwBase + cwExtra;
+        const net = acw - cwTotal;
+        const tilt = clamp((cwTotal - acw) / 220, -10, 10);
+
+        const ox = 360, oy = 180, scale = 5.2;
+        let svg = pivotTriangle(ox, oy + 7, 26, mint);
+        svg += `<g transform="rotate(${tilt} ${ox} ${oy})">`;
+        svg += box(ox - 260, oy - 9, 520, 16, '#26424d', '#88a6b0', 4);
+
+        // Point A: 40 cm left of O
+        const ax = ox - 40 * scale;
+        svg += arrow(ax, oy + 7, ax, oy + 72, mint, 3.5);
+        svg += text(ax, oy - 15, 'A (40 cm left)', mint, 13);
+        svg += text(ax, oy + 92, '150 gf', mint, 14);
+
+        // Point B: 20 cm right of O
+        const bx = ox + 20 * scale;
+        svg += arrow(bx, oy + 7, bx, oy + 78, gold, 3.5);
+        svg += text(bx + 15, oy - 15, 'B (20 cm right)', gold, 13);
+        svg += text(bx, oy + 98, '250 gf', gold, 14);
+
+        // Optional 100 gf weight
+        if (p.add100) {
+          const cx = ox + p.dist100 * scale;
+          svg += arrow(cx, oy + 7, cx, oy + 55, blue, 3.5);
+          svg += box(cx - 22, oy - 34, 44, 24, '#1d3b52', blue, 4);
+          svg += text(cx, oy - 18, '100gf', blue, 11);
+          svg += text(cx, oy + 72, `${p.dist100} cm`, blue, 12);
+        }
+        svg += `</g>`;
+        svg += text(ox, oy + 46, 'O (Centre)', '#fff', 13);
+        svg += text(360, 345, net === 0 ? '✓ Balanced! 100 gf at 10 cm right adds 1000 gf·cm CW moment.' : `Imbalance: ${fmt(Math.abs(net), 0)} gf·cm (${net > 0 ? 'Anticlockwise excess' : 'Clockwise excess'})`, net === 0 ? mint : gold, 15);
+
+        return {
+          svg,
+          simPass: p.add100 === 1 && p.dist100 === 10,
+          metrics: [
+            ['ACW Moment (150×40)', '6000 gf·cm'],
+            ['CW Moment (250×20 + 100×d)', `${fmt(cwTotal, 0)} gf·cm`],
+            ['Moment Difference', `${fmt(Math.abs(net), 0)} gf·cm`],
+            ['Equilibrium State', net === 0 ? 'Balanced' : 'Unbalanced']
+          ],
+          equation: `(i) τ_ACW = 150 × 40 = 6000 gf·cm  |  (ii) τ_CW = 250 × 20 = 5000 gf·cm\n(iii) Difference = 6000 − 5000 = 1000 gf·cm (ACW)  |  (iv) 100 × d = 1000 ⇒ d = 10 cm right of O`,
+          explanation: 'Because the uniform rule (100 gf) is pivoted right at its centre O, its own weight has zero moment arm about O. To cancel the 1000 gf·cm anticlockwise excess, the 100 gf weight must be placed on the right side at d = 1000 / 100 = 10 cm.'
+        };
+      }
+    },
+    {
+      id: 'fig-1-34-supports',
+      tag: 'PROBLEM 18 · FIG. 1.34',
+      title: '8. Normal Reactions at End Supports of a Loaded Beam',
+      problem: 'In Fig. 1.34, a uniform bar of length l m is supported at its ends and loaded by a weight W kgf at its middle. In equilibrium, find the upward normal reactions R₁ and R₂ at the ends using R₁ + R₂ = W and moments about the middle.',
+      simGoal: 'Position the load W at the exact middle (fraction = 0.50) to see how R₁ and R₂ share the load equally, or slide the load to see how reactions shift.',
+      controls: [
+        { key: 'W', label: 'Suspended Load W', min: 10, max: 100, step: 10, init: 40, sol: 40, unit: 'kgf' },
+        { key: 'pos', label: 'Load Position along length l', min: 0.1, max: 0.9, step: 0.05, init: 0.5, sol: 0.5, unit: '× l' }
+      ],
+      questions: [
+        { key: 'q1', label: '(i) Force equilibrium condition for vertical forces on the bar:', type: 'select', options: [
+          ['', 'Select answer…'],
+          ['sum_eq_W', 'R₁ + R₂ = W (Total upward reaction equals total downward load)'],
+          ['diff_eq_W', 'R₁ − R₂ = W'],
+          ['prod_eq_W', 'R₁ × R₂ = W']
+        ], ans: 'sum_eq_W' },
+        { key: 'q2', label: '(ii) Moment equilibrium about the mid-point (R₁ × l/2 = R₂ × l/2) gives:', type: 'select', options: [
+          ['', 'Select answer…'],
+          ['half', 'R₁ = W/2 kgf and R₂ = W/2 kgf'],
+          ['full', 'R₁ = W kgf and R₂ = W kgf'],
+          ['quarter', 'R₁ = W/4 kgf and R₂ = 3W/4 kgf']
+        ], ans: 'half' }
+      ],
+      compute(p) {
+        // Taking moments about left end: R2 * l = W * (pos * l) => R2 = W * pos, R1 = W * (1 - pos)
+        const R2 = p.W * p.pos;
+        const R1 = p.W - R2;
+
+        const x1 = 140, x2 = 580, y = 210;
+        const lx = x1 + (x2 - x1) * p.pos;
+
+        let svg = '';
+        // End supports
+        svg += pivotTriangle(x1, y + 6, 24, mint) + pivotTriangle(x2, y + 6, 24, mint);
+        // Beam
+        svg += box(x1 - 10, y - 8, (x2 - x1) + 20, 14, '#2a4854', blue, 4);
+
+        // Upward normal reaction arrows R1 and R2
+        const h1 = 45 + R1 * 1.1, h2 = 45 + R2 * 1.1;
+        svg += arrow(x1, y - 10, x1, y - 10 - h1, mint, 4);
+        svg += text(x1, y - 22 - h1, `R₁ = ${fmt(R1, 1)} kgf`, mint, 15);
+
+        svg += arrow(x2, y - 10, x2, y - 10 - h2, mint, 4);
+        svg += text(x2, y - 22 - h2, `R₂ = ${fmt(R2, 1)} kgf`, mint, 15);
+
+        // Downward load W
+        svg += arrow(lx, y + 6, lx, y + 65 + p.W * 0.7, gold, 4);
+        svg += text(lx, y + 88 + p.W * 0.7, `W = ${p.W} kgf`, gold, 15);
+
+        // Dimension labels
+        svg += text((x1 + lx)/2, y - 18, `${fmt(p.pos)} l`, '#d0e4dc', 13);
+        svg += text((lx + x2)/2, y - 18, `${fmt(1 - p.pos)} l`, '#d0e4dc', 13);
+        svg += text(360, 355, p.pos === 0.5 ? `✓ Load at Mid-Point (l/2): R₁ = R₂ = W/2 = ${fmt(p.W/2, 1)} kgf` : `Asymmetric Load: Support closer to weight carries larger reaction`, p.pos === 0.5 ? mint : gold, 15);
+
+        return {
+          svg,
+          simPass: Math.abs(p.pos - 0.5) < 1e-6,
+          metrics: [
+            ['Left Reaction R₁', `${fmt(R1, 1)} kgf`],
+            ['Right Reaction R₂', `${fmt(R2, 1)} kgf`],
+            ['Sum R₁ + R₂', `${fmt(R1 + R2, 1)} kgf (= W)`],
+            ['Ratio R₁ : R₂', p.pos === 0.5 ? '1 : 1 (Equal)' : `${fmt(1 - p.pos)} : ${fmt(p.pos)}`]
+          ],
+          equation: `In Equilibrium:\n(1) Total Upward Force = Total Downward Force ⇒ R₁ + R₂ = W\n(2) Taking moments about mid-point: R₁ × (l/2) = R₂ × (l/2) ⇒ R₁ = R₂ = W/2 kgf`,
+          explanation: 'For a body in complete equilibrium, both the net force (ΣF = 0) and the net torque (Στ = 0) must be zero. When loaded at the centre, symmetry demands equal moments about the middle, so each support carries exactly W/2.'
+        };
+      }
+    }
+  ];
+
+  // App State
+  const state = {
+    currentIdx: 0,
+    params: {},
+    answers: {},
+    solved: {}
+  };
+
+  const $ = id => document.getElementById(id);
+
+  function renderNav() {
+    const nav = $('missions');
+    nav.innerHTML = '';
+    MISSIONS.forEach((m, idx) => {
+      const btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'chapter' + (state.solved[m.id] ? ' solved' : '');
+      btn.setAttribute('aria-current', idx === state.currentIdx ? 'page' : 'false');
+      btn.innerHTML = `<small>${esc(m.tag)}</small><b>${esc(m.title)}</b><span class="badge">${state.solved[m.id] ? '✓ Mastered' : 'Unsolved'}</span>`;
+      btn.addEventListener('click', () => loadMission(idx));
+      nav.appendChild(btn);
+    });
+    const solvedCount = Object.keys(state.solved).length;
+    $('scoreDisplay').textContent = `${solvedCount} / ${MISSIONS.length}`;
+    $('prevBtn').disabled = state.currentIdx === 0;
+    $('nextBtn').disabled = state.currentIdx === MISSIONS.length - 1;
+    $('navStatus').textContent = `Mission ${state.currentIdx + 1} of ${MISSIONS.length}`;
+  }
+
+  function loadMission(idx) {
+    state.currentIdx = idx;
+    const m = MISSIONS[idx];
+    state.params = {};
+    m.controls.forEach(c => { state.params[c.key] = c.init; });
+    state.answers[m.id] = state.answers[m.id] || {};
+
+    $('missionTag').textContent = m.tag;
+    $('missionTitle').textContent = m.title;
+    $('problemStatement').textContent = m.problem;
+    $('simGoal').textContent = m.simGoal;
+    $('resultBox').hidden = true;
+
+    buildControls(m);
+    buildQuiz(m);
+    updateScene();
+    renderNav();
+  }
+
+  function buildControls(m) {
+    const container = $('controls');
+    container.innerHTML = '';
+    m.controls.forEach(c => {
+      const wrap = document.createElement('label');
+      wrap.className = 'control';
+      const row = document.createElement('span');
+      row.className = 'control-row';
+      const title = document.createElement('span');
+      title.textContent = c.label;
+      const out = document.createElement('output');
+
+      let input;
+      if (c.type === 'select') {
+        input = document.createElement('select');
+        c.options.forEach(([val, textLabel]) => {
+          const opt = document.createElement('option');
+          opt.value = val;
+          opt.textContent = textLabel;
+          input.appendChild(opt);
+        });
+        input.value = state.params[c.key];
+      } else {
+        input = document.createElement('input');
+        input.type = 'range';
+        input.min = c.min;
+        input.max = c.max;
+        input.step = c.step;
+        input.value = state.params[c.key];
+      }
+
+      const syncOutput = () => {
+        out.textContent = c.type === 'select' ? '' : `${state.params[c.key]} ${c.unit || ''}`;
+      };
+      syncOutput();
+
+      input.addEventListener('input', () => {
+        state.params[c.key] = Number(input.value);
+        syncOutput();
+        $('resultBox').hidden = true;
+        updateScene();
+      });
+
+      row.append(title, out);
+      wrap.append(row, input);
+      container.appendChild(wrap);
+    });
+  }
+
+  function buildQuiz(m) {
+    const qWrap = $('quizContainer');
+    qWrap.innerHTML = '';
+    const saved = state.answers[m.id] || {};
+
+    m.questions.forEach(q => {
+      const card = document.createElement('div');
+      card.className = 'q-card';
+      card.dataset.qkey = q.key;
+
+      const lbl = document.createElement('label');
+      lbl.textContent = q.label;
+
+      const sel = document.createElement('select');
+      q.options.forEach(([val, txt]) => {
+        const opt = document.createElement('option');
+        opt.value = val;
+        opt.textContent = txt;
+        sel.appendChild(opt);
+      });
+      sel.value = saved[q.key] || '';
+      sel.addEventListener('change', () => {
+        state.answers[m.id][q.key] = sel.value;
+        card.classList.remove('correct', 'wrong');
+        $('resultBox').hidden = true;
+      });
+
+      card.append(lbl, sel);
+      qWrap.appendChild(card);
+    });
+  }
+
+  function updateScene() {
+    const m = MISSIONS[state.currentIdx];
+    const res = m.compute(state.params);
+    $('drawing').innerHTML = res.svg;
+
+    const metricsEl = $('metrics');
+    metricsEl.innerHTML = '';
+    res.metrics.forEach(([k, v]) => {
+      const div = document.createElement('div');
+      div.className = 'metric';
+      div.innerHTML = `<small>${esc(k)}</small><strong>${esc(v)}</strong>`;
+      metricsEl.appendChild(div);
+    });
+
+    $('equationBox').innerHTML = esc(res.equation).replace(/\n/g, '<br>');
+    $('explanationBox').textContent = res.explanation;
+  }
+
+  function checkMission() {
+    const m = MISSIONS[state.currentIdx];
+    const res = m.compute(state.params);
+    const userAns = state.answers[m.id] || {};
+
+    let allQuizCorrect = true;
+    m.questions.forEach(q => {
+      const card = $('quizContainer').querySelector(`[data-qkey="${q.key}"]`);
+      const isRight = userAns[q.key] === q.ans;
+      if (card) {
+        card.classList.toggle('correct', isRight);
+        card.classList.toggle('wrong', !isRight);
+      }
+      if (!isRight) allQuizCorrect = false;
+    });
+
+    const box = $('resultBox');
+    box.hidden = false;
+    const fullPass = res.simPass && allQuizCorrect;
+    box.dataset.success = String(fullPass);
+
+    if (fullPass) {
+      state.solved[m.id] = true;
+      $('resultTitle').textContent = '✓ Mission Accomplished! Both Simulation & Textbook Questions Verified.';
+      $('resultBody').textContent = res.explanation;
+    } else if (!res.simPass && allQuizCorrect) {
+      $('resultTitle').textContent = 'Almost there! Your question answers are right, but adjust the simulator controls to match the target state.';
+      $('resultBody').textContent = m.simGoal;
+    } else if (res.simPass && !allQuizCorrect) {
+      $('resultTitle').textContent = 'Simulation is set up properly! Now check the highlighted textbook question dropdown(s) above.';
+      $('resultBody').textContent = 'Use the live measurements bar below the diagram to verify your answers.';
+    } else {
+      $('resultTitle').textContent = 'Keep experimenting — adjust the simulation controls and review the highlighted questions.';
+      $('resultBody').textContent = m.simGoal;
+    }
+    renderNav();
+  }
+
+  $('checkBtn').addEventListener('click', checkMission);
+  $('resetBtn').addEventListener('click', () => loadMission(state.currentIdx));
+  $('demoBtn').addEventListener('click', () => {
+    const m = MISSIONS[state.currentIdx];
+    m.controls.forEach(c => { state.params[c.key] = c.sol; });
+    buildControls(m);
+    updateScene();
+  });
+  $('prevBtn').addEventListener('click', () => {
+    if (state.currentIdx > 0) loadMission(state.currentIdx - 1);
+  });
+  $('nextBtn').addEventListener('click', () => {
+    if (state.currentIdx < MISSIONS.length - 1) loadMission(state.currentIdx + 1);
+  });
+
+  loadMission(0);
+})();
+</script>
+<script src="../../board.js" defer></script><script src="../../lab-context.js" defer data-studio="force"></script></body>
+</html>

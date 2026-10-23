@@ -1,0 +1,838 @@
+<!doctype html>
+<html lang="en" data-ignite-context-pending>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="description" content="Station Helios: a student-first, offline mechanics playground. Move one control, test your idea and see the physics.">
+  <title>Station Helios · Contraption Foundry</title>
+  <style>
+:root{color-scheme:dark;--bg:#0c141a;--panel:#142128;--surface:#192a32;--line:#2c4149;--ink:#edf5f1;--muted:#a2b9be;--accent:#8ae4bd;--gold:#f8cb7a;--blue:#a6c7ff;--bad:#ffb1a0;--radius:22px;font-family:"Segoe UI",system-ui,sans-serif}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(ellipse at 20% -10%,#21403980,transparent 48%),var(--bg);color:var(--ink);line-height:1.55}button,input,select{font:inherit}button{cursor:pointer}button:disabled{cursor:default;opacity:.45}a{color:inherit}button:focus-visible,a:focus-visible,input:focus-visible,summary:focus-visible,select:focus-visible{outline:3px solid var(--gold);outline-offset:4px}button{color:var(--ink);border:1px solid var(--line);background:var(--surface);border-radius:12px;min-height:44px;padding:9px 14px}button:hover:not(:disabled){border-color:var(--muted)}[hidden]{display:none!important}.skip{position:absolute;left:16px;top:-100px;padding:12px;background:var(--gold);color:#13221c;z-index:20}.skip:focus{top:12px}.topbar{max-width:1320px;margin:auto;padding:24px 34px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid var(--line)}.brand{text-decoration:none;display:flex;gap:12px;align-items:center;letter-spacing:.13em;font-size:16px;font-weight:800}.brand-symbol{display:grid;place-items:center;background:var(--accent);color:#0c2822;width:42px;height:42px;border-radius:13px;font-size:30px}.brand small{display:block;font-size:8px;letter-spacing:.14em;color:var(--muted);font-weight:600}.offline-label{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:12px}.offline-label i{width:7px;height:7px;border-radius:50%;background:var(--accent)}main{max-width:1320px;margin:auto;padding:32px 34px 20px}.intro{display:flex;justify-content:space-between;align-items:center;gap:24px;margin-bottom:28px}.eyebrow{font-size:10px;letter-spacing:.14em;font-weight:750;color:var(--accent);margin:0 0 9px;text-transform:uppercase}h1{font-size:clamp(30px,4vw,46px);line-height:1.12;letter-spacing:-.045em;margin:0;font-weight:650}h1 span{display:block;color:var(--muted);font-weight:350;font-size:.65em;letter-spacing:-.02em;margin-top:7px}.intro>p{font-size:15px;color:var(--muted);margin:0}.intro strong{color:var(--ink);font-weight:600}.wings{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-bottom:26px}.wing{display:flex;align-items:center;gap:14px;text-align:left;padding:15px 18px;background:#14212888;border-radius:16px}.wing-icon{display:grid;place-items:center;flex:0 0 40px;height:40px;font-size:24px;border-radius:12px;background:#ffffff08;color:var(--wing-colour)}.wing b{display:block;font-size:15px;font-weight:650}.wing small{display:block;color:var(--muted);font-size:11px;margin-top:2px}.wing[aria-pressed=true]{border-color:var(--wing-colour);box-shadow:inset 0 0 0 1px var(--wing-colour);background:#20352f}.workspace{border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;background:var(--panel);box-shadow:0 20px 60px #0002}.mission-heading{display:flex;align-items:center;justify-content:space-between;gap:20px;padding:24px 26px;border-bottom:1px solid var(--line)}h2{font-size:27px;letter-spacing:-.025em;line-height:1.2;margin:0;font-weight:650}.mission-heading>div>p:last-child{color:var(--muted);font-size:13px;margin:7px 0 0}.modes{display:flex;gap:4px;border:1px solid var(--line);border-radius:13px;padding:4px;background:#0d191f}.modes button{border:0;background:transparent;font-size:12px;white-space:nowrap;padding:7px 12px;min-height:36px}.modes [aria-pressed=true]{background:#30483f;color:var(--accent)}.play-layout{display:grid;grid-template-columns:minmax(0,1fr) 320px}.scene-panel{padding:22px 24px 16px;min-width:0;background:radial-gradient(ellipse at 50% 50%,#24424955,transparent 65%),#101d24}.scene-top{display:flex;align-items:center;justify-content:space-between;gap:12px;font-size:10px;color:var(--muted);letter-spacing:.04em;min-height:26px}.scene-tag{border:1px solid #3e595d;border-radius:20px;padding:4px 9px;font-weight:700;color:var(--accent);white-space:nowrap}#scene{display:block;width:100%;height:auto;aspect-ratio:760/400;overflow:visible}#scene text{font-family:"Segoe UI",system-ui,sans-serif;fill:var(--muted);font-size:14px}#scene .label{fill:var(--ink);font-weight:600;font-size:16px}#scene .small{font-size:12px}#scene .rope{stroke:var(--gold);stroke-width:3;fill:none}#scene .outline{stroke:#8ba7ac;fill:none;stroke-width:2}#scene .guide{stroke:#567279;stroke-dasharray:5 6;stroke-width:1;fill:none}#scene .beam{fill:#65858c;stroke:#c3d8d5;stroke-width:1}#scene .cargo{fill:#314c52;stroke:#a7ccca;stroke-width:2}#scene .force{stroke:var(--gold);stroke-width:3;fill:none}#scene .accent{fill:var(--accent)}#scene .hot{fill:var(--gold)}#scene .muted{fill:#2b444c}.measurements{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.measurement{border:1px solid var(--line);background:#15272e;border-radius:12px;padding:11px 14px}.measurement small{display:block;font-size:10px;color:var(--muted)}.measurement strong{font-size:21px;font-weight:600;color:var(--ink)}.measurement span{color:var(--muted);font-size:11px;margin-left:5px}.scene-note{font-size:10px;color:#8ba7ae;margin:12px 0 0}.coach{padding:24px;border-left:1px solid var(--line);display:flex;flex-direction:column;gap:12px}.coach>.eyebrow{margin:0}h3{font-size:18px;line-height:1.4;font-weight:600;margin:0}.think{font-size:12px;color:var(--muted);margin:0}.steps{padding:0;margin:5px 0;display:flex;gap:8px;list-style:none;font-size:10px;color:#a6babe}.steps li{display:flex;align-items:center;gap:5px}.steps span{border:1px solid #5a6d6f;width:19px;height:19px;border-radius:50%;display:grid;place-items:center;font-size:10px}.steps [aria-current=step]{color:var(--accent)}.steps [aria-current=step] span{background:var(--accent);border-color:var(--accent);color:#142c22}.control{display:block;border:1px solid #3a6858;background:#25423770;padding:15px;border-radius:14px;margin-top:2px}.control-label{display:flex;justify-content:space-between;gap:10px;font-size:12px;font-weight:600}.control output{color:var(--accent);font-variant-numeric:tabular-nums;white-space:nowrap}.control input[type=range]{accent-color:var(--accent);width:100%;height:30px;margin:10px 0 0;cursor:pointer}.control select{width:100%;margin-top:10px;min-height:38px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);padding:5px}.control-ends{display:flex;justify-content:space-between;color:var(--muted);font-size:10px}.primary{background:var(--accent);color:#102a20;border:0;font-weight:750;min-height:48px}.run{display:flex;justify-content:space-between;align-items:center;margin-top:3px}.transport{display:flex;gap:7px}.transport button{flex:1;font-size:11px;padding:5px;min-height:36px;background:transparent}.help-row{display:flex;justify-content:space-between;gap:8px;border-top:1px solid var(--line);padding-top:12px}.help-row button{border:0;padding:5px 0;background:transparent;font-size:11px;min-height:30px;color:var(--muted)}.hint{font-size:12px;padding:10px;border-left:2px solid var(--gold);background:#f8cb7a0c;margin:0}.gentle{font-size:10px;color:var(--muted);margin:auto 0 0;padding-top:5px}summary{cursor:pointer;min-height:40px;padding:10px 0;font-size:12px;color:var(--muted)}#extraControls .control{background:var(--bg);border-color:var(--line);padding:10px}.result{display:flex;gap:15px;align-items:flex-start;margin:0 24px 20px;padding:18px;border:1px solid #475a60;border-radius:14px;background:#20353b}.result[data-success=true]{background:#1b362b;border-color:#4b9676}.result-icon{display:grid;place-items:center;width:32px;height:32px;flex:0 0 32px;border-radius:50%;background:#ffffff0a;font-size:20px;color:var(--accent)}.result p:not(.eyebrow){font-size:13px;margin:8px 0 0;color:#d0dfdc}.result .takeaway{color:var(--accent)!important}.result .eyebrow{margin:0 0 5px}.science{margin:0 24px 20px;border-top:1px solid var(--line);padding-top:6px}.science summary{color:var(--ink);font-size:13px}.science summary span{display:inline-block;margin-left:12px;font-size:10px;color:var(--muted)}.science-body{padding:12px 0;color:var(--muted);font-size:12px}.formula{padding:14px;background:#0d1b20;border:1px solid var(--line);border-radius:12px;font-family:Consolas,monospace;font-size:14px;line-height:1.9;color:#e6eeeb;overflow-wrap:anywhere}.formula mark{padding:2px 5px;border-radius:4px;background:#8ae4bd28;color:var(--accent)}.science p{margin:10px 0}.mission-footer{display:flex;justify-content:space-between;align-items:center;gap:14px;border-top:1px solid var(--line);padding:18px 24px}.mission-footer p{font-size:11px;color:var(--muted);margin:0;text-align:center}.mission-footer button{font-size:12px;min-height:40px}.next{color:var(--accent);border-color:#48755f;background:#25423770}.back{background:transparent}.page-note{max-width:760px;margin:18px auto 0;color:var(--muted);font-size:10px;text-align:center}.energy-bars{display:grid;gap:6px;margin-top:12px}.energy-line{display:grid;grid-template-columns:86px 1fr 60px;gap:8px;align-items:center;font-size:10px;color:var(--muted)}.energy-track{height:7px;border-radius:5px;background:#294047;overflow:hidden}.energy-fill{height:100%;background:var(--bar-color);border-radius:5px}.energy-line output{text-align:right;font-variant-numeric:tabular-nums}
+@media(max-width:1050px){main{padding:24px}.topbar{padding:20px 24px}.play-layout{grid-template-columns:minmax(0,1fr) 300px}.scene-panel{padding:18px}.coach{padding:20px}.wing{padding:13px}.wing small{display:none}.mission-heading{padding:22px}.intro{margin-bottom:22px}}
+@media(max-width:800px){.play-layout{grid-template-columns:minmax(0,1fr)}.coach{border-left:0;border-top:1px solid var(--line);display:grid;grid-template-columns:1fr 1fr;gap:12px 20px}.coach>.eyebrow,.coach>h3,.coach>.think,.coach>.steps,.coach>#extraControls,.coach>.hint,.coach>.gentle{grid-column:1/-1}.coach>#primaryControl{grid-row:5/8}.coach>.help-row{grid-column:2;border:0}.coach>.gentle{text-align:center}.scene-panel{padding:18px 24px}.scene-note{max-width:600px}.mission-heading{align-items:flex-start}.modes button{padding:7px 10px}.wing{gap:9px}.wing b{font-size:13px}.wing-icon{flex-basis:32px;height:32px;font-size:21px}.mission-footer{padding:16px 20px}}
+@media(max-width:560px){main{padding:22px 12px 18px}.topbar{padding:14px 16px}.offline-label{font-size:10px}.brand{font-size:13px;gap:9px}.brand-symbol{width:34px;height:34px;font-size:24px}.brand small{font-size:6px}.intro{gap:12px;margin-bottom:20px}.intro>p{display:none}h1{font-size:34px}.intro .eyebrow{font-size:8px}.wings{gap:7px;margin-bottom:18px}.wing{display:block;text-align:center;padding:10px 3px;min-height:80px}.wing-icon{width:28px;height:28px;margin:0 auto 5px;font-size:22px;background:none}.wing b{font-size:10px}.mission-heading{display:block;padding:20px 18px}h2{font-size:25px}.modes{margin-top:18px;width:100%;justify-content:space-between}.modes button{flex:1}.scene-panel{padding:14px 12px 16px}.scene-top{font-size:8px;gap:6px}#scene{min-height:180px}.measurement{padding:10px}.measurement strong{font-size:19px}.measurement small{font-size:9px}.coach{display:flex;padding:20px 18px;gap:12px}.coach .gentle{text-align:left}.steps{font-size:10px;justify-content:space-between}.result{margin:0 12px 16px;padding:14px;gap:10px}.result h3{font-size:17px}.result p:not(.eyebrow){font-size:12px}.science{margin:0 18px 16px}.science summary span{display:block;margin-left:14px;font-size:9px}.mission-footer{padding:14px 12px;gap:7px;flex-wrap:wrap}.mission-footer button{font-size:11px;padding:7px 9px}.mission-footer p{order:3;flex-basis:100%;font-size:10px}.page-note{padding:0 10px}.energy-line{grid-template-columns:75px 1fr 50px}}
+@media(prefers-reduced-motion:reduce){*{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+@media(max-width:560px){#scene text{font-size:20px}#scene .label{font-size:24px}#scene .small{font-size:18px}}
+.top-links{display:flex;align-items:center;gap:18px}.top-links>a{font-size:12px;color:var(--accent);text-decoration:none}.top-links>a:hover{text-decoration:underline}@media(max-width:560px){.top-links{flex-direction:column;align-items:flex-end;gap:4px}.top-links>a{font-size:10px}}
+.control-label>span{min-width:0}.control output{max-width:58%;white-space:normal;text-align:right}.balance-guide{padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:#101f26;font-size:11px}.balance-guide p{margin:0}.balance-guide p:first-child{color:var(--gold);font-weight:650}.balance-guide p+p{margin-top:7px;color:var(--muted);font-size:10px;line-height:1.6}.edit-notice{font-size:11px;color:var(--gold);margin:0;border-left:2px solid var(--gold);padding:7px 10px;background:#f8cb7a0a}@media(min-width:561px) and (max-width:800px){.coach>.balance-guide,.coach>.edit-notice{grid-column:1/-1}.coach>#primaryControl{grid-row:auto}.coach>.run,.coach>.transport{grid-column:1/-1}}
+.wings{margin-bottom:12px}.mission-picker{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:22px}.mission-picker button,.mission-picker a{display:inline-flex;align-items:center;background:#142128;border:1px solid var(--line);border-radius:12px;color:var(--ink);font-size:11px;min-height:38px;padding:7px 12px;text-decoration:none}.mission-picker .lab-link{border-color:#7e6840;background:#352d1f;color:var(--gold);font-weight:650}.mission-picker .lab-link:hover{border-color:var(--gold);background:#443825}.mission-picker [aria-current=page]{border-color:var(--accent);color:var(--accent);background:#25423770}@media(max-width:560px){.wing b{font-size:11px}.mission-picker{gap:6px;margin-bottom:16px}.mission-picker button,.mission-picker a{font-size:10px;min-height:36px;padding:6px 9px}.wing{min-height:90px}}
+
+</style>
+<link rel="stylesheet" href="../../labs.css"></head>
+<body>
+  <a class="skip" href="#mission">Skip to the mission</a>
+  <header class="topbar">
+    <a class="brand" href="#top"><span class="brand-symbol" aria-hidden="true">✳</span><span>IGNITE <small>LEARNING BY MAKING</small></span></a>
+    <div class="top-links"><a href="../ignite-subject-labs/Ignite-Subject-Worlds.html">All subject labs ↗</a><span class="offline-label"><i aria-hidden="true"></i> Offline playground</span></div>
+  </header>
+  <main id="top">
+    <section class="intro">
+      <div><p class="eyebrow">ICSE CLASS 10 · MECHANICS &amp; MACHINES</p><h1>Station Helios<span>Contraption Foundry</span></h1></div>
+      <p>Make a move. Test an idea.<br><strong>See why it works.</strong></p>
+    </section>
+    <nav class="wings" aria-label="Choose a chapter" id="wings"></nav>
+    <nav class="mission-picker" id="missionPicker" aria-label="Concept activities in this chapter"></nav>
+    <section class="workspace" id="mission" aria-labelledby="missionTitle">
+      <div class="mission-heading">
+        <div><p class="eyebrow" id="missionCount"></p><h2 id="missionTitle" tabindex="-1"></h2><p id="missionSubtitle"></p></div>
+        <div class="modes" role="group" aria-label="Learning mode">
+          <button type="button" data-mode="guided" aria-pressed="true">Learn</button>
+          <button type="button" data-mode="twist" aria-pressed="false">Try a twist</button>
+          <button type="button" data-mode="explore" aria-pressed="false">Explore</button>
+        </div>
+      </div>
+      <div class="play-layout">
+        <div class="scene-panel">
+          <div class="scene-top"><span class="scene-tag" id="sceneStatus">READY TO TRY</span><span id="sceneCaption"></span></div>
+          <svg id="scene" viewBox="0 0 760 400" role="img" aria-labelledby="sceneTitle sceneDescription"><title id="sceneTitle"></title><desc id="sceneDescription"></desc><g id="drawing"></g></svg>
+          <div class="measurements" id="measurements" aria-label="Live measurements"></div>
+          <div class="energy-bars" id="energyBars" hidden aria-label="Energy ledger"></div>
+          <p class="scene-note" id="sceneNote"></p>
+        </div>
+        <aside class="coach" aria-label="Your mission controls">
+          <p class="eyebrow">YOUR ONE JOB</p><h3 id="goal"></h3>
+          <p class="think" id="think"></p>
+          <ol class="steps" aria-label="Three simple steps"><li id="step1" aria-current="step"><span>1</span>Make a move</li><li id="step2"><span>2</span>Test it</li><li id="step3"><span>3</span>See why</li></ol>
+          <div id="primaryControl"></div>
+          <div class="balance-guide" id="balanceGuide" hidden><p id="balanceTarget"></p><p id="setupEquation"></p></div>
+          <details id="extraControls" hidden><summary>More things to try</summary><div id="extraControlBody"></div></details>
+          <button class="run primary" type="button" id="run">Test my setup <span aria-hidden="true">↗</span></button>
+          <div class="transport"><button type="button" id="pause" disabled>Pause</button><button type="button" id="step">One step</button><button type="button" id="reset">Reset</button></div>
+          <p class="edit-notice" id="editNotice" role="status" hidden></p>
+          <div class="help-row"><button type="button" id="hint">A little hint</button><button type="button" id="demo">Show me how</button></div>
+          <p class="hint" id="hintText" role="status" hidden></p>
+          <p class="gentle">No timer. No lives to lose. Try as many times as you like.</p>
+        </aside>
+      </div>
+      <section class="result" id="result" hidden aria-labelledby="resultTitle" aria-live="polite">
+        <span class="result-icon" id="resultIcon" aria-hidden="true"></span><div><p class="eyebrow" id="resultTag"></p><h3 id="resultTitle"></h3><p id="resultBody"></p><p class="takeaway" id="takeaway"></p></div>
+      </section>
+      <details class="science" id="science"><summary>See the science <span>formulas, measurements &amp; model notes</span></summary><div id="scienceBody"></div></details>
+      <footer class="mission-footer"><button class="back" type="button" id="previous">← Previous</button><p id="progressText"></p><button class="next" type="button" id="next">Next mission →</button></footer>
+    </section>
+    <p class="page-note">A focused learning prototype, not the full Unit I syllabus. Practice stays in this page only. No account, personal details or internet needed. Content still needs teacher review.</p>
+  </main>
+  <noscript><p>This interactive playground needs JavaScript. Open the HTML file in Edge, Chrome or Firefox.</p></noscript>
+  <script>
+'use strict';
+(function (root) {
+  const g = 10; // Classroom model, explicitly displayed in the UI.
+  const rad = d => d * Math.PI / 180;
+  const deg = r => r * 180 / Math.PI;
+  function value(n, min = 0, max = 1e6) {
+    if (!Number.isFinite(n) || n < min || n > max) throw new RangeError('Value outside this model’s range.');
+    return n;
+  }
+  function moments(p) {
+    const load = value(p.load), left = value(p.left, .01), force = value(p.force), right = value(p.right, .01);
+    const angle = value(p.angle, 0, 180), d = right * Math.sin(rad(angle));
+    const anticlockwise = load * left, clockwise = force * d;
+    return { anticlockwise, clockwise, net: anticlockwise - clockwise, d,
+      reactionX: -force * Math.cos(rad(angle)), reactionY: load + force * Math.sin(rad(angle)),
+      balanced: Math.abs(anticlockwise - clockwise) <= Math.max(1, anticlockwise * .01) };
+  }
+  function stability(p) {
+    const width = value(p.width, .05), height = value(p.height, .05), tilt = value(p.tilt, 0, 80);
+    const critical = deg(Math.atan(width / (2 * height)));
+    const offset = height * Math.tan(rad(tilt));
+    const margin = critical - tilt;
+    return { critical, offset, margin, stable: margin > 1e-7, marginal: Math.abs(margin) <= 1e-7,
+      outside: offset > width / 2 + 1e-7 };
+  }
+  function lever(p) {
+    const load = value(p.load), loadArm = value(p.loadArm, .01), effortArm = value(p.effortArm, .01), force = value(p.force);
+    const classId = value(p.classId, 1, 3);
+    if (!Number.isInteger(classId)) throw new RangeError('Choose lever class I, II or III.');
+    if ((classId === 2 && loadArm >= effortArm) || (classId === 3 && effortArm >= loadArm)) throw new RangeError('Lever arm positions do not match the chosen class.');
+    const vr = effortArm / loadArm, required = load / vr;
+    return { vr, ma: vr, required, loadMoment: load * loadArm, effortMoment: force * effortArm,
+      net: force * effortArm - load * loadArm, balanced: Math.abs(force - required) <= Math.max(1, required * .01) };
+  }
+  // Clockwise-positive coordinates, matching SVG. The massless beam carries a
+  // point load of mass W/g. Applied forces keep their world-space directions.
+  // There is no invented torque-to-angle equilibrium or angular damping.
+  const rotationLimit = rad(20);
+  function rotationAt(p, type, elapsed) {
+    const t = value(elapsed, 0, 10);
+    let loadArm, effortArm, effortX, effortY;
+    if (type === 'moments') {
+      moments(p); loadArm = -p.left; effortArm = p.right;
+      effortX = p.force * Math.cos(rad(p.angle)); effortY = p.force * Math.sin(rad(p.angle));
+    } else if (type === 'lever') {
+      lever(p); loadArm = (p.classId === 1 ? -1 : 1) * p.loadArm; effortArm = p.effortArm;
+      effortX = 0; effortY = (p.classId === 1 ? 1 : -1) * p.force;
+    } else throw new RangeError('Rotation is supported only for beams and levers.');
+    const inertia = value(p.load, .01) / g * loadArm * loadArm;
+    const forces = angle => {
+      const loadTorque = loadArm * p.load * Math.cos(angle);
+      const effortTorque = effortArm * (Math.cos(angle) * effortY - Math.sin(angle) * effortX);
+      return { loadTorque, effortTorque, torque: loadTorque + effortTorque };
+    };
+    let angle = 0, velocity = 0;
+    const steps = Math.ceil(t * 240), dt = steps ? t / steps : 0;
+    const acceleration = a => forces(a).torque / inertia;
+    // Fixed maximum step RK4, starting from rest at level for each experiment.
+    for (let i = 0; i < steps; i++) {
+      const k1a = velocity, k1v = acceleration(angle);
+      const k2a = velocity + k1v * dt / 2, k2v = acceleration(angle + k1a * dt / 2);
+      const k3a = velocity + k2v * dt / 2, k3v = acceleration(angle + k2a * dt / 2);
+      const k4a = velocity + k3v * dt, k4v = acceleration(angle + k3a * dt);
+      angle += dt / 6 * (k1a + 2 * k2a + 2 * k3a + k4a);
+      velocity += dt / 6 * (k1v + 2 * k2v + 2 * k3v + k4v);
+      // Inelastic mechanical end stops, not friction or a false equilibrium.
+      if (angle >= rotationLimit) { angle = rotationLimit; velocity = Math.min(0, velocity); }
+      if (angle <= -rotationLimit) { angle = -rotationLimit; velocity = Math.max(0, velocity); }
+    }
+    const result = forces(angle), atStop = Math.abs(angle) >= rotationLimit - 1e-10;
+    const blocked = atStop && result.torque * angle > 0 && Math.abs(velocity) < 1e-10;
+    const alpha = blocked ? 0 : result.torque / inertia, mass = p.load / g;
+    const ax = -loadArm * (Math.cos(angle)*velocity*velocity + Math.sin(angle)*alpha);
+    const ay = loadArm * (Math.cos(angle)*alpha - Math.sin(angle)*velocity*velocity);
+    return { ...result, angle, degrees: deg(angle), velocity, inertia, elapsed: t, atStop,
+      acceleration: alpha, loadAccelerationX: ax, loadAccelerationY: ay,
+      reactionX: mass*ax-effortX, reactionYUp: p.load+effortY-mass*ay,
+      stopTorque: blocked ? -result.torque : 0,
+      loadArm, effortArm, effortX, effortY };
+  }
+  function pulley(p) {
+    const n = value(p.n, 1, 6);
+    if (![1, 2, 4, 6].includes(n)) throw new RangeError('Only the drawn rope configurations are supported.');
+    const load = value(p.load, .01), lift = value(p.lift, .01), efficiency = value(p.efficiency, .01, 1);
+    const required = load / (n * efficiency), rope = n * lift;
+    const output = load * lift, input = required * rope;
+    return { n, vr: n, ma: n * efficiency, required, rope, output, input, lost: input - output,
+      fitsEffort: required <= value(p.maxEffort) + 1e-8, fitsRope: rope <= value(p.maxRope) + 1e-8,
+      feasible: required <= p.maxEffort + 1e-8 && rope <= p.maxRope + 1e-8 };
+  }
+  function brake(p) {
+    const mass = value(p.mass, .1), height = value(p.height, .01), force = value(p.force);
+    const energy = mass * g * height, speed = Math.sqrt(2 * g * height);
+    const rampLength = Math.hypot(4, height), acceleration = g * height / rampLength;
+    const rampTime = Math.sqrt(2 * rampLength / acceleration);
+    const stop = force === 0 ? Infinity : energy / force;
+    const brakeTime = force === 0 ? Infinity : mass * speed / force;
+    const target = value(p.target), tolerance = value(p.tolerance);
+    return { mass, height, force, energy, speed, stop, rampLength, acceleration, rampTime, brakeTime,
+      duration: rampTime + brakeTime, onTarget: stop >= target - tolerance - 1e-8 && stop <= target + tolerance + 1e-8 };
+  }
+  function energyAt(p, elapsed) {
+    const b = brake(p), t = value(elapsed);
+    if (t < b.rampTime) {
+      const fraction = Math.min(1, .5 * b.acceleration * t * t / b.rampLength);
+      const potential = b.energy * (1 - fraction), kinetic = b.energy - potential;
+      return { fraction, distance: 0, potential, kinetic, thermal: 0, speed: b.acceleration * t, power: 0, stopped: false };
+    }
+    const time = Math.min(t - b.rampTime, b.brakeTime);
+    const speed = Math.max(0, b.speed - b.force / b.mass * time);
+    const distance = Math.max(0, b.speed * time - .5 * b.force / b.mass * time * time);
+    const kinetic = .5 * b.mass * speed * speed, thermal = b.energy - kinetic;
+    return { fraction: 1, distance, potential: 0, kinetic, thermal, speed, power: b.force * speed,
+      stopped: b.force > 0 && time >= b.brakeTime - 1e-8 };
+  }
+  function couple(p) {
+    const force = value(p.force), separation = value(p.separation, .01), target = value(p.targetTorque);
+    const torque = force * separation;
+    return { force, separation, torque, netForce: 0, onTarget: Math.abs(torque-target) <= Math.max(.1,target*.01) };
+  }
+  function circular(p) {
+    const mass = value(p.mass,.01), radius = value(p.radius,.01), speed = value(p.speed,.01);
+    const angle = rad(value(p.releaseAngle,0,360)), target = rad(value(p.targetAngle,0,360));
+    const vx = -speed*Math.sin(angle), vy = speed*Math.cos(angle);
+    const difference = Math.atan2(Math.sin(angle-target),Math.cos(angle-target));
+    return { mass,radius,speed,angle,vx,vy,acceleration:speed*speed/radius,force:mass*speed*speed/radius,
+      onTarget:Math.abs(difference)<1e-7 };
+  }
+  function circularAt(p,elapsed) {
+    const m=circular(p),t=value(elapsed),releaseTime=.8,after=t>=releaseTime;
+    const angle=after?m.angle:m.angle-m.speed/m.radius*(releaseTime-t);
+    const vx=-m.speed*Math.sin(angle),vy=m.speed*Math.cos(angle);
+    return {x:m.radius*Math.cos(angle)+(after?m.vx*(t-releaseTime):0),
+      y:m.radius*Math.sin(angle)+(after?m.vy*(t-releaseTime):0),vx,vy,after,
+      tension:after?0:m.force,ax:after?0:-m.acceleration*Math.cos(angle),ay:after?0:-m.acceleration*Math.sin(angle),releaseTime};
+  }
+  function work(p) {
+    const force=value(p.force),distance=value(p.distance),angle=value(p.angle,0,180),target=value(Math.abs(p.targetWork));
+    const rawParallel=force*Math.cos(rad(angle)),parallel=Math.abs(rawParallel)<1e-10?0:rawParallel,W=parallel*distance;
+    return {parallel,work:W,counterWork:W===0?0:-W,netWork:0,
+      onTarget:Math.abs(W-p.targetWork)<=Math.max(.1,target*.01)};
+  }
+  function liftPower(p) {
+    const mass=value(p.mass,.01),height=value(p.height,.01),liftTime=value(p.liftTime,.1),target=value(p.targetPower);
+    const work=mass*g*height,power=work/liftTime,speed=height/liftTime;
+    return {mass,height,liftTime,work,power,speed,force:mass*g,onTarget:Math.abs(power-target)<=Math.max(.1,target*.01)};
+  }
+  root.HeliosPhysics = Object.freeze({ g, moments, stability, lever, rotationAt, rotationLimit, pulley, brake, energyAt, couple, circular, circularAt, work, liftPower });
+  if (typeof module !== 'undefined' && module.exports) module.exports = root.HeliosPhysics;
+})(globalThis);
+
+</script>
+  <script>
+'use strict';
+(function (root) {
+  const wings = [
+    { id: 'balance', chapter: 'ICSE-P01', name: 'Force', theme:'Balance Harbour', icon: '↔', description: 'Moments, couples, stability and circular motion.', colour: '#8ae4bd' },
+    { id: 'energy', chapter: 'ICSE-P02', name: 'Work, Power & Energy', theme:'Energy Park', icon: '〰', description: 'Work, energy transfers and lifting power.', colour: '#a6c7ff' },
+    { id: 'rig', chapter: 'ICSE-P03', name: 'Machines', theme:'Rescue Rig', icon: '↑', description: 'Levers, pulleys and work budgets.', colour: '#f8cb7a' },
+  ];
+  const missions = [
+    { id: 'beam', wing: 'balance', type: 'moments', title: 'Balance the cargo', subtitle: 'A small change can have a big turning effect.',
+      goal: 'Balance the beam. Adjust the left weight or the right-hand pull.',
+      think: 'Which side would drop with this setup? Think about both force and distance.',
+      primary: 'force', visibleControls: ['force', 'load'], controls: [
+        ['force', 'Right-hand pull', 50, 600, 10, 'N'], ['load', 'Left cargo weight', 100, 500, 10, 'N'],
+        ['left', 'Left distance from pivot', .5, 3, .1, 'm'], ['right', 'Right distance from pivot', .5, 3, .1, 'm'],
+      ],
+      initial: { load: 300, left: 2, right: 2, force: 150, angle: 90 },
+      twist: { load: 240, left: 2.5, right: 1.5, force: 200, angle: 90 },
+      twistGoal: 'The cargo and distances have changed. Balance the new beam.',
+      hints: ['Compare the turning effect on each side, not just the weights.', 'Turning effect = force × perpendicular distance. The two sides need to match.'],
+      takeaway: 'A force further from the pivot has a greater turning effect.',
+      note: 'Massless rigid beam, ideal fixed hinge, point load with mass weight/g at the left attachment. Release from level and rest: numerical integration of Στ = Iα, with world-vertical weight and world-vertical right pull. Mechanical stops at ±20° absorb impact; there is no artificial balancing spring. The automatic preview shows the pose 0.4 s after each fresh release, not an equilibrium angle.' },
+    { id: 'angle', wing: 'balance', type: 'moments', title: 'The angled rope', subtitle: 'The rope angle changes the useful lever arm.',
+      goal: 'Balance the cargo with the rope at 30°. Change the pull, not the angle.',
+      think: 'Will this angled pull need more or less force than a straight-down pull?',
+      primary: 'force', controls: [
+        ['force', 'Pull along the rope', 50, 700, 1, 'N'], ['angle', 'Pull direction below horizontal', 10, 90, 5, '°'],
+        ['right', 'Distance to rope attachment', 1, 3, .1, 'm'],
+      ],
+      initial: { load: 300, left: 2, right: 3, force: 200, angle: 30 },
+      twist: { load: 300, left: 2, right: 2, force: 200, angle: 60 },
+      twistGoal: 'The rope is now at 60° and closer to the pivot. Find a balancing pull.',
+      hints: ['Only the component perpendicular to the beam causes this turning effect.', 'The effective lever arm is r × sin θ. At 30°, it is half of r.'],
+      takeaway: 'The same rope force gives less turning effect when the angle is smaller.',
+      note: 'The chosen rope direction is measured below horizontal and remains fixed in world space; its angle to the beam changes during rotation. A massless beam carries a point load (mass = weight/g). Numerical integration of Στ = Iα from level/rest, with ±20° mechanical safety stops. The automatic preview is a 0.4 s release, not an equilibrium.' },
+    { id: 'cargo', wing: 'balance', type: 'stability', title: 'Keep the cargo upright', subtitle: 'Follow the weight line, not the shape alone.',
+      goal: 'Lower the centre of gravity until the cargo stays upright on a 35° slope.',
+      think: 'Where must the vertical weight line meet the supporting base?',
+      primary: 'height', controls: [
+        ['height', 'Centre of gravity height', .5, 3, .1, 'm'], ['width', 'Supporting base width', 1, 3, .1, 'm'],
+        ['tilt', 'Slope angle', 10, 50, 1, '°'],
+      ],
+      initial: { width: 2, height: 2.2, tilt: 35 }, twist: { width: 1.6, height: 2, tilt: 40 },
+      twistGoal: 'A narrower base and steeper slope: keep the weight line inside the new base.',
+      hints: ['Look at where the dashed vertical weight line meets the sloping base.', 'Lowering the centre of gravity brings that intersection closer to the middle of the base.'],
+      takeaway: 'A lower centre of gravity and a wider base increase resistance to toppling.',
+      note: 'Side-view rigid-body model. The centre of gravity is centred across the base. Friction prevents sliding. At the exact edge, the body is marginal—not safely stable.' },
+    { id: 'lever', wing: 'rig', type: 'lever', title: 'Lift with a lever', subtitle: 'Trade a longer movement for a smaller force.',
+      goal: 'Balance this Class I lever. Adjust the effort on the long arm.',
+      think: 'Which matters more here: equal forces or equal turning effects?',
+      primary: 'force', controls: [['force', 'Your effort', 25, 650, 5, 'N'], ['load', 'Cargo weight', 100, 400, 10, 'N']],
+      initial: { classId: 1, load: 200, loadArm: 1, effortArm: 2, force: 200 },
+      twist: { classId: 3, load: 200, loadArm: 2, effortArm: 1, force: 200 },
+      twistGoal: 'Class III twist: the effort is closer to the pivot. Find the force that balances it.',
+      hints: ['Compare effort × effort arm with load × load arm.', 'In the Class III setup, the effort arm is shorter. More effort force is needed.'],
+      takeaway: 'Levers can multiply force or movement. They do not create work.',
+      note: 'Ideal massless lever with a fixed hinge and a point load (mass = weight/g). Effort and weight stay vertical; perpendicular arms change with angle. Release motion integrates Στ = Iα from rest at level; ±20° safety stops absorb impact. MA = VR is the ideal, small-displacement ratio. The automatic 0.4 s preview is not an equilibrium angle.' },
+    { id: 'pulley', wing: 'rig', type: 'pulley', title: 'Choose a rescue rig', subtitle: 'Less effort means more rope to pull.',
+      goal: 'Lift a 400 N load by 2 m. You have 120 N of effort and 8 m of rope travel.',
+      think: 'Could adding more supporting strands solve one problem but create another?',
+      primary: 'n', controls: [['n', 'Supporting rope strands', [1, 2, 4, 6], '', '', ''],
+        ['efficiency', 'Rig efficiency', .5, 1, .05, 'ratio'], ['load', 'Load weight', 100, 600, 20, 'N'],
+        ['lift', 'Lift height', .5, 3, .5, 'm']],
+      initial: { n: 2, efficiency: 1, load: 400, lift: 2, maxEffort: 120, maxRope: 8 },
+      twist: { n: 4, efficiency: .8, load: 480, lift: 1, maxEffort: 320, maxRope: 3 },
+      twistGoal: 'The rig is only 80% efficient. Lift 480 N by 1 m with 320 N effort and 3 m rope travel.',
+      hints: ['Count the rope strands supporting the moving block. Each shares the load in the ideal model.', 'Check BOTH limits: required effort and rope travel. More strands also need more rope movement.'],
+      takeaway: 'A pulley reduces the required effort by increasing the distance you pull.',
+      note: 'Quasi-static work-budget model with the drawn 1-, 2-, 4- or 6-strand routing. η is overall efficiency; rope mass is neglected. The animation shows displacement ratio, not acceleration.' },
+    { id: 'brake', wing: 'energy', type: 'brake', title: 'Park the energy cart', subtitle: 'The energy has to go somewhere.',
+      goal: 'Release the cart and stop it inside the bay, 4.5–5.5 m after the ramp.',
+      think: 'Will a stronger brake stop the cart sooner or later? Where will its energy go?',
+      primary: 'force', controls: [['force', 'Braking force', 10, 150, 1, 'N'], ['mass', 'Cart mass', 5, 25, 1, 'kg'],
+        ['height', 'Release height', 1, 4, .5, 'm']],
+      initial: { mass: 10, height: 2, force: 20, target: 5, tolerance: .5 },
+      twist: { mass: 10, height: 3, force: 40, target: 5, tolerance: .5 },
+      twistGoal: 'Same bay, higher starting point: release from 3 m and adjust the brake.',
+      hints: ['A higher starting point stores more gravitational potential energy.', 'On the horizontal braking zone, energy transferred by the brake = braking force × distance.'],
+      takeaway: 'Height energy becomes movement energy, then thermal energy. Total energy stays accounted for.',
+      note: 'Point-mass cart on a frictionless ramp, then a constant resisting force on a horizontal track. g = 10 m/s². This is not a realistic speed-dependent magnetic-brake model; no extra motor work is supplied.' },
+  ];
+  missions.push(
+    { id:'couple',wing:'balance',type:'couple',title:'Turn without a resultant force',subtitle:'Two equal opposite forces can still produce a turning effect.',
+      goal:'Make a 100 N·m couple while keeping the resultant of the pair zero.',think:'Do equal and opposite forces always cancel the turning effect?',primary:'force',
+      controls:[['force','Magnitude of EACH force',10,100,10,'N'],['separation','Perpendicular line separation',.5,3,.5,'m']],
+      initial:{force:20,separation:2,targetTorque:100},twist:{force:20,separation:1,targetTorque:80},twistGoal:'The lines are now 1 m apart. Make an 80 N·m couple.',
+      hints:['The forces act along different parallel lines, not the same line.','Couple moment equals either force × perpendicular separation.'],
+      takeaway:'Zero resultant force does not imply zero resultant moment.',note:'Static free-body diagram of the applied force pair, not a rotation trajectory. Forces are equal, opposite and parallel. Their resultant is zero, but their couple moment is Fd. Any weight/support of an actual apparatus is outside this pair ledger.' },
+    { id:'circular',wing:'balance',type:'circular',title:'Release the orbiting pod',subtitle:'A changing velocity direction needs an inward force.',
+      goal:'Release at the top of the circle (90°), so the pod leaves towards the left.',think:'After the string is released, will the pod go inward, outward or along the tangent?',primary:'releaseAngle',
+      controls:[['releaseAngle','Release position, anticlockwise from right',0,330,30,'°'],['radius','Orbit radius',1,4,.5,'m'],['speed','Pod speed',1,6,.5,'m/s'],['mass','Pod mass',1,4,1,'kg']],
+      initial:{releaseAngle:30,radius:2.5,speed:3,mass:2,targetAngle:90},twist:{releaseAngle:180,radius:2,speed:4,mass:2,targetAngle:0},
+      twistGoal:'Release at the rightmost point (0°), so the pod leaves upwards.',
+      hints:['The instantaneous velocity is perpendicular to the radius.','At the top, anticlockwise motion points left. At the rightmost point, it points up.'],
+      takeaway:'After release, the pod follows its instantaneous tangent when no net force acts.',note:'Top-down inertial-frame model on a frictionless horizontal surface; weight and normal cancel. A massless string supplies mv²/r until release at t=0.8 s. Afterwards the string force is zero and the velocity stays constant. The ready preview shows t=1.2 s, not an outward force.' },
+    { id:'work',wing:'energy',type:'work',title:'Which part of the force does work?',subtitle:'The direction matters as much as the force.',
+      goal:'Make the selected force do +100 J over a prescribed 4 m rightward displacement.',think:'What happens to work when the force is perpendicular to the movement?',primary:'angle',
+      controls:[['angle','Force angle above rightward displacement',0,180,15,'°'],['force','Selected force',10,100,10,'N'],['distance','Prescribed rightward travel',2,6,1,'m']],
+      initial:{angle:0,force:50,distance:4,targetWork:100},twist:{angle:90,force:50,distance:4,targetWork:-100},
+      twistGoal:'Now make the selected force do −100 J over the same rightward displacement.',
+      hints:['Only the component parallel to displacement contributes to this force’s work.','W = Fs cos θ. At 90° it is zero; above 90° it is negative.'],
+      takeaway:'A force can do positive, zero or negative work without changing its magnitude.',note:'Prescribed constant-speed horizontal travel, with an external drive/counterforce and vertical constraint. This displays work by the selected force, not net work or free acceleration. The drive does opposite work so ΔKE=0. Motion playback lasts 1.6 s; this is not a force-driven cart dynamics model.' },
+    { id:'power',wing:'energy',type:'liftPower',title:'Same lift, different power',subtitle:'Work is the energy transferred; power is how fast it is transferred.',
+      goal:'Raise 10 kg through 4 m at a steady speed with power 100 W.',think:'If the same load reaches the same height in half the time, what changes?',primary:'liftTime',
+      controls:[['liftTime','Time for the lifting segment',2,12,.5,'s'],['mass','Load mass',5,25,5,'kg'],['height','Vertical lift',1,5,1,'m']],
+      initial:{liftTime:8,mass:10,height:4,targetPower:100},twist:{liftTime:10,mass:20,height:3,targetPower:150},
+      twistGoal:'Raise 20 kg through 3 m with steady lifting power 150 W.',
+      hints:['First find the work against gravity: mgh.','Power = work / lifting time. Changing time need not change the work.'],
+      takeaway:'Doing the same work in less time requires greater average power.',note:'Ideal constant-speed lifting segment with g=10 m/s² and no friction. Startup/stopping transients are omitted; input work becomes gravitational potential energy, with no change in kinetic energy during this segment. P=mgh/t=Fv. The ready preview shows the first 0.8 s.' },
+    { id:'lever2',wing:'rig',type:'lever',title:'Class II: put the load between',subtitle:'The load is between the fulcrum and effort.',
+      goal:'Balance this Class II lever by adjusting the upward effort.',think:'Why can a smaller effort support this load when its arm is longer?',primary:'force',
+      controls:[['force','Upward effort',25,650,5,'N'],['load','Load weight',100,400,10,'N']],
+      initial:{classId:2,load:200,loadArm:1,effortArm:2,force:200},twist:{classId:2,load:300,loadArm:1.5,effortArm:3,force:200},
+      twistGoal:'The load is now 300 N and both arms are longer. Find the balancing effort.',
+      hints:['The effort is farther from the pivot than the load.','Balance requires effort × effort arm = load × load arm.'],
+      takeaway:'A Class II lever multiplies force by trading for greater effort travel.',note:'Ideal massless lever and fixed hinge with vertical forces, using the same repaired point-load rotation solver and ±20° safety stops. The load stays between pivot and effort. MA=VR is the ideal small-displacement ratio; the ready pose is a 0.4 s release preview, not equilibrium.' }
+  );
+  const order=['beam','angle','cargo','couple','circular','work','power','brake','lever','lever2','pulley'];
+  missions.sort((a,b)=>order.indexOf(a.id)-order.indexOf(b.id));
+  root.HeliosMissions = { wings, missions };
+  if (typeof module !== 'undefined' && module.exports) module.exports = root.HeliosMissions;
+})(globalThis);
+
+</script>
+  <script>
+'use strict';
+(function () {
+  const P = window.HeliosPhysics, { wings, missions } = window.HeliosMissions;
+  const $ = id => document.getElementById(id);
+  const create = (tag, text, className) => { const node = document.createElement(tag); if (text !== undefined) node.textContent = text; if (className) node.className = className; return node; };
+  const clamp = (n, lo, hi) => Math.min(hi, Math.max(lo, n));
+  const f = (n, digits = 1) => Number.isFinite(n) ? Number(n.toFixed(digits)).toLocaleString('en-IN') : '∞';
+  const radians = n => n * Math.PI / 180;
+  const state = { mission: missions[0], mode: 'guided', params: {}, result: null, demo: false, hint: 0,
+    moved: false, time: 0, running: false, tested: false, records: {}, activeTerm: 'force', restartNotice: false };
+  let frame, lastTime;
+  const reduce = () => window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const model = () => ({ moments: P.moments, stability: P.stability, lever: P.lever, pulley: P.pulley, brake: P.brake, couple:P.couple, circular:P.circular, work:P.work, liftPower:P.liftPower })[state.mission.type](state.params);
+  const success = m => state.mission.type === 'moments' || state.mission.type === 'lever' ? m.balanced
+    : state.mission.type === 'stability' ? m.stable : state.mission.type === 'pulley' ? m.feasible : m.onTarget;
+  const duration = () => state.mission.type === 'brake' ? model().duration : state.mission.type==='liftPower'?state.params.liftTime:1.6;
+  const rotating = () => ['moments', 'lever'].includes(state.mission.type);
+  function rotationPose() {
+    if (!rotating()) return null;
+    const preview = state.time === 0 && !state.running && !state.tested;
+    return { ...P.rotationAt(state.params, state.mission.type, preview ? .4 : state.time), preview };
+  }
+  function stop() { if (frame) cancelAnimationFrame(frame); frame = undefined; state.running = false; lastTime = undefined; }
+  function setStep(number) {
+    for (let i = 1; i <= 3; i++) { if (i === number) $('step' + i).setAttribute('aria-current', 'step'); else $('step' + i).removeAttribute('aria-current'); }
+  }
+  function load(mission = state.mission, mode = state.mode, focus = false) {
+    stop(); state.mission = mission; state.mode = mode; state.params = { ...(mode === 'twist' ? mission.twist : mission.initial) };
+    state.result = null; state.demo = false; state.hint = 0; state.moved = false; state.time = 0; state.tested = false; state.activeTerm = mission.primary; state.restartNotice = false;
+    $('result').hidden = true; $('hintText').hidden = true; $('science').open = false; $('extraControls').open = false;
+    $('missionTitle').textContent = mission.title;
+    $('missionSubtitle').textContent = mission.subtitle;
+    $('goal').textContent = mode === 'explore' ? 'Try an idea. Change the setup and see what happens.' : mode === 'twist' ? mission.twistGoal : mission.goal;
+    $('think').textContent = mission.think;
+    $('missionCount').textContent = `${wings.find(w => w.id === mission.wing).name} · Mission ${missions.filter(m => m.wing === mission.wing).indexOf(mission) + 1} of ${missions.filter(m => m.wing === mission.wing).length}`;
+    $('extraControls').hidden = mode !== 'explore';
+    $('wings').querySelectorAll('button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.wing === mission.wing)));
+    const chapterLinks = missions.filter(m=>m.wing===mission.wing).map(m=>{const b=create('button',m.title);b.type='button';b.dataset.mission=m.id;if(m===mission)b.setAttribute('aria-current','page');b.addEventListener('click',()=>load(m,state.mode,true));return b;});
+    if (mission.wing === 'balance') {
+      const lab = create('a', '8 textbook moments challenges ↗', 'lab-link');
+      lab.href = './Force-Moments-Lab.html';
+      lab.setAttribute('aria-label', 'Open the Force textbook moments lab with eight challenges');
+      chapterLinks.push(lab);
+    }
+    $('missionPicker').replaceChildren(...chapterLinks);
+    document.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === mode)));
+    $('sceneNote').textContent = mission.type === 'brake' ? 'Ramp: no friction · Brake: constant resisting force · g = 10 m/s²'
+      : mission.type === 'pulley' ? 'Rope diagram is schematic. Watch the measured travel and work—not the number of wheels.'
+        : mission.type === 'stability' ? 'Assume the cargo cannot slide. The dot marks its centre of gravity.'
+          : 'Live preview: 0.4 s after release from level. Run starts again from level. ±20° mechanical safety stops.';
+    const notes={couple:'Force-pair diagram · equal opposite parallel forces · this is not a rotation animation.',circular:'Top view · string released at t = 0.8 s · after release no horizontal force acts.',work:'Prescribed constant-speed path · selected-force work is not net work · external drive balances it.',liftPower:'Ideal constant-speed lifting segment · startup and stopping omitted · g = 10 m/s²'};
+    if(notes[mission.type])$('sceneNote').textContent=notes[mission.type];
+    buildControls(); setStep(1); refresh();
+    try { history.replaceState(null,'','#'+mission.id); } catch {}
+    if (focus) $('missionTitle').focus({ preventScroll: true });
+  }
+  function control(spec) {
+    const [key, label, min, max, step, unit] = spec;
+    const wrap = create('label', undefined, 'control'); wrap.dataset.control = key;
+    const row = create('span', undefined, 'control-label'), name = create('span', label), output = create('output');
+    let input;
+    if (Array.isArray(min)) {
+      input = create('select');
+      for (const n of min) { const option = create('option', n === 1 ? '1 strand · fixed pulley' : `${n} supporting strands`); option.value = n; input.append(option); }
+    } else {
+      input = create('input'); input.type = 'range'; input.min = min; input.max = max; input.step = step;
+    }
+    input.id = `control-${key}`; input.name = key; input.value = state.params[key]; output.htmlFor = input.id; output.id = `value-${key}`;
+    const updateOutput = () => { output.textContent = controlValue(spec); input.setAttribute('aria-valuetext', output.textContent); };
+    updateOutput(); row.append(name, output); wrap.append(row, input);
+    if (!Array.isArray(min)) { const ends = create('span', undefined, 'control-ends'); ends.id = `range-${key}`; input.setAttribute('aria-describedby', ends.id); ends.append(create('span', 'Min: ' + (unit === 'ratio' ? `${min * 100}%` : `${min}${unit ? ' ' + unit : ''}`)), create('span', 'Max: ' + (unit === 'ratio' ? `${max * 100}%` : `${max}${unit ? ' ' + unit : ''}`))); wrap.append(ends); }
+    const applyValue = () => {
+      const next = Number(input.value); if (state.params[key] === next) { updateOutput(); return; }
+      state.restartNotice = state.restartNotice || state.running || state.time > 0;
+      stop(); state.params[key] = next; state.activeTerm = key; state.result = null; state.tested = false; state.time = 0; state.moved = true;
+      $('result').hidden = true; setStep(2); updateOutput(); refresh();
+    };
+    input.addEventListener('input', applyValue); input.addEventListener('change', applyValue);
+    return wrap;
+  }
+  function controlValue(spec) {
+    const [key, , , , , unit] = spec, value = state.params[key];
+    const formatted = unit === 'ratio' ? `${f(value * 100, 0)}%` : `${f(value, 2)}${unit === '°' ? '°' : unit ? ' ' + unit : ''}`;
+    return key === 'force' ? 'Applied: ' + formatted : formatted;
+  }
+  function syncControls() {
+    // One authoritative setup value drives the native slider, readout, SVG and
+    // equations, including after demos, reset and browser form restoration.
+    for (const spec of state.mission.controls) {
+      const key = spec[0], input = $(`control-${key}`), output = $(`value-${key}`);
+      if (!input || !output) continue;
+      input.value = state.params[key]; input.disabled = false;
+      output.textContent = controlValue(spec); input.setAttribute('aria-valuetext', output.textContent);
+    }
+  }
+  function buildControls() {
+    const mission = state.mission;
+    const visible = mission.visibleControls || [mission.primary];
+    $('primaryControl').replaceChildren(...visible.map(key => control(mission.controls.find(c => c[0] === key))));
+    $('extraControlBody').replaceChildren(...mission.controls.filter(c => !visible.includes(c[0])).map(control));
+    if (state.mode === 'explore' && mission.type === 'lever') {
+      const label = create('label', 'Lever arrangement', 'control'), select = create('select'); select.id = 'lever-class';
+      for (const [value, text] of [[1, 'Class I · pivot in the middle'], [2, 'Class II · load in the middle'], [3, 'Class III · effort in the middle']]) {
+        const opt = create('option', text); opt.value = value; select.append(opt);
+      }
+      select.value = state.params.classId;
+      select.addEventListener('change', () => {
+        state.restartNotice = state.restartNotice || state.running || state.time > 0;
+        stop(); const c = Number(select.value); state.params.classId = c;
+        state.params.loadArm = c === 3 ? 2 : 1; state.params.effortArm = c === 3 ? 1 : 2;
+        state.result = null; state.tested = false; state.time = 0; $('result').hidden = true; refresh();
+      });
+      label.append(select); $('extraControlBody').prepend(label);
+    }
+  }
+  function metrics(items) {
+    $('measurements').replaceChildren(...items.map(([label, value, unit]) => {
+      const card = create('div', undefined, 'measurement'); card.append(create('small', label), create('strong', value)); if (unit) card.append(create('span', unit)); return card;
+    }));
+  }
+  function ledger(rows) {
+    $('energyBars').replaceChildren(...rows.map(([label, quantity, total, colour]) => {
+      const row = create('div', undefined, 'energy-line'), track = create('div', undefined, 'energy-track'), fill = create('div', undefined, 'energy-fill');
+      fill.style.width = `${clamp(quantity / Math.max(total, .001) * 100, 0, 100)}%`; fill.style.setProperty('--bar-color', colour);
+      track.append(fill); row.append(create('span', label), track, create('output', `${f(quantity, 0)} J`)); return row;
+    }));
+  }
+  function arrow(x1, y1, x2, y2, colour = '#f8cb7a', label = '') {
+    const angle = Math.atan2(y2 - y1, x2 - x1), length = 9;
+    const a = `${x2 - length * Math.cos(angle - .45)},${y2 - length * Math.sin(angle - .45)}`;
+    const b = `${x2 - length * Math.cos(angle + .45)},${y2 - length * Math.sin(angle + .45)}`;
+    return `<path d="M${x1} ${y1}L${x2} ${y2}" fill="none" stroke="${colour}" stroke-width="3"/><path d="M${a}L${x2} ${y2}L${b}" fill="none" stroke="${colour}" stroke-width="3"/>${label ? `<text x="${x2 + 10}" y="${y2}" class="small">${label}</text>` : ''}`;
+  }
+  const floor = '<path d="M55 345H705" stroke="#36515b" stroke-width="2"/><path d="M55 350H705" stroke="#223940" stroke-width="8"/>';
+  function rotationMessage(pose) {
+    if (pose.atStop) return 'Safety stop reached — this is NOT balance';
+    if (Math.abs(pose.torque) < 1e-7 && Math.abs(pose.velocity) < 1e-7) return 'Equal turning effects · stays level from rest';
+    if (Math.abs(pose.velocity) < 1e-7) return 'Turning effects are unequal';
+    return pose.velocity < 0 ? 'Left end moving down · right end moving up' : 'Right end moving down · left end moving up';
+  }
+  function rotationStops(cx, cy) {
+    return `<path d="M${cx-44} ${cy}H${cx+44}" class="guide"/>
+      <path d="M${cx-40} ${cy-15}l8 3M${cx+32} ${cy+12}l8 3M${cx-40} ${cy+15}l8-3M${cx+32} ${cy-12}l8-3" stroke="#f8cb7a" stroke-width="4"/>`;
+  }
+  function beamScene(p, m, pose) {
+    const scale = 78, cx = 350, cy = 170, a = radians(p.angle), b = pose.angle;
+    const leftX = cx - p.left * scale, rightX = cx + p.right * scale;
+    const lx = cx - p.left * scale * Math.cos(b), ly = cy - p.left * scale * Math.sin(b);
+    const rx = cx + p.right * scale * Math.cos(b), ry = cy + p.right * scale * Math.sin(b);
+    const pullLength = clamp(p.force * .2, 30, 100), weightLength = clamp(p.load * .2, 30, 90);
+    const dx = Math.cos(a) * pullLength, dy = Math.sin(a) * pullLength;
+    $('sceneDescription').textContent = `${pose.preview ? 'Live release preview' : 'Release test'} at ${f(pose.elapsed,2)} seconds. Beam angle ${f(pose.degrees,2)} degrees clockwise from level. A ${p.load} newton point load acts ${p.left} metres left of the pivot; its weight stays vertical. Right pull ${p.force} newtons at ${p.angle} degrees below horizontal. Current left moment ${f(-pose.loadTorque)} and right moment ${f(pose.effortTorque)} newton metres. ${rotationMessage(pose)}.`;
+    return `${rotationStops(cx, cy)}<g id="rotating-beam" data-angle="${pose.degrees}" transform="rotate(${pose.degrees} ${cx} ${cy})">
+      <rect x="${leftX-24}" y="162" width="${rightX-leftX+48}" height="16" rx="6" class="beam"/>
+      <path d="M${leftX} 132H${rightX}" class="guide"/>
+      <text x="${(leftX+cx)/2}" y="119" text-anchor="middle">${p.left} m</text><text x="${(cx+rightX)/2}" y="119" text-anchor="middle">${p.right} m</text></g>
+      <rect x="${lx-34}" y="${ly-23}" width="68" height="46" rx="7" class="cargo"/>
+      <circle cx="${lx}" cy="${ly}" r="4" fill="#a6c7ff"/>
+      ${arrow(lx,ly,lx,ly+weightLength,'#a6c7ff')}
+      <text x="${lx-15}" y="${ly+weightLength+22}" text-anchor="middle" class="label">${p.load} N</text>
+      <circle cx="${rx}" cy="${ry}" r="5" fill="#f8cb7a"/>
+      ${arrow(rx,ry,rx+dx,ry+dy,'#f8cb7a')}
+      <text id="appliedForceLabel" x="${Math.min(rx+dx+12,680)}" y="${ry+dy+22}" class="label">${f(p.force)} N</text>
+      ${p.angle!==90 ? `<text x="${Math.min(rx+20,650)}" y="${ry-26}" class="small">${f(p.angle-pose.degrees)}° to beam</text>` : ''}
+      <path d="M350 183L322 251H378Z" fill="#37534f" stroke="#8ae4bd" stroke-width="2"/><circle cx="350" cy="170" r="10" fill="#8ae4bd"/>
+      <text x="350" y="275" text-anchor="middle">fixed pivot · ±20° stops</text>
+      <text x="380" y="305" text-anchor="middle" class="label">${rotationMessage(pose)}</text>
+      <text x="380" y="330" text-anchor="middle" class="small">${pose.preview?'Live preview':'Test'} · ${f(pose.elapsed,2)} s after release · net ${f(Math.abs(pose.torque))} N·m</text>`;
+  }
+  function stabilityScene(p, m) {
+    const b = p.width * 76, h = p.height * 76, a = radians(p.tilt), cx = 350, cy = 290;
+    const gx = cx + h * Math.sin(a), gy = cy - h * Math.cos(a), footY = cy + m.offset * 76 * Math.sin(a);
+    $('sceneDescription').textContent = `Cargo on a ${p.tilt} degree slope. Centre of gravity ${p.height} metres above a ${p.width} metre base. Its weight line meets the base ${f(m.offset, 2)} metres from the centre; the edge is ${f(p.width / 2)} metres from the centre. ${m.marginal ? 'At the tipping boundary.' : m.stable ? 'Inside the base.' : 'Outside the base.'}`;
+    return `<g transform="translate(${cx} ${cy}) rotate(${p.tilt})"><path d="M-210 0H210" stroke="#4d6d70" stroke-width="10"/>
+      <path d="M${-b / 2} 0H${b / 2}" stroke="#8ae4bd" stroke-width="8"/>
+      <rect x="${-b / 2}" y="${-Math.max(h + 35, 110)}" width="${b}" height="${Math.max(h + 35, 110)}" rx="10" fill="#284048" stroke="#789c9e" stroke-width="2"/>
+      <path d="M${-b / 2} 0H${b / 2}" stroke="#8ae4bd" stroke-width="7"/>
+      <circle cx="0" cy="${-h}" r="8" fill="#f8cb7a"/><text x="15" y="${-h + 4}" class="small">G</text></g>
+      <path d="M${gx} ${gy}V${footY + 28}" stroke="${m.stable ? '#8ae4bd' : '#ffb1a0'}" stroke-width="2" stroke-dasharray="6 5"/>
+      ${arrow(gx, gy + 10, gx, Math.min(370, footY + 45), '#f8cb7a')}
+      <text x="${gx + 15}" y="${Math.min(358, footY + 30)}" class="small">weight line</text>
+      <text x="78" y="80" class="label">Slope ${p.tilt}°</text><text x="78" y="106">Base ${p.width} m</text>
+      <text x="78" y="132">G height ${p.height} m</text><text x="560" y="280" class="small">${m.marginal ? 'At the edge' : m.stable ? 'Inside the base' : 'Outside the base'}</text>`;
+  }
+  function leverScene(p, m, pose) {
+    const scale = 100, pivot = p.classId === 1 ? 350 : 190;
+    const loadX = pivot + (p.classId === 1 ? -1 : 1) * p.loadArm * scale, effortX = pivot + p.effortArm * scale;
+    const end = Math.max(loadX, effortX) + 38, start = Math.min(loadX, pivot) - 38;
+    const downEffort = p.classId === 1;
+    const b = pose.angle, lx = pivot+(loadX-pivot)*Math.cos(b), ly = 195+(loadX-pivot)*Math.sin(b);
+    const ex = pivot+(effortX-pivot)*Math.cos(b), ey = 195+(effortX-pivot)*Math.sin(b);
+    const loadLength=clamp(p.load*.2,30,80), effortLength=clamp(p.force*.2,30,85);
+    $('sceneDescription').textContent = `Class ${p.classId} lever at ${f(pose.elapsed,2)} seconds after release. Angle ${f(pose.degrees,2)} degrees clockwise. Load ${p.load} newtons at ${p.loadArm} metres, effort ${p.force} newtons at ${p.effortArm} metres. Both force arrows stay vertical. ${rotationMessage(pose)}.`;
+    return `${rotationStops(pivot,195)}<g id="rotating-beam" data-angle="${pose.degrees}" transform="rotate(${pose.degrees} ${pivot} 195)"><rect x="${start}" y="187" width="${end - start}" height="16" rx="6" class="beam"/></g>
+      <rect x="${lx-30}" y="${ly-22}" width="60" height="44" rx="7" class="cargo"/>
+      ${arrow(lx,ly,lx,ly+loadLength,'#a6c7ff')}
+      <text x="${lx-15}" y="${ly+loadLength+22}" text-anchor="middle" class="label">${p.load} N</text>
+      ${arrow(ex,ey,ex,ey+(downEffort?1:-1)*effortLength,'#f8cb7a')}
+      <text id="appliedForceLabel" x="${ex+15}" y="${ey+(downEffort?1:-1)*effortLength+15}" class="label">${p.force} N</text>
+      <path d="M${pivot} 204l-25 62h50Z" fill="#37534f" stroke="#8ae4bd" stroke-width="2"/><circle cx="${pivot}" cy="195" r="8" fill="#8ae4bd"/>
+      <text x="${pivot}" y="285" text-anchor="middle">pivot · ±20° stops</text><text x="${(pivot + loadX) / 2}" y="75" text-anchor="middle">load arm ${p.loadArm} m</text>
+      <text x="${(pivot + effortX) / 2}" y="100" text-anchor="middle">effort arm ${p.effortArm} m</text>
+      <text x="380" y="325" text-anchor="middle" class="label">${rotationMessage(pose)}</text>
+      <text x="380" y="370" text-anchor="middle" class="small">Class ${['', 'I', 'II', 'III'][p.classId]} · ${pose.preview?'Live preview':'Test'} at ${f(pose.elapsed,2)} s</text>`;
+  }
+  function pulleyScene(p, m, progress) {
+    const lift = m.fitsEffort ? Math.min(p.lift, p.maxRope / p.n) * progress : 0;
+    const by = 250 - lift * 40;
+    let drawing = '<path d="M150 38H630" stroke="#536f77" stroke-width="12"/>';
+    if (p.n === 1) {
+      drawing += `<circle cx="380" cy="90" r="25" class="cargo"/><circle cx="380" cy="90" r="4" fill="#a7ccca"/>
+        <path d="M355 ${by + 30}V90A25 25 0 0 1 405 90V350" class="rope"/>
+        <rect x="325" y="${by + 30}" width="60" height="50" rx="7" class="cargo"/><text x="355" y="${by + 61}" text-anchor="middle" class="label">${p.load} N</text>`;
+    } else {
+      const k = p.n / 2, base = 380 - (k * 100 - 50) / 2;
+      let route = `M${base} 55`;
+      drawing += `<path d="M${base} 38V55" class="outline"/><circle cx="${base}" cy="55" r="4" fill="#f8cb7a"/>
+        <rect x="${base - 12}" y="${by - 31}" width="${(k - 1) * 100 + 74}" height="63" rx="12" fill="#284048" stroke="#789c9e"/>`;
+      for (let i = 0; i < k; i++) {
+        const x = base + 100 * i;
+        route += `L${x} ${by}A25 25 0 0 0 ${x + 50} ${by}L${x + 50} 80A25 25 0 0 1 ${x + 100} 80`;
+        drawing += `<circle cx="${x + 25}" cy="${by}" r="22" class="outline"/><circle cx="${x + 75}" cy="80" r="22" class="cargo"/>
+          <path d="M${x + 75} 38V58" class="outline"/>`;
+      }
+      route += `V350`;
+      drawing += `<path d="${route}" class="rope"/><path d="M380 ${by + 32}V${by + 46}" class="outline"/>
+        <rect x="338" y="${by + 46}" width="84" height="48" rx="8" class="cargo"/><text x="380" y="${by + 76}" text-anchor="middle" class="label">${p.load} N</text>`;
+    }
+    drawing += `<text x="80" y="104" class="label">${p.n} supporting</text><text x="80" y="128">${p.n === 1 ? 'strand' : 'strands'}</text>
+      <text x="80" y="170">Load rises ${f(lift, 2)} m</text><text x="80" y="195">Pull ${f(p.n * lift, 2)} m of rope</text>
+      <text x="570" y="280" class="small">Required pull</text><text x="570" y="305" class="label">${f(m.required)} N</text>
+      <text x="570" y="330" class="small">${f(p.efficiency * 100, 0)}% efficient</text>`;
+    $('sceneDescription').textContent = `Rope configuration with ${p.n} supporting strands. Required effort ${f(m.required)} newtons; available ${p.maxEffort}. Rope travel for full lift ${f(m.rope)} metres; available ${p.maxRope}. Shown load lift ${f(lift, 2)} metres and rope pulled ${f(p.n * lift, 2)} metres.`;
+    return drawing;
+  }
+  function energyScene(p, m) {
+    const e = P.energyAt(p, state.time), range = Math.max(8, m.stop + 1), sx = 400 / range;
+    const rampX = 260, y = 300, startY = y - p.height * 42, bayX = rampX + (p.target - p.tolerance) * sx;
+    const x = e.fraction < 1 ? 70 + (rampX - 70) * e.fraction : rampX + e.distance * sx;
+    const cartY = e.fraction < 1 ? startY + (y - startY) * e.fraction : y;
+    const rotation = e.fraction < 1 ? Math.atan2(y - startY, rampX - 70) * 180 / Math.PI : 0;
+    $('sceneDescription').textContent = `Cart mass ${p.mass} kilograms released from ${p.height} metres. Constant brake ${p.force} newtons after the ramp. At simulation time ${f(state.time)} seconds: potential ${f(e.potential)} joules, kinetic ${f(e.kinetic)} joules, thermal ${f(e.thermal)} joules. Braking distance so far ${f(e.distance, 2)} metres.`;
+    return `<path d="M70 ${startY}L${rampX} ${y}H700" fill="none" stroke="#77959a" stroke-width="7"/>
+      <path d="M70 ${startY}V${y}H${rampX}Z" fill="#254047"/>
+      <path d="M70 ${y}H700" stroke="#29434a" stroke-width="2"/>
+      <rect x="${bayX}" y="278" width="${Math.max(2, 2 * p.tolerance * sx)}" height="42" fill="#8ae4bd22" stroke="#8ae4bd" stroke-dasharray="5 5"/>
+      <text x="${bayX + p.tolerance * sx}" y="255" text-anchor="middle" class="label">Parking bay</text>
+      <text x="${bayX + p.tolerance * sx}" y="340" text-anchor="middle" class="small">${f(p.target - p.tolerance)}–${f(p.target + p.tolerance)} m</text>
+      <path d="M${rampX} 302V353" class="guide"/><text x="${rampX}" y="374" text-anchor="middle" class="small">brake starts · 0 m</text>
+      <g transform="translate(${x} ${cartY}) rotate(${rotation})"><rect x="-25" y="-31" width="50" height="23" rx="7" fill="#a6c7ff" stroke="#dce8ff"/>
+        <circle cx="-15" cy="-6" r="6" fill="#0c141a" stroke="#a7c4d2"/><circle cx="15" cy="-6" r="6" fill="#0c141a" stroke="#a7c4d2"/></g>
+      <text x="45" y="${startY - 30}" class="label">${p.height} m</text><text x="525" y="70">${p.mass} kg cart</text>
+      <text x="525" y="98">${p.force} N brake</text><text x="525" y="126">${f(e.speed, 2)} m/s</text>
+      <text x="525" y="154">${f(e.power, 1)} W → heat</text>`;
+  }
+  function coupleScene(p,m) {
+    const half=p.separation*60,cx=380,cy=180,L=clamp(p.force,30,100);
+    $('sceneDescription').textContent=`Two ${p.force} newton forces act on separate parallel lines ${p.separation} metres apart. Left force up and right force down. Resultant of pair zero; clockwise couple ${f(m.torque)} newton metres. Static force-pair diagram, not a motion trajectory.`;
+    return `<rect x="150" y="172" width="460" height="16" rx="6" class="beam"/>
+      ${arrow(cx-half,cy,cx-half,cy-L,'#a6c7ff')}${arrow(cx+half,cy,cx+half,cy+L,'#f8cb7a')}
+      <text x="${cx-half}" y="${cy-L-18}" text-anchor="middle" class="label">${p.force} N up</text><text x="${cx+half}" y="${cy+L+25}" text-anchor="middle" class="label">${p.force} N down</text>
+      <path d="M${cx-half} 315H${cx+half}" class="guide"/><text x="380" y="340" text-anchor="middle">Perpendicular separation ${p.separation} m</text>
+      <path d="M380 115A65 65 0 0 1 445 180" stroke="#8ae4bd" stroke-width="3" fill="none"/>${arrow(445,178,445,198,'#8ae4bd')}
+      <text x="380" y="70" text-anchor="middle" class="label">Clockwise couple: ${f(m.torque)} N·m</text>`;
+  }
+  function circularScene(p,m) {
+    const t=state.time===0&&!state.running&&!state.tested?1.2:state.time,e=P.circularAt(p,t),s=Math.min(60,150/(p.radius+p.speed*.8)),cx=380,cy=190;
+    const x=cx+e.x*s,y=cy-e.y*s,rx=cx+p.radius*Math.cos(m.angle)*s,ry=cy-p.radius*Math.sin(m.angle)*s;
+    const tx=-Math.sin(m.angle),ty=-Math.cos(m.angle);let path='';
+    for(let i=0;i<=70;i++){const q=P.circularAt(p,t*i/70);path+=`${i?'L':'M'}${cx+q.x*s} ${cy-q.y*s}`;}
+    $('sceneDescription').textContent=`Pod at ${f(t)} seconds. Radius ${p.radius} metres, speed ${p.speed} metres per second. Release position ${p.releaseAngle} degrees anticlockwise from right. ${e.after?'String released; zero tension and a straight tangent trajectory.':'String taut; inward tension changes the velocity direction.'} Current tension ${f(e.tension)} newtons.`;
+    return `<circle cx="${cx}" cy="${cy}" r="${p.radius*s}" class="outline"/><path d="M${rx-tx*90} ${ry-ty*90}L${rx+tx*110} ${ry+ty*110}" class="guide"/>
+      <path d="${path}" fill="none" stroke="#8ae4bd" stroke-width="3"/><circle cx="${rx}" cy="${ry}" r="6" fill="#f8cb7a"/>
+      ${e.after?'':`<path d="M${cx} ${cy}L${x} ${y}" class="rope"/>`}${e.after?'':arrow(x,y,x+(cx-x)*.55,y+(cy-y)*.55,'#f8cb7a')}
+      <circle cx="${x}" cy="${y}" r="10" fill="#a6c7ff"/>${arrow(x,y,x+e.vx/p.speed*45,y-e.vy/p.speed*45,'#a6c7ff')}
+      <text x="380" y="45" text-anchor="middle" class="label">${e.after?'Released: motion follows the tangent':'Before release: force points inward'}</text>
+      <text x="380" y="330" text-anchor="middle">t = ${f(t,2)} s · current string force ${f(e.tension)} N</text>`;
+  }
+  function workScene(p,m) {
+    const fraction=clamp(state.time/1.6,0,1),x=150+p.distance*65*fraction,y=240,a=radians(p.angle),L=clamp(p.force,35,100);
+    $('sceneDescription').textContent=`Cart follows a prescribed rightward path of ${p.distance} metres at constant speed. Selected force ${p.force} newtons at ${p.angle} degrees above displacement. Full-path work ${f(m.work)} joules; drive/counterforce work ${f(m.counterWork)} joules. This is not free acceleration.`;
+    return `<path d="M130 270H${170+p.distance*65}" stroke="#6d8d93" stroke-width="5"/>
+      ${arrow(150,300,150+p.distance*65,300,'#8ae4bd')}<text x="${150+p.distance*32.5}" y="330" text-anchor="middle">${p.distance} m rightward displacement</text>
+      <rect x="${x-28}" y="${y-10}" width="56" height="30" rx="7" fill="#314c52" stroke="#a6c7ff"/><circle cx="${x-16}" cy="264" r="6" fill="#a6c7ff"/><circle cx="${x+16}" cy="264" r="6" fill="#a6c7ff"/>
+      ${arrow(x,y,x+L*Math.cos(a),y-L*Math.sin(a),'#f8cb7a')}
+      <text x="${clamp(x+L*Math.cos(a),90,680)}" y="${y-L*Math.sin(a)-20}" text-anchor="middle" class="label">${p.force} N at ${p.angle}°</text>
+      <text x="380" y="65" text-anchor="middle" class="label">${Math.abs(m.work)<.01?'Zero':m.work>0?'Positive':'Negative'} work by the selected force</text>
+      <text x="380" y="100" text-anchor="middle">Full path: selected ${f(m.work)} J · drive ${f(m.counterWork)} J · net 0 J</text>`;
+  }
+  function powerScene(p,m) {
+    const t=state.time===0&&!state.running&&!state.tested?.8:state.time,height=p.height*clamp(t/p.liftTime,0,1),y=310-height*42,target=310-p.height*42;
+    $('sceneDescription').textContent=`Constant-speed lifting segment: ${p.mass} kilograms through ${p.height} metres in ${p.liftTime} seconds. Current height ${f(height)} metres at ${f(t)} seconds. Work ${f(m.work)} joules and power ${f(m.power)} watts. Startup and stopping omitted.`;
+    return `<path d="M240 55H520" stroke="#536f77" stroke-width="10"/><path d="M380 55V${y-34}" class="rope"/><rect x="340" y="${y-34}" width="80" height="45" rx="8" class="cargo"/>
+      <text x="380" y="${y-7}" text-anchor="middle" class="label">${p.mass} kg</text>${arrow(435,y-10,435,y-75,'#f8cb7a')}
+      <text x="510" y="${y-50}" text-anchor="middle">lift force ${f(m.force)} N</text><path d="M180 ${target}H580" class="guide"/>
+      <text x="155" y="${target}" text-anchor="middle">${p.height} m</text><text x="380" y="345" text-anchor="middle">t = ${f(t)} / ${p.liftTime} s · height gained ${f(height)} m</text>
+      <text x="145" y="100" text-anchor="middle" class="label">${f(m.power)} W</text>`;
+  }
+  function updateScene() {
+    const p = state.params, m = model(), type = state.mission.type, progress = clamp(state.time / 1.6, 0, 1);
+    const pose = rotationPose();
+    let graphic;
+    $('sceneTitle').textContent = state.mission.title;
+    if (type === 'moments') { graphic = beamScene(p, m, pose); metrics([['Left turning effect now', f(-pose.loadTorque), 'N·m'], ['Right turning effect now', f(pose.effortTorque), 'N·m']]); }
+    else if (type === 'stability') { graphic = stabilityScene(p, m); metrics([['Slope angle', f(p.tilt), '°'], ['Tipping boundary', f(m.critical), '°']]); }
+    else if (type === 'lever') { graphic = leverScene(p, m, pose); metrics([['Load turning effect now', f(Math.abs(pose.loadTorque)), 'N·m'], ['Effort turning effect now', f(Math.abs(pose.effortTorque)), 'N·m']]); }
+    else if (type === 'pulley') { graphic = pulleyScene(p, m, progress); metrics([['Required effort / limit', `${f(m.required)} / ${p.maxEffort}`, 'N'], ['Rope travel / limit', `${f(m.rope)} / ${p.maxRope}`, 'm']]); }
+    else if(type==='couple'){graphic=coupleScene(p,m);metrics([['Resultant of force pair',0,'N'],['Couple moment',f(m.torque),'N·m']]);}
+    else if(type==='circular'){graphic=circularScene(p,m);metrics([['Acceleration before release',f(m.acceleration),'m/s²'],['String force before release',f(m.force),'N']]);}
+    else if(type==='work'){graphic=workScene(p,m);metrics([['Selected force: full-path work',f(m.work),'J'],['Parallel force component',f(m.parallel),'N']]);}
+    else if(type==='liftPower'){graphic=powerScene(p,m);metrics([['Work against gravity',f(m.work),'J'],['Lifting power',f(m.power),'W']]);}
+    else { graphic = energyScene(p, m); const e = P.energyAt(p, state.time); metrics([['Distance after the ramp', f(e.distance, 2), 'm'], ['Energy accounted for', f(e.potential + e.kinetic + e.thermal), 'J']]); ledger([['Height energy', e.potential, m.energy, '#8ae4bd'], ['Movement', e.kinetic, m.energy, '#a6c7ff'], ['Thermal energy', e.thermal, m.energy, '#f8cb7a']]); }
+    $('energyBars').hidden = type !== 'brake';
+    $('drawing').innerHTML = floor + graphic; // Only finite numeric model values and trusted static labels; no user HTML or loaded cartridges.
+    $('sceneCaption').textContent = state.running ? 'Watching the test' : state.time > 0 && !state.tested ? 'Paused · take one step' : state.tested ? 'Change something to try again' : pose ? 'Live release preview · 0.4 s' : type==='circular'?'Release preview · 1.2 s':type==='liftPower'?'Lifting preview · 0.8 s':'Live measurements · result after testing';
+    $('sceneStatus').textContent = state.demo ? 'DEMONSTRATION' : state.running ? 'TEST IN PROGRESS' : state.tested ? 'TEST COMPLETE' : 'READY TO TRY';
+  }
+  function science() {
+    const p = state.params, m = model(), section = create('div', undefined, 'science-body'), formula = create('div', undefined, 'formula');
+    const token = (key, text) => create(key === state.activeTerm ? 'mark' : 'span', text);
+    const add = (...parts) => { const line = create('div'); for (const part of parts) line.append(typeof part === 'string' ? document.createTextNode(part) : part); formula.append(line); };
+    if (state.mission.type === 'moments') {
+      add('Left moment = ', token('load', `${p.load} N`), ' × ', token('left', `${p.left} m`), ` = ${f(m.anticlockwise)} N·m`);
+      add('Right moment = ', token('force', `${f(p.force)} N`), ' × ', token('right', `${p.right} m`), ' × sin ', token('angle', `${p.angle}°`), ` = ${f(m.clockwise)} N·m`);
+      add(`Perpendicular arm = r sin θ = ${f(m.d, 2)} m`);
+      add('Static balance requires both ΣF = 0 and Στ = 0. During acceleration, use ΣF = ma instead.');
+    } else if (state.mission.type === 'stability') {
+      add('Critical angle = atan[(base width / 2) / ', token('height', `${p.height} m`), `] = ${f(m.critical, 2)}°`);
+      add(`Weight-line intersection: h tan θ = ${f(m.offset, 2)} m from base centre; half-base = ${f(p.width / 2, 2)} m.`);
+      add('Inside: stable against toppling. Exactly at the edge: marginal. Outside: toppling tendency.');
+    } else if (state.mission.type === 'lever') {
+      add('Effort moment = ', token('force', `${p.force} N`), ` × ${p.effortArm} m = ${f(m.effortMoment)} N·m`);
+      add(`Load moment = ${p.load} N × ${p.loadArm} m = ${f(m.loadMoment)} N·m`);
+      add(`Ideal MA = VR = effort arm / load arm = ${f(m.vr, 2)}. Required balancing effort = ${f(m.required, 2)} N.`);
+      add('Small displacements: effort travel / load travel = VR. Ideal input work equals output work.');
+    } else if (state.mission.type === 'pulley') {
+      add('VR = ', token('n', String(p.n)), ` supporting strands; MA = η × VR = ${f(m.ma, 2)}`);
+      add(`Required effort = load / (nη) = ${f(m.required, 2)} N; rope travel = n × lift = ${f(m.rope)} m.`);
+      add(`Full-lift work: input ${f(m.input)} J = useful ${f(m.output)} J + losses ${f(m.lost)} J.`);
+      add(`Efficiency = output/input = ${f(p.efficiency * 100, 0)}%. Not 100% when the model includes losses.`);
+    } else if(state.mission.type==='couple') {
+      add('Couple moment = ',token('force',`${p.force} N`),' × ',token('separation',`${p.separation} m`),` = ${f(m.torque)} N·m clockwise.`);
+      add(`Resultant of the pair: ${p.force} N up + ${p.force} N down = 0 N.`);
+      add('Different parallel lines leave a nonzero moment even though the resultant force vanishes. Coincident lines (d=0) would give no couple.');
+    } else if(state.mission.type==='circular') {
+      const t=state.time===0&&!state.running&&!state.tested?1.2:state.time,e=P.circularAt(p,t);
+      add('Inward acceleration before release: v²/r = ',token('speed',`${p.speed}²`),' / ',token('radius',`${p.radius}`),` = ${f(m.acceleration)} m/s².`);
+      add(`Before release: F = mv²/r = ${f(m.force)} N. At t=${f(t)} s the string force is ${f(e.tension)} N.`);
+      add(`Release velocity (x right, y up): (${f(m.vx)}, ${f(m.vy)}) m/s. It is perpendicular to the release radius.`);
+      add('After t=0.8 s: position = release position + release velocity × elapsed time since release. No outward force is added in this inertial frame.');
+    } else if(state.mission.type==='work') {
+      add('Selected-force work = ',token('force',`${p.force} N`),' × ',token('distance',`${p.distance} m`),' × cos ',token('angle',`${p.angle}°`),` = ${f(m.work)} J.`);
+      add(`Parallel component F cos θ = ${f(m.parallel)} N. Target selected-force work: ${p.targetWork} J.`);
+      add(`External drive/counterforce does ${f(m.counterWork)} J, so net work = 0 J and ΔKE = 0 during prescribed constant-speed travel.`);
+    } else if(state.mission.type==='liftPower') {
+      add('Work against gravity = ',token('mass',`${p.mass} kg`),' × 10 m/s² × ',token('height',`${p.height} m`),` = ${f(m.work)} J.`);
+      add('Power = work / ',token('liftTime',`${p.liftTime} s`),` = ${f(m.power)} W.`);
+      add(`Steady speed v = h/t = ${f(m.speed,3)} m/s. F = mg = ${f(m.force)} N; Fv = ${f(m.force*m.speed)} W.`);
+      add('Average power equals instantaneous power during this ideal constant-speed segment. Acceleration/stopping transients are not included.');
+    } else {
+      const e = P.energyAt(p, state.time);
+      add('Initial energy = ', token('mass', `${p.mass} kg`), ' × 10 m/s² × ', token('height', `${p.height} m`), ` = ${f(m.energy)} J`);
+      add('Stopping distance = mgh / ', token('force', `${p.force} N`), ` = ${f(m.stop, 2)} m. Speed at ramp end = √(2gh) = ${f(m.speed, 2)} m/s.`);
+      add(`At this instant: PE ${f(e.potential, 2)} + KE ${f(e.kinetic, 2)} + thermal ${f(e.thermal, 2)} = ${f(m.energy, 2)} J.`);
+      add(`Instantaneous brake power P = Fv = ${f(e.power)} W. With constant force, braking power falls as speed falls.`);
+    }
+    if (rotating()) {
+      const pose = rotationPose();
+      add('The moment calculations above describe the LEVEL release position.');
+      add(`Drawn pose: ${f(pose.elapsed,2)} s after release, β = ${f(pose.degrees,2)}° clockwise. Current applied net torque = ${f(pose.torque,2)} N·m clockwise.`);
+      add(`Point-load inertia I = (weight / g) × load arm² = ${f(pose.inertia,2)} kg·m². Away from the stops, angular acceleration α = Στ / I.`);
+      add(`Current α = ${f(pose.acceleration,3)} rad/s²; angular speed = ${f(pose.velocity,3)} rad/s (clockwise positive).`);
+      add(`Current hinge reaction: Rₓ = ${f(pose.reactionX,2)} N (right positive), Rᵧ = ${f(pose.reactionYUp,2)} N (up positive). These include the load’s acceleration; they are not static support values during motion.`);
+      if (pose.atStop) add(`Mechanical stop supplies ${f(pose.stopTorque,2)} N·m of reaction torque. A stopped bar with unequal applied moments is NOT balanced.`);
+      add('Load weight stays vertical. Lever effort stays vertical; angled-rope pull keeps its chosen direction relative to horizontal. Perpendicular arms are recalculated as the bar rotates.');
+    }
+    section.append(formula, create('p', state.mission.note)); $('scienceBody').replaceChildren(section);
+  }
+  function refresh() {
+    syncControls(); updateScene(); science();
+    $('balanceGuide').hidden = !rotating();
+    if (rotating()) {
+      const p = state.params, m = model(), lever = state.mission.type === 'lever';
+      const needed = lever ? m.required : p.load * p.left / (p.right * Math.sin(radians(p.angle)));
+      $('balanceTarget').textContent = `Needed for balance at level: ${f(needed, 2)} N`;
+      $('balanceGuide').dataset.applied = p.force; $('balanceGuide').dataset.required = needed;
+      $('setupEquation').textContent = lever ? `At level—load: ${p.load} N × ${p.loadArm} m = ${f(m.loadMoment)} N·m. Applied effort: ${f(p.force)} N × ${p.effortArm} m = ${f(m.effortMoment)} N·m.`
+        : `Left: ${p.load} N × ${p.left} m = ${f(m.anticlockwise)} N·m. Applied right pull: ${f(p.force)} N × ${p.right} m × sin ${p.angle}° = ${f(m.clockwise)} N·m.`;
+    }
+    $('editNotice').hidden = !state.restartNotice;
+    $('editNotice').textContent = rotating() ? 'Setup changed: the previous trial stopped. Showing a fresh 0.4 s release preview.' : 'Setup changed: the previous trial stopped. Run again to test the new values.';
+    $('run').disabled = state.running; $('run').firstChild.textContent = state.mission.type === 'brake' ? 'Release the cart ' : rotating() ? 'Run from level ' : 'Test my setup ';
+    $('pause').disabled = !state.running && (state.time === 0 || state.tested);
+    $('pause').textContent = state.running ? 'Pause' : 'Resume';
+    $('step').disabled = state.running || state.tested;
+    // Setup edits remain available during playback; their handlers cancel the
+    // old trial and show a fresh preview rather than retaining stale results.
+    const i = missions.indexOf(state.mission); $('previous').disabled = i === 0; $('next').textContent = i === missions.length - 1 ? 'Back to Force ↗' : missions[i+1]?.wing!==state.mission.wing?'Next chapter →':'Next concept →';
+    const own = Object.values(state.records).filter(r => r === 'independent').length, helped = Object.values(state.records).filter(r => r === 'helped').length;
+    $('progressText').textContent = `${own} solved independently${helped ? ` · ${helped} with support` : ''} · all missions are open`;
+  }
+  function finish() {
+    stop(); state.time = duration(); state.tested = true; state.result = model(); const m = state.result, p = state.params, ok = success(m);
+    setStep(3); $('result').hidden = false; $('result').dataset.success = String(ok);
+    $('resultIcon').textContent = state.mode === 'explore' ? '↗' : ok ? '✓' : '↻';
+    $('resultTag').textContent = state.demo ? 'DEMONSTRATION · TRY IT YOURSELF NEXT' : state.mode === 'explore' ? 'EXPERIMENT OBSERVED' : state.hint ? 'TESTED WITH A HINT' : 'YOUR TEST RESULT';
+    $('resultTitle').textContent = state.mode === 'explore' ? 'Here’s what your setup does.' : ok ? state.demo ? 'That’s one way to make it work.' : 'You made it work.' : 'Not yet. Here’s what to change.';
+    let body;
+    if (state.mission.type === 'moments') body = m.balanced ? `At level, the two turning effects match to within the 1% challenge tolerance: about ${f(m.anticlockwise)} N·m each. Exact equality keeps the beam level from rest; a small mismatch can still cause slow rotation.`
+      : `At release, the ${m.net > 0 ? 'left' : 'right'} side has the stronger turning effect (${f(m.anticlockwise)} versus ${f(m.clockwise)} N·m). ${m.net > 0 ? 'Increase' : 'Reduce'} the right-hand pull${state.mission.id==='beam' ? ' or adjust the left weight' : ''} and try again. Reaching a safety stop does not mean balance.`;
+    else if (state.mission.type === 'stability') body = m.marginal ? 'The weight line meets the very edge. This is the tipping boundary, not a comfortably stable setup.'
+      : m.stable ? `The weight line meets the supporting base. The ${p.tilt}° slope is below this setup’s ${f(m.critical)}° tipping boundary.`
+        : `The weight line falls outside the base. Lower the centre of gravity${state.mode === 'explore' ? ', widen the base or reduce the slope' : ''}, then test again.`;
+    else if (state.mission.type === 'lever') body = m.balanced ? `At level, both moments are about ${f(m.loadMoment)} N·m (within 1% challenge tolerance). The arm ratio is ${f(m.vr, 2)}; the distances matter as well as the forces.`
+      : `The effort moment is ${f(m.effortMoment)} N·m; the load moment is ${f(m.loadMoment)} N·m. ${m.effortMoment < m.loadMoment ? 'Increase' : 'Reduce'} the effort to match them.`;
+    else if (state.mission.type === 'pulley') body = m.feasible ? `This rig needs ${f(m.required)} N and ${f(m.rope)} m of rope travel. Both fit your limits. ${f(m.input)} J goes in: ${f(m.output)} J lifts the cargo and ${f(m.lost)} J is lost to the model’s inefficiency.`
+      : !m.fitsEffort ? `This routing needs ${f(m.required)} N, more than your ${p.maxEffort} N limit. More supporting strands reduce the effort—but check the rope-travel limit too.`
+        : `The effort fits, but this routing needs ${f(m.rope)} m of rope travel. You only have ${p.maxRope} m. Try fewer supporting strands.`;
+    else if(state.mission.type==='couple') body=`The two applied forces have zero resultant, but their ${p.separation} m separation gives a clockwise moment of ${f(m.torque)} N·m. Your target was ${p.targetTorque} N·m. ${m.onTarget?'Both conditions are met.':'Change either force magnitude or their perpendicular separation.'}`;
+    else if(state.mission.type==='circular') body=`At ${p.releaseAngle}°, release velocity is (${f(m.vx)}, ${f(m.vy)}) m/s with x right and y up. ${m.onTarget?'That gives the requested tangent direction.':'Move the release point and inspect the tangent—not the radial line.'} The string provided ${f(m.force)} N before release and zero afterwards.`;
+    else if(state.mission.type==='work') body=`The selected force does ${f(m.work)} J over ${p.distance} m; the target was ${p.targetWork} J. ${Math.abs(m.work)<.01?'Its perpendicular direction gives zero work.':m.work<0?'Its component opposes the displacement, so this work is negative.':'Its component is along the displacement, so this work is positive.'} The separate drive does ${f(m.counterWork)} J to maintain the prescribed speed.`;
+    else if(state.mission.type==='liftPower') body=`This lift transfers ${f(m.work)} J over ${p.liftTime} s, giving ${f(m.power)} W. Your target was ${p.targetPower} W. Keeping mass and height unchanged keeps work unchanged; shortening the time raises power.`;
+    else body = `The cart stops ${f(m.stop, 2)} m after the ramp. ${m.onTarget ? 'That’s inside the bay.' : m.stop > p.target ? 'It goes too far: try a stronger brake.' : 'It stops too soon: try a weaker brake.'} All ${f(m.energy)} J is now accounted for as thermal energy in the constant-force brake model.`;
+    $('resultBody').textContent = body; $('takeaway').textContent = state.mission.takeaway;
+    if (ok && state.mode !== 'explore') {
+      const key = state.mission.id + ':' + state.mode, record = state.demo || state.hint ? 'helped' : 'independent';
+      if (state.records[key] !== 'independent') state.records[key] = record;
+    }
+    refresh();
+  }
+  function tick(timestamp) {
+    if (!state.running) return;
+    const dt = lastTime === undefined ? 0 : Math.min(.1, (timestamp - lastTime) / 1000); lastTime = timestamp;
+    state.time = Math.min(duration(), state.time + dt);
+    if (state.time >= duration() - 1e-8) { finish(); return; }
+    updateScene(); if ($('science').open) science(); frame = requestAnimationFrame(tick);
+  }
+  function run(resume = false) {
+    stop(); state.restartNotice = false; if (!resume) { state.time = 0; state.tested = false; state.result = null; $('result').hidden = true; }
+    setStep(2);
+    if (reduce()) { finish(); return; }
+    state.running = true; refresh(); frame = requestAnimationFrame(tick);
+  }
+  function demonstrate() {
+    stop(); state.demo = true; state.time = 0; state.tested = false; $('result').hidden = true;
+    const p = state.params, type = state.mission.type;
+    if (type === 'moments') p.force = p.load * p.left / (p.right * Math.sin(radians(p.angle)));
+    else if (type === 'stability') p.height = .8;
+    else if (type === 'lever') p.force = p.load * p.loadArm / p.effortArm;
+    else if (type === 'pulley') p.n = [1, 2, 4, 6].find(n => P.pulley({ ...p, n }).feasible) || p.n;
+    else if(type==='couple')p.force=p.targetTorque/p.separation;
+    else if(type==='circular')p.releaseAngle=p.targetAngle;
+    else if(type==='work') { const ratio=p.targetWork/(p.force*p.distance); if(Math.abs(ratio)<=1)p.angle=Math.acos(ratio)*180/Math.PI; }
+    else if(type==='liftPower')p.liftTime=p.mass*P.g*p.height/p.targetPower;
+    else p.force = p.mass * P.g * p.height / p.target;
+    const spec = state.mission.controls.find(c => c[0] === state.mission.primary);
+    if (!Array.isArray(spec[2])) p[spec[0]] = clamp(Math.round(p[spec[0]] / spec[4]) * spec[4], spec[2], spec[3]);
+    buildControls(); refresh(); run();
+  }
+  wings.forEach(wing => {
+    const button = create('button', undefined, 'wing'); button.type = 'button'; button.dataset.wing = wing.id; button.style.setProperty('--wing-colour', wing.colour);
+    const icon = create('span', wing.icon, 'wing-icon'); icon.setAttribute('aria-hidden', 'true'); const copy = create('span'); copy.append(create('b', wing.name), create('small',`${wing.chapter} · ${wing.theme}`)); button.append(icon, copy);button.title=wing.description;
+    button.addEventListener('click', () => load(missions.find(m => m.wing === wing.id), state.mode, true)); $('wings').append(button);
+  });
+  document.querySelectorAll('[data-mode]').forEach(button => button.addEventListener('click', () => load(state.mission, button.dataset.mode)));
+  $('run').addEventListener('click', () => run());
+  $('pause').addEventListener('click', () => { if (state.running) { stop(); refresh(); } else if (state.time > 0 && !state.tested) run(true); });
+  $('step').addEventListener('click', () => { stop(); state.time = Math.min(duration(), state.time + (state.mission.type === 'brake' ? .25 : .4)); setStep(2); if (state.time >= duration() - 1e-8) finish(); else refresh(); });
+  $('reset').addEventListener('click', () => load());
+  $('hint').addEventListener('click', () => { state.hint = Math.min(2, state.hint + 1); $('hintText').textContent = state.mission.hints[state.hint - 1]; $('hintText').hidden = false; });
+  $('demo').addEventListener('click', demonstrate);
+  $('previous').addEventListener('click', () => load(missions[Math.max(0, missions.indexOf(state.mission) - 1)], state.mode, true));
+  $('next').addEventListener('click', () => load(missions[(missions.indexOf(state.mission) + 1) % missions.length], state.mode, true));
+  document.addEventListener('visibilitychange', () => { if (document.hidden && state.running) { stop(); refresh(); } });
+  window.addEventListener('pageshow', () => refresh());
+  window.addEventListener('hashchange',()=>{const m=missions.find(m=>m.id===location.hash.slice(1));if(m&&m!==state.mission)load(m,state.mode,true);});
+  window.HeliosPreview = Object.freeze({ snapshot: () => JSON.parse(JSON.stringify({ mission: state.mission.id, mode: state.mode, params: state.params,
+    running: state.running, tested: state.tested, demo: state.demo, time: state.time, records: state.records, rotation: rotationPose() })) });
+  load(missions.find(m=>m.id===location.hash.slice(1))||missions[0]);
+})();
+
+</script>
+<script src="../../board.js" defer></script><script src="../../lab-context.js" defer data-studio="force"></script></body>
+</html>
