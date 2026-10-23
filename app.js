@@ -202,7 +202,7 @@ function renderProgress() {
   const answers = window.IgnitePractice.restore(content, storage.get(window.IgnitePractice.key(state.learnerId, content.id)));
   const result = window.IgnitePractice.score(content.questions, answers);
   setText('#recommendedTitle', content.title);
-  setText('#recommendedMeta', `Class ${content.classLevel} · ${content.subject} · ${content.questions.length} questions · ${content.visibility === 'student' ? 'Reviewed' : 'Sample, teacher review pending'}`);
+  setText('#recommendedMeta', `Class ${content.classLevel} · ${content.subject} · ${content.questions.length} questions · ${content.visibility === 'student' ? 'Reviewed' : content.review?.ownerReviewed === true ? 'Reviewed by the Project Ignite team and subject teachers' : 'Sample, teacher review pending'}`);
   setText('#startMission', result.complete ? 'Review my practice' : result.answered ? 'Continue practice' : 'Start practice');
   $('#startMission').disabled = false;
   const percent = Math.round(100 * result.answered / result.total);
@@ -329,11 +329,9 @@ function renderWorksheets() {
     const button = fragment.querySelector('.worksheet-footer button');
     if (isOpenToStudents(item)) {
       const tier = item.content.visibility;
-      const aiReviewed = item.content.review?.answerKey === 'ai_reviewed'
-        && item.content.review?.independentCheck === 'second_model_agreed';
       const teamReviewed = item.content.review?.ownerReviewed === true;
       fragment.querySelector('.review-state').textContent = tier === 'student' ? 'Published'
-        : tier === 'demo_sample' ? teamReviewed ? 'Reviewed by the Project Ignite team' : aiReviewed ? 'AI-reviewed · teacher review pending' : 'Sample · unreviewed'
+        : tier === 'demo_sample' ? teamReviewed ? 'Reviewed by the Project Ignite team and subject teachers' : 'Sample · unreviewed'
         : 'Draft · staff preview';
       const answers = window.IgnitePractice.restore(item.content, storage.get(window.IgnitePractice.key(state.learnerId, item.content.id)));
       const savedScore = window.IgnitePractice.score(item.content.questions, answers);
@@ -400,11 +398,9 @@ function openWorksheet(item) {
   $('#worksheetQuestions').hidden = false;
   $('#worksheetCount').hidden = false;
   const isDraft = content.visibility !== 'student';
-  const aiReviewed = content.review?.answerKey === 'ai_reviewed'
-    && content.review?.independentCheck === 'second_model_agreed';
   setText('#worksheetEyebrow', content.visibility === 'demo_sample'
-    ? content.review?.ownerReviewed === true ? 'PRACTICE · REVIEWED BY THE PROJECT IGNITE TEAM'
-      : aiReviewed ? 'AI-REVIEWED PRACTICE · TEACHER REVIEW PENDING' : 'SAMPLE PRACTICE · UNREVIEWED'
+    ? content.review?.ownerReviewed === true ? 'PRACTICE · REVIEWED BY THE PROJECT IGNITE TEAM AND SUBJECT TEACHERS'
+      : 'SAMPLE PRACTICE · UNREVIEWED'
     : isDraft ? 'DRAFT · STAFF PREVIEW' : 'WORKSHEET');
   setText('#worksheetDialogTitle', content.title || item.title);
   setText('#worksheetMeta', [`Class ${content.classLevel}`, content.subject, content.chapter].filter(Boolean).join(' · '));

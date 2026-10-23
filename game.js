@@ -270,11 +270,12 @@
   function noticeFor(questions) {
     const notices = new Set(questions.map((q) => byQuestion.get(q.id)?.level.notice).filter(Boolean));
     if (notices.size === 1) return [...notices][0];
-    return 'This round mixes chapters. Chapter questions were reviewed by an AI (Claude) with a second AI model agreeing; original sample sets are unreviewed. Not yet checked by a teacher.';
+    if ([...notices].every((text) => /^Reviewed by the Project Ignite team/.test(text))) return 'Reviewed by the Project Ignite team and subject teachers. Tell us if anything looks wrong.';
+    return 'This round mixes chapters. Some questions are original samples that have not been reviewed yet.';
   }
   function summaryFor(notice) {
-    if (/reviewed by the Project Ignite team/.test(notice)) return 'Reviewed by the Project Ignite team';
-    return /second AI model/.test(notice) ? 'AI-reviewed · teacher check pending' : 'Sample questions · not yet teacher-checked';
+    if (/^Reviewed by the Project Ignite team/.test(notice)) return 'Reviewed by the Project Ignite team and subject teachers';
+    return 'Sample questions · not yet teacher-checked';
   }
 
   function begin(kind, questions, extra) {
