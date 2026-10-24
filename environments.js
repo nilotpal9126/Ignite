@@ -7,6 +7,7 @@
   const LAYERS = ['macro', 'mid', 'micro'];
   const MODE = new Set(['browse', 'question', 'test', 'lab', 'focus']);
   const SCENE_KEY = 'ignite-surroundings-scene-v1';
+  const DASHBOARD_SCENE_KEY = 'ignite-dashboard-surroundings-v1';
   const STATIC_KEY = 'ignite-surroundings-static-v1';
   const assetBase = typeof document === 'undefined' ? null : new URL('./', document.currentScript?.src || root.location.href);
   const normalizeSubject = value => {
@@ -56,12 +57,20 @@
       this.frame = 0; this.exploreDepth = .15; this.isExploreMode = false;
       this.signedIn=false; this.grainFrame=0; this.cameraDepth=null;
       this.grainFlow={velocity:0,offset:0,phase:0};this.grainScrollY=root.scrollY||0;
+      this.grainRipples=[];this.motionPreference='system';
       this.listeners = []; this.mounted = false;
       if (autoMount) this.mount();
     }
-    get isStatic() { return this.userStatic || this.reducedMotion; }
+    get isStatic() { return this.userStatic || (this.reducedMotion&&this.motionPreference!=='animate'); }
+    setMotionPreference(value='system') {
+      // Explicit, non-persistent preview/app choice; OS settings are unchanged.
+      this.motionPreference=value==='animate'?'animate':'system';
+      this.refreshControls();this.render();
+    }
     pool() {
       const scenes=Object.values(this.assets);
+      if(this.landing)return [];
+      if(this.dashboard)return scenes;
       const preferred=scenes.filter(scene => !this.currentSubject || scene.subjects.includes(this.currentSubject));
       // Remaining scenery is also available on Maths/Biology pages, without
       // representing it as a diagram of those subjects.
@@ -85,8 +94,10 @@
       document.body.classList.add('ignite-env-ready');
       document.body.classList.toggle('ignite-env-dashboard', Boolean(document.querySelector('.mobile-nav')));
       this.landing=Boolean(document.querySelector('.landing-hero'));
+      this.dashboard=Boolean(document.querySelector('.app-shell #worksheetGrid'));
       document.body.classList.toggle('ignite-env-landing',this.landing);
       document.body.classList.toggle('ignite-env-flow-ready',this.landing&&Boolean(this.grainContext));
+      this.mountDashboardPicker();
       this.resizeGrain();
       const identity=root.IgniteIdentity;
       const appearance=user=>this.setSignedIn(Boolean(user?.emailVerified));
@@ -97,10 +108,19 @@
         if(this.landing&&!this.isStatic&&!this.isExploreMode&&!this.otherDialog&&!document.hidden){
           // Actual scroll displacement covers wheel, touch and keyboard input.
           // The native page scroll is never prevented or replaced.
-          this.grainFlow.velocity=Math.max(-18,Math.min(18,this.grainFlow.velocity*.45+delta*.075));
+          this.grainFlow.velocity=Math.max(-22,Math.min(22,this.grainFlow.velocity*.45+delta*.1));
+          if(Math.abs(delta)>1){
+            const now=root.performance.now(),last=this.grainRipples.at(-1);
+            if(last&&now-last.born<110)last.strength=Math.min(16,last.strength+Math.abs(delta)*.035);
+            else{
+              this.grainRipples.push({x:this.grainOrigin?.x??root.innerWidth*.5,y:this.grainOrigin?.y??root.innerHeight*.48,born:now,strength:Math.min(16,4+Math.abs(delta)*.06)});
+              if(this.grainRipples.length>3)this.grainRipples.shift();
+            }
+          }
         }
         this.schedule();
       }, { passive: true });
+      this.on(root,'pointermove',event=>{if(this.landing)this.grainOrigin={x:event.clientX,y:event.clientY};},{passive:true});
       this.on(root, 'resize', () => { this.resizeGrain();this.schedule(); if (this.isExploreMode) this.renderInspection(); }, { passive: true });
       this.on(document, 'visibilitychange', () => {
         if (document.hidden && this.frame) { root.cancelAnimationFrame(this.frame); this.frame = 0; }
@@ -137,20 +157,26 @@
       const w=root.innerWidth,h=root.innerHeight;
       const flow=this.isStatic?{velocity:0,offset:0,phase:0}:this.grainFlow;
       const t=time*.00022+flow.phase,wrap=(v,size)=>((v%size)+size)%size;
-      ctx.clearRect(0,0,w,h);ctx.fillStyle=this.signedIn?'#77939688':'#a399847d';ctx.beginPath();
+      ctx.clearRect(0,0,w,h);ctx.fillStyle=this.signedIn?'#779396a0':'#958a73a6';ctx.beginPath();
       for(let y=-44;y<h+44;y+=22)for(let x=-44;x<w+44;x+=22){
         const seed=(Math.sin(x*12.9898+y*78.233)*43758.5453)%1;
         const depth=.55+Math.abs(seed)*.45,radius=.5+Math.abs(seed)*.28;
-        const dx=seed*4+6*Math.sin(t+y*.013)+3*Math.cos(t*.63+x*.017)+Math.sin(y*.023+x*.006+t*1.3)*flow.velocity*1.6;
-        const dy=seed*3+5*Math.cos(t*.87+x*.012)+2*Math.sin(t*.51+y*.017)-flow.offset*depth+Math.cos(x*.019-y*.007+t)*flow.velocity*.8;
+        let dx=seed*4+8*Math.sin(t+y*.013)+4*Math.cos(t*.63+x*.017)+Math.sin(y*.023+x*.006+t*1.3)*flow.velocity*2.1;
+        let dy=seed*3+6*Math.cos(t*.87+x*.012)+3*Math.sin(t*.51+y*.017)-flow.offset*depth+Math.cos(x*.019-y*.007+t)*flow.velocity;
+        if(!this.isStatic)for(const ripple of this.grainRipples){
+          const age=Math.max(0,time-ripple.born),rx=x-ripple.x,ry=y-ripple.y,distance=Math.max(1,Math.hypot(rx,ry));
+          const wave=(distance-age*.22)/125;
+          const push=Math.sin((distance-age*.22)*.04)*ripple.strength*Math.exp(-wave*wave-age/950);
+          dx+=rx/distance*push;dy+=ry/distance*push;
+        }
         const px=wrap(x+dx+44,w+88)-44,py=wrap(y+dy+44,h+88)-44;
         ctx.moveTo(px+radius,py);ctx.arc(px,py,radius,0,Math.PI*2);
       }
       ctx.fill();this.lastGrainTime=time;
     }
-    stopGrain(){if(this.grainFrame)root.cancelAnimationFrame(this.grainFrame);this.grainFrame=0;this.grainFlow.velocity=0;this.lastGrainTime=0;}
+    stopGrain(){if(this.grainFrame)root.cancelAnimationFrame(this.grainFrame);this.grainFrame=0;this.grainFlow.velocity=0;this.grainRipples=[];this.lastGrainTime=0;}
     updateGrain() {
-      const moving=this.landing&&!this.isStatic&&!this.contrastMedia?.matches&&this.taskMode==='browse'&&!this.otherDialog&&!this.isExploreMode&&!document.hidden&&root.scrollY<root.innerHeight*1.35;
+      const moving=this.landing&&!this.isStatic&&!this.contrastMedia?.matches&&this.taskMode==='browse'&&!this.otherDialog&&!this.isExploreMode&&!document.hidden;
       this.grain.style.opacity=this.userStatic||!this.landing?'0':'1';
       if(!moving){this.stopGrain();if(!this.userStatic)this.drawGrain(0);return;}
       if(this.grainFrame||!this.grainContext)return;
@@ -159,6 +185,7 @@
         const elapsed=time-(this.lastGrainTime||time-33);
         if(elapsed>=32){
           const dt=Math.min(elapsed,64),flow=this.grainFlow;
+          this.grainRipples=this.grainRipples.filter(ripple=>time-ripple.born<2400);
           flow.offset+=flow.velocity*dt/33;flow.phase+=flow.velocity*dt*.00035;
           flow.velocity*=Math.exp(-dt/420);
           if(Math.abs(flow.velocity)<.001)flow.velocity=0;
@@ -195,6 +222,19 @@
       this.motionNote = element('small', 'ignite-env-motion-note');
       this.panel.append(this.caption, this.exploreButton, this.cycleButton, this.staticButton, this.motionNote);
       this.toolbar.append(summary, this.panel); document.body.append(this.toolbar);
+    }
+    mountDashboardPicker() {
+      const host=document.querySelector('#boardBar');
+      if(!this.dashboard||!host)return;
+      this.dashboardPicker=element('div','ignite-env-dashboard-picker');
+      this.dashboardPicker.setAttribute('role','group');this.dashboardPicker.setAttribute('aria-label','Dashboard surroundings');
+      this.dashboardPicker.append(element('span','','Your surroundings'));
+      for(const [id,title] of [['lunar_surface','Moon'],['molecular_lattice','Molecule']]){
+        if(!Object.hasOwn(this.assets,id))continue;
+        const choice=button('',title,()=>this.applyEnvironment(id));choice.dataset.scene=id;
+        choice.setAttribute('aria-pressed','false');this.dashboardPicker.append(choice);
+      }
+      host.after(this.dashboardPicker);
     }
     mountExplorer() {
       this.dialog = element('dialog', 'ignite-env-explorer');
@@ -240,19 +280,20 @@
       document.body.dataset.envMode = this.taskMode;
       if (this.taskMode !== 'browse' && this.isExploreMode) this.toggleExploreMode(false);
       const pool = this.pool();
-      const saved = storage('sessionStorage', SCENE_KEY);
-      const chosen = pool.find(scene => scene.id === this.activeEnv?.id) || pool.find(scene => scene.id === saved) || pool[Math.floor(Math.random()*pool.length)];
+      const saved = storage('sessionStorage', this.dashboard?DASHBOARD_SCENE_KEY:SCENE_KEY);
+      const chosen = pool.find(scene => scene.id === this.activeEnv?.id) || pool.find(scene => scene.id === saved)
+        || (this.dashboard?pool.find(scene=>scene.id==='lunar_surface'):null) || pool[Math.floor(Math.random()*pool.length)];
       this.applyEnvironment(chosen?.id || null);
       return this;
     }
     applyEnvironment(id) {
-      const scene = Object.hasOwn(this.assets, id) ? this.assets[id] : null;
+      const scene = !this.landing&&Object.hasOwn(this.assets, id) ? this.assets[id] : null;
       document.body.dataset.environment = scene?.id || 'paper';
       if (this.activeEnv?.id === scene?.id && this.activeEnv === scene) { this.refreshControls(); this.render(); return; }
       this.activeEnv = scene;
       this.setArtwork(this.world,scene?.artwork);
       this.cameraDepth=null;
-      if (scene) storage('sessionStorage', SCENE_KEY, scene.id);
+      if (scene) storage('sessionStorage', this.dashboard?DASHBOARD_SCENE_KEY:SCENE_KEY, scene.id);
       this.refreshControls(); this.render();
       if (this.isExploreMode) this.renderInspection();
     }
@@ -260,11 +301,15 @@
       const restricted = this.taskMode !== 'browse';
       this.toolbar.hidden = restricted;
       if (restricted) this.toolbar.open = false;
-      this.caption.textContent = this.activeEnv?.caption || 'Paper surroundings · more subjects can be added';
+      if(this.dashboardPicker){
+        this.dashboardPicker.hidden=restricted;
+        this.dashboardPicker.querySelectorAll('button').forEach(choice=>choice.setAttribute('aria-pressed',String(choice.dataset.scene===this.activeEnv?.id)));
+      }
+      this.caption.textContent = this.activeEnv?.caption || (this.landing?'Floating grains · scroll to stir the current':'Paper surroundings · more subjects can be added');
       this.exploreButton.disabled = !this.activeEnv || typeof this.dialog.showModal !== 'function';
       this.cycleButton.disabled = this.pool().length < 2;
       this.staticButton.setAttribute('aria-pressed', String(this.userStatic));
-      this.motionNote.textContent = this.reducedMotion ? 'Your device’s reduced-motion setting is active.' : 'Your study progress is unaffected.';
+      this.motionNote.textContent = this.reducedMotion&&this.motionPreference!=='animate' ? 'Your device’s reduced-motion setting is active.' : 'Your study progress is unaffected.';
       document.body.dataset.envStatic = String(this.isStatic);
       document.body.dataset.envPaper = String(this.userStatic);
     }
@@ -294,7 +339,7 @@
       const target=still ? .55 : this.progress();
       if(this.cameraDepth===null||still)this.cameraDepth=target;
       else this.cameraDepth+= (target-this.cameraDepth)*.2;
-      if(Math.abs(target-this.cameraDepth)>.0004&&!still)this.schedule();else this.cameraDepth=target;
+      if(this.activeEnv&&Math.abs(target-this.cameraDepth)>.0004&&!still)this.schedule();else this.cameraDepth=target;
       const hero=this.landing?clamp((root.scrollY-root.innerHeight*.35)/(root.innerHeight*.55)):1;
       const amplitude=this.taskMode==='browse' ? (this.signedIn ? .35 : .24)*hero : this.taskMode==='question' ? .018 : 0;
       this.world.style.opacity=String(this.userStatic||!this.activeEnv?0:amplitude);
@@ -385,6 +430,7 @@
       if (this.frame) root.cancelAnimationFrame(this.frame);
       this.stopGrain();
       this.stage?.remove(); this.toolbar?.remove(); this.dialog?.remove();
+      this.dashboardPicker?.remove();
       document.body.classList.remove('ignite-env-ready','ignite-env-dashboard','ignite-env-landing','ignite-env-flow-ready');
       ['envMode','envStatic','envPaper','environment','exploreMode','envAppearance'].forEach(key=>delete document.body.dataset[key]);
       this.mounted = false;

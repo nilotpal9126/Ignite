@@ -40,6 +40,12 @@ body.ignite-env-ready[data-env-paper="true"] { background-image: radial-gradient
 .ignite-env-toolbar > summary { cursor: pointer; min-height: 44px; padding: 11px 16px; background: #fffdf7f5; border: 1px solid #a69983; border-radius: 4px 10px 4px 8px; box-shadow: 2px 3px 0 #10243e16; font-weight: 750; }
 .ignite-env-menu { position: absolute; bottom: calc(100% + 8px); right: 0; width: min(300px,calc(100vw - 32px)); max-height: min(510px,65dvh); overflow: auto; padding: 14px; background: var(--bg-paper); border: 1px solid #a69983; border-top: 4px solid var(--lime,#dff04f); border-radius: 4px 12px 5px 10px; box-shadow: 3px 5px 0 #10243e20; }
 .ignite-env-caption { margin: 0 0 10px; font-size: 12px; }
+.ignite-env-dashboard-picker { display:flex;align-items:center;flex-wrap:wrap;gap:8px;margin:12px 0 18px;color:var(--ink-navy);font:13px/1.4 var(--font-body,"Satoshi",sans-serif); }
+.ignite-env-dashboard-picker > span { margin-right:4px;color:var(--ink-soft,#53657a); }
+.ignite-env-dashboard-picker button { min-height:44px;padding:8px 16px;border:1px solid #a69983;border-radius:5px;background:#fffdf7;color:var(--ink-navy);font:700 13px/1.4 var(--font-body,"Satoshi",sans-serif);cursor:pointer; }
+.ignite-env-dashboard-picker button[aria-pressed="true"] { background:var(--lime,#dff04f);box-shadow:2px 2px 0 #10243e20; }
+.ignite-env-dashboard-picker button:focus-visible { outline:3px solid var(--ink-navy);outline-offset:3px; }
+.ignite-env-dashboard-picker[hidden] { display:none; }
 .ignite-env-menu button { display: block; width: 100%; min-height: 44px; padding: 8px 12px; margin-bottom: 6px; border: 1px solid #a69983; border-radius: 5px; text-align: left; background: #fffdf7; color: var(--ink-navy); font: inherit; cursor: pointer; }
 .ignite-env-menu button:hover:not(:disabled), .ignite-env-menu button[aria-pressed="true"] { background: var(--lime,#dff04f); }
 .ignite-env-menu button:disabled { cursor: default; opacity: .55; }
@@ -86,7 +92,7 @@ dialog.ignite-env-explorer::backdrop { background: #f7f2e8ee; backdrop-filter: b
   body.ignite-env-ready { transition: none !important; }
   .ignite-env-stage *, .ignite-env-explorer * { transition: none !important; animation: none !important; }
 }
-@media print { .ignite-env-stage,.ignite-env-toolbar,.ignite-env-explorer { display: none !important; } }
+@media print { .ignite-env-stage,.ignite-env-toolbar,.ignite-env-explorer,.ignite-env-dashboard-picker { display: none !important; } }
 @media(forced-colors:active) {
   .ignite-env-stage { display: none; }
   .ignite-env-toolbar > summary,.ignite-env-menu,dialog.ignite-env-explorer,.ignite-env-explorer button { background: Canvas; color: CanvasText; border-color: CanvasText; }

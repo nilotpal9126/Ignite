@@ -8,14 +8,21 @@ it does not replace page layouts, typography, subject cards or study content.
 - Two continuous scenes: NASA's LRO-based Moon visualization and a methane
   model. Stomata/leaf and mathematical background figures have been removed.
   Each remaining scene retains one artwork at every depth.
-- A smoothly interpolated camera approaches the same features as the user scrolls.
-  The images appear directly behind the page as the user scrolls, without needing
-  to open Explore. The landing hero keeps its paper texture: grains drift in a
-  slow flow and respond to actual scroll displacement with directional currents,
-  a curling wake, depth-dependent displacement and a short, damped coast.
+- The landing page uses floating grains throughout its scroll. Scroll impulses
+  create a curling current and outward ripples around the pointer, with layered
+  displacement and a short, damped coast. Grain contrast keeps the motion visible
+  within the existing warm paper palette. The landing page has no Moon/molecule
+  imagery; those scenes belong on learning pages.
+- The user dashboard starts with the Moon and provides a visible Moon / Molecule
+  switch below the board bar. Its session preference survives reloads and subject
+  filters; it does not read or change learner/account data. Both scenes remain
+  available regardless of the current dashboard subject. A smoothly interpolated
+  camera approaches the same features behind the page during scrolling, without
+  requiring Explore. The selector hides during questions, tests and Focus mode.
   Scrolling back reverses the current. Native wheel, touch and keyboard scrolling
   stay unchanged. Maths/Biology use the remaining scenery as ambient backgrounds;
-  unsupported subjects retain paper. Removed scene IDs in storage fall back safely.
+  unsupported subjects retain paper outside the dashboard. Removed scene IDs in
+  storage fall back safely.
 - Confirmed, verified sign-in changes the outer paper to a mist-blue studio.
   Cream cards, navy text, lime accents, fonts and layouts retain their existing
   design. Sign-out returns the visitor atmosphere; studios keep their own theme.
@@ -31,9 +38,14 @@ it does not replace page layouts, typography, subject cards or study content.
   and interactions remain untouched.
 - Reduced-motion support (including live OS changes), storage-denied and canvas
   fallbacks, print hiding and mobile touch controls. The landing dot canvas draws
-  at most about 30 times/second while visible near the hero; it pauses for hidden
-  tabs, dialogs, inspection, reduced motion, forced colours and Static paper.
+  at most about 30 times/second across the visible landing page; it pauses for
+  hidden tabs, dialogs, questions, reduced motion, forced colours and Static paper.
   The scroll camera stops requesting frames after settling.
+
+The local review wrapper has an explicit Animate preview / Device setting control.
+`setMotionPreference('animate')` temporarily previews animation even if the device
+requests reduced motion; it does not persist or alter OS settings. The production
+default remains `system`, and Static paper always takes precedence.
 
 `environments.js` reads no questions, responses, scores, user identifiers or
 attempt keys. It subscribes to the existing identity service and retains only a
