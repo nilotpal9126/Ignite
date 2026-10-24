@@ -13,7 +13,7 @@
   function render(){
     const subject=$('labsSubject').value,all=registry.forBoard(current),filtered=all.filter(s=>subject==='all'||s.subject===subject);
     $('labsCards').replaceChildren(...filtered.map(studio=>{
-      const a=document.createElement('a');a.className='studio-card';a.href='./'+studio.path;a.dataset.studio=studio.id;a.style.setProperty('--studio-colour',studio.colour);
+      const a=document.createElement('a');a.className='studio-card';a.href='./'+studio.path;a.dataset.studio=studio.id;a.dataset.subject=studio.subject;a.style.setProperty('--studio-colour',studio.colour);
       for(const [tag,text,cls]of [['small',`${studio.board} · CLASS ${studio.classLevel} · ${studio.subject.toUpperCase()}`,'studio-meta'],['span',studio.symbol,'studio-symbol'],['h2',studio.title,''],['p',studio.description,''],['small',studio.tag,'studio-tag'],['span','Open studio ↗','studio-open']]){const n=document.createElement(tag);n.textContent=text;if(cls)n.className=cls;if(cls==='studio-symbol')n.setAttribute('aria-hidden','true');a.append(n);}return a;
     }));
     $('labsEmpty').hidden=filtered.length>0;

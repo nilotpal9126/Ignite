@@ -99,7 +99,9 @@ body .landing-hero .hero-copy h1 { max-width: 10ch; font-size: clamp(54px, 6.2vw
 }
 .hero-preview::before,
 .coverage-grid .coverage-subject::before,
-.app-shell .subject-card::before {
+.app-shell .subject-card::before,
+.game-page .chapter-tile::before,
+.labs-page .studio-card::before {
   content: "";
   position: absolute;
   left: 50%;
@@ -184,7 +186,9 @@ body .landing-hero .hero-copy h1 { max-width: 10ch; font-size: clamp(54px, 6.2vw
   background-size: 7px 7px;
 }
 .coverage-grid .coverage-subject,
-.app-shell .subject-card {
+.app-shell .subject-card,
+.game-page .chapter-tile,
+.labs-page .studio-card {
   --note-fill: var(--note-yellow);
   --note-border: #e6b924;
   --note-tilt: -1.5deg;
@@ -205,13 +209,21 @@ body .landing-hero .hero-copy h1 { max-width: 10ch; font-size: clamp(54px, 6.2vw
   animation: note-settle 650ms ease-out backwards;
 }
 .coverage-grid .coverage-subject[data-subject="Chemistry"],
-.app-shell .subject-card[data-subject="Chemistry"] { --note-fill: var(--note-blue); --note-border: #40add3; --note-tilt: 1.3deg; animation-delay: 70ms; }
+.app-shell .subject-card[data-subject="Chemistry"],
+.game-page .chapter-tile[data-subject="Chemistry"],
+.labs-page .studio-card[data-subject="Chemistry"] { --note-fill: var(--note-blue); --note-border: #40add3; --note-tilt: 1.3deg; animation-delay: 70ms; }
 .coverage-grid .coverage-subject[data-subject="Biology"],
-.app-shell .subject-card[data-subject="Biology"] { --note-fill: var(--note-mint); --note-border: #7bb36c; --note-tilt: -.8deg; animation-delay: 140ms; }
+.app-shell .subject-card[data-subject="Biology"],
+.game-page .chapter-tile[data-subject="Biology"],
+.labs-page .studio-card[data-subject="Biology"] { --note-fill: var(--note-mint); --note-border: #7bb36c; --note-tilt: -.8deg; animation-delay: 140ms; }
 .coverage-grid .coverage-subject[data-subject="Mathematics"],
-.app-shell .subject-card[data-subject="Mathematics"] { --note-fill: #eadff7; --note-border: #a582c7; --note-tilt: 1deg; animation-delay: 210ms; }
+.app-shell .subject-card[data-subject="Mathematics"],
+.game-page .chapter-tile[data-subject="Mathematics"],
+.labs-page .studio-card[data-subject="Mathematics"] { --note-fill: #eadff7; --note-border: #a582c7; --note-tilt: 1deg; animation-delay: 210ms; }
 .coverage-grid .coverage-subject::before,
-.app-shell .subject-card::before {
+.app-shell .subject-card::before,
+.game-page .chapter-tile::before,
+.labs-page .studio-card::before {
   z-index: 1;
   inset: -12px auto auto 50%;
   padding: 0;
@@ -221,7 +233,9 @@ body .landing-hero .hero-copy h1 { max-width: 10ch; font-size: clamp(54px, 6.2vw
   animation: none;
 }
 .coverage-grid .coverage-subject::after,
-.app-shell .subject-card::after {
+.app-shell .subject-card::after,
+.game-page .chapter-tile::after,
+.labs-page .studio-card::after {
   content: "";
   position: absolute;
   right: -2px;
@@ -235,13 +249,17 @@ body .landing-hero .hero-copy h1 { max-width: 10ch; font-size: clamp(54px, 6.2vw
 .coverage-grid .coverage-subject:hover,
 .coverage-grid .coverage-subject[aria-pressed="true"],
 .app-shell .subject-card:hover,
-.app-shell .subject-card[aria-pressed="true"] {
+.app-shell .subject-card[aria-pressed="true"],
+.game-page .chapter-tile:hover,
+.labs-page .studio-card:hover {
   border-color: var(--note-border);
   transform: translateY(-5px) rotate(0deg);
   box-shadow: 4px 9px 0 #10243e1a;
 }
 .coverage-grid .coverage-subject:focus-visible,
-.app-shell .subject-card:focus-visible { outline: 3px solid #102c4e; outline-offset: 5px; }
+.app-shell .subject-card:focus-visible,
+.game-page .chapter-tile:focus-visible,
+.labs-page .studio-card:focus-visible { outline: 3px solid #102c4e; outline-offset: 5px; }
 .coverage-subject .subject-symbol,
 .app-shell .subject-icon {
   width: 50px;
@@ -275,6 +293,62 @@ body .landing-hero .hero-copy h1 { max-width: 10ch; font-size: clamp(54px, 6.2vw
 .demo-panel { border: 2px solid #d4dca2; border-top: 5px solid #dff04f; background: #fffefa; }
 #demoQuestionText { scroll-margin-top: 120px; }
 #demoQuestionText:focus { outline: 2px dashed #526075; outline-offset: 8px; border-radius: 3px; }
+
+/* The later Play and Labs pages use this same established pinboard foundation. */
+.game-page h1, .game-page h2, .game-page .tile-copy strong,
+.labs-page h1, .labs-page h2 { font-family: var(--font-display); font-weight: 800; }
+.game-page .chapter-grid { gap: 28px 22px; padding: 16px 5px 12px; }
+.game-page .chapter-tile { min-height: 160px; }
+.game-page .tile-icon { background: #ffffff66; border: 1px solid #10243e2e; border-radius: 50% 44% 48% 42%; }
+.game-page .tile-copy strong { font-size: 20px; }
+.game-page .tile-copy small { color: #405362; }
+.game-page .player-card, .game-page .continue-card,
+.game-page .play-card, .game-page .result-card, .game-page .shelf-row {
+  color: #10243e; background: #fffdf7; border: 1px solid #cbbfa8;
+  border-top: 4px solid #d6e33d; border-radius: 4px 12px 5px 10px;
+  box-shadow: 3px 5px 0 #10243e12;
+}
+.game-page .player-card .eyebrow { color: #8a452f; }
+.game-page .player-copy small, .game-page .player-stats small { color: #41536a; }
+.game-page .player-stats { color: #10243e; background: #f4f0e5; border-radius: 4px 12px 5px 10px; }
+.game-page .xp-bar { background: #e4ddce; }
+.game-page .xp-bar span { background: #566400; }
+.game-page .daily-card { background: var(--note-yellow); color: #10243e; border: 2px solid #e6b924; border-radius: 3px 5px 18px 3px; box-shadow: 3px 5px 0 #10243e12; }
+.game-page .daily-card.is-done { background: var(--note-mint); border-color: #7bb36c; }
+.game-page .chip { border-radius: 4px; }
+.game-page .play-option { border-color: #cbbfa8; border-radius: 4px 10px 4px 8px; background: #fffefa; }
+.game-page .play-option .demo-option-diagram { font-family: var(--font-body); background: #f7f2e8; }
+.game-page .play-option .demo-option-diagram text { font-family: var(--font-body); }
+.game-page .play-option.is-correct { border-color: #2f8a57; background: #e5f6ec; }
+.game-page .play-option.is-wrong { border-color: #c4472c; background: #fdece7; }
+.game-page .primary-button { border: 1px solid #10243e; border-radius: 5px; box-shadow: 3px 3px 0 #10243e; }
+.game-page .badge-grid li { border-radius: 3px 5px 10px 3px; background: #f4efe4; }
+.game-page .badge-grid li.earned { background: var(--note-mint); border-color: #7bb36c; }
+.app-shell .levels-spotlight { color: #10243e; background: #fffdf7; border: 1px solid #cbbfa8; border-top: 4px solid #d6e33d; border-radius: 4px 12px 5px 10px; box-shadow: 3px 5px 0 #10243e12; }
+.app-shell .levels-copy .eyebrow { color: #8a452f; }
+.app-shell .levels-copy h2 { font-family: var(--font-display); font-weight: 800; }
+.app-shell .levels-copy > p:not(.eyebrow), .app-shell .levels-summary small { color: #41536a; }
+.app-shell .levels-summary strong { color: #566400; }
+.app-shell .levels-summary > p { border-color: #cbbfa8; }
+.app-shell .worksheet-footer { flex-wrap: wrap; }
+.app-shell .worksheet-footer .review-state { max-width: 100%; white-space: normal; }
+.labs-page .studio-grid { gap: 30px 22px; padding: 16px 5px 12px; }
+.labs-page .studio-card { min-height: 255px; }
+.labs-page .studio-card h2 { font-family: var(--font-display); font-size: 25px; }
+.labs-page .studio-card p, .labs-page .studio-tag { color: #405362; }
+.labs-page .studio-meta, .labs-page .studio-symbol, .labs-page .studio-open { color: #10243e; }
+.labs-page .labs-intro h1 { font-family: var(--font-display); font-weight: 900; }
+.labs-page .labs-intro h1 em { font-family: inherit; font-weight: inherit; font-style: normal; color: #ab412b; background: linear-gradient(transparent 72%, #ffd6b6 72%, #ffd6b6 95%, transparent 95%); }
+.labs-page .brand .wordmark-project { font-size: 9px; letter-spacing: .38em; }
+.labs-page .brand .wordmark-ignite { font-size: 33px; letter-spacing: .055em; }
+
+@media (max-width: 700px) {
+  .game-page .game-topbar { flex-wrap: wrap; }
+  .game-page .topbar-actions { gap: 7px; flex-wrap: wrap; }
+  .game-page #gameAccountLink { width: auto; min-width: 44px; padding: 0 12px; }
+  .labs-page .brand .wordmark-project { font-size: 8px; }
+  .labs-page .brand .wordmark-ignite { font-size: 27px; }
+}
 
 @keyframes note-settle {
   from { transform: translateY(-7px) rotate(0deg); }
@@ -321,15 +395,21 @@ body .landing-hero .hero-copy h1 { max-width: 10ch; font-size: clamp(54px, 6.2vw
   html { scroll-behavior: auto; }
   .hero-subjects button, .hero-subjects button:hover { transition: none; transform: none; }
   .coverage-grid .coverage-subject,
-  .app-shell .subject-card { animation: none; transition: none; transform: none; }
+  .app-shell .subject-card,
+  .game-page .chapter-tile,
+  .labs-page .studio-card { animation: none; transition: none; transform: none; }
   .coverage-grid .coverage-subject:hover,
   .coverage-grid .coverage-subject[aria-pressed="true"],
   .app-shell .subject-card:hover,
-  .app-shell .subject-card[aria-pressed="true"] { transform: none; }
+  .app-shell .subject-card[aria-pressed="true"],
+  .game-page .chapter-tile:hover,
+  .labs-page .studio-card:hover { transform: none; }
 }
 @media (forced-colors: active) {
   .cutout-number, .cutout-word i { clip-path: none; border: 1px solid CanvasText; }
   .coverage-grid .coverage-subject::before, .coverage-grid .coverage-subject::after,
   .app-shell .subject-card::before, .app-shell .subject-card::after,
-  .hero-preview::before, .app-shell .hero::after { display: none; }
+  .hero-preview::before, .app-shell .hero::after,
+  .game-page .chapter-tile::before, .game-page .chapter-tile::after,
+  .labs-page .studio-card::before, .labs-page .studio-card::after { display: none; }
 }

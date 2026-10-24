@@ -198,6 +198,7 @@
         el('span', { className: 'tile-bar' }, el('span', { style: `width:${Math.round(100 * stars / max)}%` }))),
       el('span', { className: 'tile-end', textContent: trophy ? TROPHY_ICON[trophy] : `${stars}/${max} ★` }));
     tile.style.setProperty('--tile-colour', colour);
+    tile.dataset.subject = track.subject;
     tile.setAttribute('aria-label', `${track.title}: ${stars} of ${max} stars${trophy ? `, ${trophy} trophy` : ''}`);
     tile.addEventListener('click', () => openTrail(track));
     return tile;
