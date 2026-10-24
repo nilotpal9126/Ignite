@@ -17,11 +17,11 @@ for (const file of ['practice.js', 'data/pilot-worksheets.js', 'trial-diagrams.j
 }
 const { IgniteTrialDiagrams: diagrams, IgnitePractice: practice, __IGNITE_PILOT_CONTENT__: content } = context.window;
 
-test('four diagram questions stay playable without changing source worksheets or recovery question IDs', () => {
+test('shared diagrams stay playable without changing source worksheets or recovery question IDs', () => {
   const before = JSON.stringify(content);
   const adapted = content.items.map(diagrams.adapt);
   const questions = adapted.flatMap(item => item.questions.filter(question => question.diagramOptions));
-  assert.equal(questions.length, 4);
+  assert.equal(questions.length, 12);
   for (const item of adapted) assert.ok(practice.playable(item), item.id);
   assert.equal(JSON.stringify(content), before);
   assert.equal(adapted[0].questions[0].id, content.items[0].questions[0].id);
@@ -38,6 +38,25 @@ test('four diagram questions stay playable without changing source worksheets or
       assert.doesNotMatch(svg.innerHTML, /<script|<foreignObject|\bon\w+=|https?:|href=/i);
     }
   }
+});
+
+test('Ignite Play receives two visual challenges in each core subject', () => {
+  const adapted = content.items.map(diagrams.adapt);
+  const counts = new Map();
+  for (const item of adapted.filter(item => item.board === 'CBSE' && !item.trial)) {
+    const challengeCount = item.questions.filter(question => question.diagramOptions).length;
+    if (challengeCount) counts.set(item.subject, (counts.get(item.subject) || 0) + challengeCount);
+  }
+  assert.deepEqual(Object.fromEntries(counts), {
+    Mathematics: 2, Chemistry: 2, Biology: 2, Physics: 2,
+  });
+  const play = readFileSync(path.join(root, 'play.html'), 'utf8');
+  const game = readFileSync(path.join(root, 'game.js'), 'utf8');
+  const css = readFileSync(path.join(root, 'game.css'), 'utf8');
+  assert.match(play, /trial-diagrams\.js[^]*game\/core\.js[^]*game\.js/);
+  assert.match(game, /IgniteTrialDiagrams\?\.adapt/);
+  assert.match(game, /IgniteTrialDiagrams\?\.render/);
+  assert.match(css, /\.play-options\.has-diagrams/);
 });
 
 test('diagram renderer rejects prototype keys, arbitrary URLs, paths and markup', () => {

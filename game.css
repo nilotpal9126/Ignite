@@ -89,14 +89,43 @@ a.icon-button { text-decoration: none; }
 .play-card .eyebrow { margin-bottom: 6px; }
 .play-card h2 { margin: 0 0 14px; font-size: clamp(20px, 4.8vw, 25px); line-height: 1.3; overflow-wrap: anywhere; outline: none; }
 .play-options { display: grid; gap: 9px; }
+.play-options.has-diagrams { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .play-option { display: flex; gap: 10px; align-items: center; width: 100%; min-height: 52px; padding: 10px 12px; text-align: left; border: 2px solid var(--line); border-bottom-width: 4px; border-radius: 14px; background: white; color: var(--ink); cursor: pointer; font-weight: 650; overflow-wrap: anywhere; transition: transform .08s ease; }
 .play-option .letter { flex: none; display: grid; place-items: center; width: 28px; height: 28px; border-radius: 8px; border: 1px solid var(--line); font-weight: 900; font-size: 13px; }
+.play-option .option-value { min-width: 0; flex: 1; }
+.play-option.has-diagram { align-items: flex-start; padding: 10px; }
+.play-option.has-diagram .letter { margin-top: 3px; }
+.play-option.has-diagram .option-value { display: grid; gap: 7px; }
+.play-option .demo-option-diagram { display: block; width: 100%; height: 128px; border-radius: 9px; background: var(--paper); color: var(--navy); fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.play-option .demo-option-diagram text { fill: currentColor; stroke: none; font: 12px "Segoe UI", system-ui, sans-serif; }
+.play-option .diagram-caption { display: block; font-size: 12px; line-height: 1.35; }
+.play-option .diagram-grid { stroke: #dbe4e8; stroke-width: 1; }
+.play-option .diagram-axis { stroke: #74859b; stroke-width: 1.4; }
+.play-option .diagram-curve { stroke: var(--navy-2); stroke-width: 3; }
+.play-option .diagram-secondary { stroke: #c4472c; stroke-width: 3; stroke-dasharray: 6 4; }
+.play-option .diagram-point { fill: var(--coral); stroke: var(--navy); }
+.play-option .diagram-wire, .play-option .diagram-device, .play-option .diagram-field { stroke: var(--navy); }
+.play-option .diagram-device { fill: white; }
+.play-option .diagram-coil { stroke: #8a5a27; opacity: .8; }
+.play-option .diagram-particle { fill: var(--blue); stroke: var(--navy); }
+.play-option .diagram-arrow { stroke: var(--lime-dark); stroke-width: 3; }
+.play-option .diagram-product { font-size: 22px; font-weight: 800; }
+.play-option .diagram-heart { fill: #fff1ec; stroke: #b85c52; }
+.play-option .diagram-chamber { fill: white; stroke: var(--navy); }
+.play-option .diagram-highlight { fill: var(--lime); stroke: var(--navy); stroke-width: 3; }
+.play-option .diagram-punnett { fill: white; stroke: var(--navy); }
+.play-option .diagram-punnett text { font-size: 16px; font-weight: 800; }
+.play-option .diagram-punnett .diagram-counter { fill: var(--lime); stroke: var(--navy); }
 .play-option:hover:not(:disabled) { border-color: var(--navy-2); }
 .play-option:active:not(:disabled) { transform: translateY(2px); }
 .play-option:disabled { cursor: default; }
 .play-option.is-correct { border-color: #2f8a57; background: #e5f6ec; animation: pulse .4s ease; }
 .play-option.is-wrong { border-color: #c4472c; background: #fdece7; animation: shake .35s ease; }
 .play-option.is-cleared { opacity: .3; text-decoration: line-through; }
+@media (max-width: 620px) {
+  .play-options.has-diagrams { grid-template-columns: minmax(0, 1fr); }
+  .play-option .demo-option-diagram { height: 118px; }
+}
 .play-tools { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-top: 14px; }
 .clue-button { min-height: 36px; padding: 0 14px; border: 1px dashed var(--navy-2); border-radius: 999px; background: white; color: var(--navy); font-weight: 800; cursor: pointer; }
 .clue-button:disabled { opacity: .45; cursor: default; }

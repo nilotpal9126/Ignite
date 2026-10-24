@@ -86,7 +86,9 @@
   }
 
   // The free-trial sets are for visitors before sign-in; signed-in learners play the chapter levels.
-  const tracks = core.buildTracks((window.__IGNITE_PILOT_CONTENT__?.items || []).filter((set) => !set.trial), window.IgnitePractice?.playable);
+  const trailSets = (window.__IGNITE_PILOT_CONTENT__?.items || []).filter((set) => !set.trial)
+    .map((set) => window.IgniteTrialDiagrams?.adapt(set) || set);
+  const tracks = core.buildTracks(trailSets, window.IgnitePractice?.playable);
   const byQuestion = core.questionIndex(tracks);
   const trackById = (id) => tracks.find((t) => t.id === id) || null;
   const today = () => core.todayKey();
@@ -312,16 +314,23 @@
   function renderQuestion() {
     const q = round.questions[round.index];
     const active = round;
-    $('playCount').textContent = `QUESTION ${round.index + 1} OF ${round.questions.length}`;
+    const diagramOptions = Array.isArray(q.diagramOptions) && q.diagramOptions.length === q.options.length
+      ? q.diagramOptions : null;
+    $('playCount').textContent = `${diagramOptions ? 'VISUAL CHALLENGE · ' : ''}QUESTION ${round.index + 1} OF ${round.questions.length}`;
     $('playTitle').textContent = q.text;
     $('levelFill').style.width = `${Math.round(100 * round.index / round.questions.length)}%`;
     $('streak').textContent = round.streak >= 2 ? `🔥 ${round.streak}` : '';
     if (round.kind === 'boss') renderBoss();
     $('answerSheet').hidden = true;
     const hidden = round.clueOn === q.id ? round.hidden : [];
+    $('playOptions').classList.toggle('has-diagrams', Boolean(diagramOptions));
     $('playOptions').replaceChildren(...q.options.map((option, index) => {
-      const button = el('button', { type: 'button', className: 'play-option' },
-        el('span', { className: 'letter', textContent: LETTERS[index] }), el('span', { textContent: option }));
+      const value = el('span', { className: 'option-value' });
+      const diagram = diagramOptions ? window.IgniteTrialDiagrams?.render(diagramOptions[index]) : null;
+      if (diagram) value.append(diagram, el('span', { className: 'diagram-caption', textContent: option }));
+      else value.textContent = option;
+      const button = el('button', { type: 'button', className: `play-option${diagram ? ' has-diagram' : ''}` },
+        el('span', { className: 'letter', textContent: LETTERS[index] }), value);
       button.dataset.index = String(index);
       if (hidden.includes(index)) { button.disabled = true; button.classList.add('is-cleared'); }
       button.addEventListener('click', () => choose(index, active, q, button));

@@ -1,7 +1,7 @@
 {
   "schemaVersion": "ignite-public-release/1",
-  "releaseId": "ignite-enrollment-20261023203454029",
-  "builtAt": "2026-10-23T20:34:54.029Z",
+  "releaseId": "ignite-enrollment-20261024070609415",
+  "builtAt": "2026-10-24T07:06:09.415Z",
   "mode": "sample_preview",
   "admissions": "paused",
   "enquiries": "not_configured",
@@ -44,8 +44,8 @@
     "enrollment.js": "e456e33cb8b53d74c822b3c902e0fe7b90a8327c04352ad9a6122a813a0583e0",
     "firebase-auth.js": "f90f1260b70ea8aef3b750c92edd07d92bfbbf709af4d7b54fec0f1ded44e958",
     "firebase-session.js": "bd84c6981ba2d9c58fc0ea80dc548f3bf48eec0b3047e940b3993f2edb8f5c63",
-    "game.css": "171dafa220ade2f4591d6e8d5be30b30cda6f94e984cd22d9f9786795df8cfed",
-    "game.js": "5b5a7598a17434f109774668e70d1df5d9e8552a6b1eb0da5f6f813d8b207ad0",
+    "game.css": "c570a7264069b41a9669960f1a60ea26c909aec8d0c0d54253f7516a1922e9f9",
+    "game.js": "78dd5f993760e7503eee384d83802a8bca29eaae21dd3eeb45085f5b912667bc",
     "game/core.js": "f1c16029dd33252f1f3857ca091c744de6d56ec7f2eb040bfe79fd98832904a3",
     "index.html": "39a59122c26e25dd8afedb902d731109a5a43dfd10748fd111958c6439401f8d",
     "lab-context.js": "5aa1f55433100c535b6bb34c22f083dc94d909c2c5de170173391d16ea1e1bfb",
@@ -68,11 +68,11 @@
     "learning-ui.css": "d9a5ddd603c57d72cd7d460ce5edfbce5c56766d547caa0c59e88dce88e255eb",
     "notice-board.css": "c4359c14000ca8df464b57bfd9c947699e7be557c48dd69f2a951e51d479ad06",
     "platform-config.js": "f0c2af00a9f16e3a545d2417edfc7314ab1855e03fa7ef42f616172886e40cdc",
-    "play.html": "d2a0cc2ded33eb7f86d3b953c8f977db21149053685e75d87ce06f49fd067e43",
+    "play.html": "cdff3ca873d1801b7c17fdc97f37e82518aac134a55d46254359910e469e0d3a",
     "practice.js": "86e0d191b2a3711734c986fac099f746993f3b236882b34a176a7609b50940cb",
     "science-text.js": "95fb51fe43229daf883c13dea3a606fecb44d9130e24e563408c23d042791311",
     "studios-link.js": "e7bdd30df9e55e10677401f909107976c97a4da6b74ead4dc74795468a33e56b",
     "styles.css": "b95cd1c0a6f725c61d6c14411d99284fe958290435b5513b71b25459badff691",
-    "trial-diagrams.js": "aa1111de6911cb3b5a07a3e239fc2cbdb1782ad0a9b8712fedf43ca3682b6056"
+    "trial-diagrams.js": "3037a5d4fad5c880e1e3ca24c38681f1e95d1e23f2b664028d01df426411eb64"
   }
 }
