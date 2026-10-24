@@ -24,6 +24,7 @@
       onStageChange(stage) {
         // The answer key must not remain visible below a recall/check activity.
         const practising = ['recall', 'recovery', 'assessment'].includes(stage);
+        window.IgniteSurroundings?.setContext({subject:active?.subject,taskMode:stage === 'assessment' ? 'test' : practising ? 'question' : 'browse'});
         get('demoMistakes').hidden = practising;
         get('demoRecommendation').hidden = practising;
       },
@@ -44,6 +45,7 @@
       get('demoSession').hidden = true;
       get('demoResult').hidden = true;
       const item = selected();
+      window.IgniteSurroundings?.setContext({subject:item?.subject,taskMode:'browse'});
       get('demoStart').disabled = !item;
       get('demoStart').textContent = 'Start free sample';
       get('demoNotice').textContent = item?.notice || 'No playable sample is available for this selection.';
@@ -54,6 +56,7 @@
     }
 
     function showQuestion() {
+      window.IgniteSurroundings?.setContext({subject:active?.subject,taskMode:'question'});
       const question = active.questions[step];
       const sessionContent = active, questionStep = step, token = generation;
       get('demoStep').textContent = `Question ${step + 1} of ${active.questions.length}`;
@@ -124,6 +127,7 @@
     }
 
     function finish() {
+      window.IgniteSurroundings?.setContext({subject:active?.subject,taskMode:'browse'});
       const tally = practice.score(active.questions, answers);
       get('demoNext').disabled = true;
       get('demoSession').hidden = true;

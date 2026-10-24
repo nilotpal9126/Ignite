@@ -98,6 +98,10 @@
   let view = 'homeView';
   function show(id, focusId = null) {
     view = id;
+    window.IgniteSurroundings?.setContext({
+      subject: id === 'homeView' ? progress.subject : openTrack?.subject || progress.subject,
+      taskMode: id === 'playView' ? 'question' : 'browse',
+    });
     for (const name of VIEWS) $(name).hidden = name !== id;
     document.body.classList.toggle('is-playing', id === 'playView');
     window.scrollTo?.(0, 0);
@@ -180,6 +184,7 @@
     const inClass = tracks.filter((t) => t.classLevel === progress.classLevel);
     const subjects = [...new Set(inClass.map((t) => t.subject))].sort();
     if (!subjects.includes(progress.subject)) progress.subject = subjects[0];
+    window.IgniteSurroundings?.setContext({subject:progress.subject,taskMode:'browse'});
     chips($('classChips'), classes, progress.classLevel, (c) => `Class ${c}`, (c) => { progress.classLevel = c; save(); renderHome(); });
     chips($('subjectChips'), subjects, progress.subject, (s) => s, (s) => { progress.subject = s; save(); renderHome(); });
     $('trackList').replaceChildren(...inClass.filter((t) => t.subject === progress.subject).map(chapterTile));
@@ -314,6 +319,7 @@
 
   function renderQuestion() {
     const q = round.questions[round.index];
+    window.IgniteSurroundings?.setContext({subject:byQuestion.get(q.id)?.track.subject || round.track?.subject || progress.subject,taskMode:'question'});
     const active = round;
     const diagramOptions = Array.isArray(q.diagramOptions) && q.diagramOptions.length === q.options.length
       ? q.diagramOptions : null;

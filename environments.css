@@ -1,0 +1,74 @@
+/* Shared surroundings extend Ignite's restored paper design. */
+.ignite-env-ready {
+  --bg-paper: var(--board-paper, #f7f2e8);
+  --ink-navy: var(--ink, #10243e);
+  --env-physics-yellow: #fff0a64d;
+  --env-chemistry-blue: #ccecf85c;
+  --env-biology-mint: #d9f1ce61;
+  --env-math-lilac: #eadff761;
+  isolation: isolate;
+}
+.ignite-env-stage { position: fixed; inset: 0; z-index: -1; overflow: hidden; pointer-events: none; contain: strict; }
+.ignite-env-stage .ignite-env-svg { position: absolute; inset: 0; width: 100%; height: 100%; transform-origin: center; }
+.ignite-env-grain { position: absolute; inset: -40px; background-image: radial-gradient(#10243e20 .45px,transparent .75px),radial-gradient(#10243e12 .4px,transparent .7px); background-size: 9px 11px,13px 17px; background-position: 0 0,5px 4px; }
+.ignite-env-svg { color: var(--ink-navy); }
+.ignite-env-svg :is(.line-primary,.line-secondary,.line-fine) { stroke: var(--ink-navy); stroke-linecap: round; stroke-linejoin: round; }
+.ignite-env-svg :is(.line-primary,.line-secondary,.line-fine):not([fill]) { fill: none; }
+.ignite-env-svg .line-primary { stroke-width: 1.5; opacity: .55; }
+.ignite-env-svg .line-secondary { stroke-width: 1; stroke-dasharray: 4 6; opacity: .35; }
+.ignite-env-svg .line-fine { stroke-width: .8; opacity: .3; }
+.ignite-env-svg .stipple-dot { fill: var(--ink-navy); opacity: .3; }
+.ignite-env-svg .subject-wash { stroke: none; opacity: .85; }
+.ignite-env-svg .env-art-label { fill: var(--ink-navy); font: 24px var(--font-body, sans-serif); }
+.ignite-env-toolbar { position: fixed; bottom: max(16px,env(safe-area-inset-bottom)); right: max(16px,env(safe-area-inset-right)); z-index: 35; font: 13px/1.5 var(--font-body,"Satoshi",sans-serif); color: var(--ink-navy); }
+.ignite-env-toolbar > summary { cursor: pointer; min-height: 44px; padding: 11px 16px; background: #fffdf7f5; border: 1px solid #a69983; border-radius: 4px 10px 4px 8px; box-shadow: 2px 3px 0 #10243e16; font-weight: 750; }
+.ignite-env-menu { position: absolute; bottom: calc(100% + 8px); right: 0; width: min(300px,calc(100vw - 32px)); max-height: min(510px,65dvh); overflow: auto; padding: 14px; background: var(--bg-paper); border: 1px solid #a69983; border-top: 4px solid var(--lime,#dff04f); border-radius: 4px 12px 5px 10px; box-shadow: 3px 5px 0 #10243e20; }
+.ignite-env-caption { margin: 0 0 10px; font-size: 12px; }
+.ignite-env-menu button { display: block; width: 100%; min-height: 44px; padding: 8px 12px; margin-bottom: 6px; border: 1px solid #a69983; border-radius: 5px; text-align: left; background: #fffdf7; color: var(--ink-navy); font: inherit; cursor: pointer; }
+.ignite-env-menu button:hover:not(:disabled), .ignite-env-menu button[aria-pressed="true"] { background: var(--lime,#dff04f); }
+.ignite-env-menu button:disabled { cursor: default; opacity: .55; }
+.ignite-env-motion-note { font-size: 11px; display: block; margin-top: 8px; }
+dialog.ignite-env-explorer { --bg-paper: var(--board-paper,#f7f2e8); --ink-navy: var(--ink,#10243e); box-sizing: border-box; width: min(1120px,calc(100vw - 32px)); height: auto; max-width: none; max-height: calc(100dvh - 32px); overflow: auto; margin: auto; padding: 22px; color: var(--ink-navy); background: var(--bg-paper); border: 1px solid #a69983; border-top: 4px solid var(--lime,#dff04f); border-radius: 4px 14px 5px 12px; box-shadow: 5px 7px 0 #10243e20; font: 14px/1.6 var(--font-body,"Satoshi",sans-serif); }
+dialog.ignite-env-explorer::backdrop { background: #f7f2e8ee; backdrop-filter: blur(2px); }
+.ignite-env-explorer-heading { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.ignite-env-explorer-heading h2 { margin: 0; font: 800 clamp(23px,3vw,34px)/1.2 var(--font-display,"Cabinet Grotesk",sans-serif); }
+.ignite-env-explorer button { color: var(--ink-navy); font: 700 13px/1.3 var(--font-body,"Satoshi",sans-serif); min-height: 44px; border: 1px solid #a69983; border-radius: 5px; background: #fffdf7; padding: 8px 12px; cursor: pointer; }
+.ignite-env-explorer button:hover,.ignite-env-explorer button[aria-expanded="true"] { background: var(--lime,#dff04f); }
+.ignite-env-explorer button:focus-visible,.ignite-env-toolbar :is(button,summary):focus-visible { outline: 3px solid var(--navy,#102c4e); outline-offset: 3px; }
+.ignite-env-inspection-caption { color: var(--ink-soft,#53657a); font-size: 12px; margin: 10px 0 16px; }
+.ignite-env-depth-controls { display: grid; grid-template-columns: auto minmax(90px,1fr) auto; align-items: center; gap: 8px 16px; margin-bottom: 16px; }
+.ignite-env-depth-controls label { font-size: 12px; font-weight: 750; }
+.ignite-env-depth-controls input { width: 100%; min-height: 44px; margin: 0; accent-color: var(--lime-dark,#566400); }
+.ignite-env-depth-name { font-size: 12px; }
+.ignite-env-depth-stages { grid-column: 1 / -1; display: flex; gap: 8px; }
+.ignite-env-inspection-grid { display: grid; grid-template-columns: minmax(0,1.9fr) minmax(240px,1fr); gap: 18px; }
+.ignite-env-inspection-art { position: relative; height: clamp(280px,45dvh,470px); border: 1px dashed #b6aa93; border-radius: 4px 12px 5px 10px; background: #fffdf7; overflow: hidden; }
+.ignite-env-inspection-art > svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.ignite-env-inspection-art .line-primary { opacity: .9; stroke-width: 2; }
+.ignite-env-inspection-art .line-secondary { opacity: .65; stroke-width: 1.5; }
+.ignite-env-inspection-art .line-fine { opacity: .6; stroke-width: 1.2; }
+.ignite-env-pins { position: absolute; inset: 0; pointer-events: none; }
+.ignite-env-pins .ignite-env-pin { position: absolute; min-width: 44px; min-height: 44px; padding: 0; border: 1px solid var(--ink-navy); border-radius: 50%; background: var(--lime,#dff04f); transform: translate(-50%,-50%); pointer-events: auto; }
+.ignite-env-labels { min-width: 0; }
+.ignite-env-label { min-height: 0; margin: 0 0 10px; border: 0; border-bottom: 1px dashed #cbbfa8; padding: 0 0 10px; background: transparent; }
+.ignite-env-label > button { width: 100%; text-align: left; }
+.ignite-env-label-detail { margin: 10px 4px 0; font-size: 13px; }
+.ignite-env-explorer-footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px 16px; margin-top: 16px; border-top: 1px dashed #cbbfa8; padding-top: 12px; font-size: 11px; }
+.ignite-env-reference { color: inherit; text-underline-offset: 4px; }
+@media(max-width:700px) {
+  .ignite-env-dashboard .ignite-env-toolbar { bottom: calc(80px + env(safe-area-inset-bottom)); }
+  dialog.ignite-env-explorer { width: calc(100vw - 20px); max-height: calc(100dvh - 20px); padding: 16px; }
+  .ignite-env-explorer-heading { align-items: flex-start; flex-direction: column; gap: 10px; }
+  .ignite-env-depth-controls { grid-template-columns: auto 1fr; gap: 6px 10px; }
+  .ignite-env-depth-name { grid-column: 1 / -1; }
+  .ignite-env-inspection-grid { grid-template-columns: minmax(0,1fr); }
+  .ignite-env-inspection-art { height: clamp(200px,33dvh,300px); }
+}
+@media(prefers-reduced-motion:reduce) {
+  .ignite-env-stage *, .ignite-env-explorer * { transition: none !important; animation: none !important; }
+}
+@media print { .ignite-env-stage,.ignite-env-toolbar,.ignite-env-explorer { display: none !important; } }
+@media(forced-colors:active) {
+  .ignite-env-stage { display: none; }
+  .ignite-env-toolbar > summary,.ignite-env-menu,dialog.ignite-env-explorer,.ignite-env-explorer button { background: Canvas; color: CanvasText; border-color: CanvasText; }
+}

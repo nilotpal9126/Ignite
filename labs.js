@@ -11,6 +11,7 @@
   if(requested&&requested.board===current){location.replace('./'+requested.path);return;}
   if(pending==='worlds'&&current){location.replace('./labs/ignite-subject-labs/Ignite-Subject-Worlds.html');return;}
   function render(){
+    window.IgniteSurroundings?.setContext({subject:$('labsSubject').value,taskMode:'browse'});
     const subject=$('labsSubject').value,all=registry.forBoard(current),filtered=all.filter(s=>subject==='all'||s.subject===subject);
     $('labsCards').replaceChildren(...filtered.map(studio=>{
       const a=document.createElement('a');a.className='studio-card';a.href='./'+studio.path;a.dataset.studio=studio.id;a.dataset.subject=studio.subject;a.style.setProperty('--studio-colour',studio.colour);

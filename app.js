@@ -73,6 +73,15 @@ const state = {
   returnFocus: null,
 };
 
+// Presentation follows the active learning surface; no answer or score data leaves it.
+function syncSurroundings() {
+  window.IgniteSurroundings?.setContext({
+    subject: state.activePractice?.content.subject || state.subject,
+    taskMode: document.body.classList.contains('focus-mode') ? 'focus'
+      : state.activeFollowUp ? 'test' : state.activePractice ? 'question' : 'browse',
+  });
+}
+
 function newAttemptId() {
   return window.crypto?.randomUUID?.() || `${Date.now()}-${Math.random().toString(36).slice(2)}`;
 }
@@ -307,6 +316,7 @@ function emptyCard(title, message, withClear) {
 }
 
 function renderWorksheets() {
+  syncSurroundings();
   const filtered = filteredWorksheets();
   const totalPages = Math.max(1, Math.ceil(filtered.length / state.pageSize));
   state.page = Math.min(Math.max(1, state.page), totalPages);
@@ -411,6 +421,7 @@ function openWorksheet(item) {
   renderPracticeQuestions();
   $('#worksheetWorkspace').hidden = false;
   document.body.classList.add('learning-open');
+  syncSurroundings();
   $('#worksheetDialogTitle').focus();
   $('#worksheetWorkspace').scrollIntoView({ block: 'start' });
 }
@@ -421,6 +432,7 @@ function closeLearningWorkspace(restoreFocus = true) {
   $('#worksheetWorkspace').hidden = true;
   $('#answerReview').hidden = true; $('#conceptRescue').hidden = true; $('#followUpTest').hidden = true;
   document.body.classList.remove('learning-open');
+  syncSurroundings();
   renderProgress(); renderPracticeProgress(); renderAdaptiveProgress();
   if (state.catalog) renderWorksheets();
   if (restoreFocus) (state.returnFocus?.isConnected !== false ? state.returnFocus || $('#startMission') : $('#startMission'))?.focus();
@@ -467,6 +479,7 @@ function openAnswerReview(question, selectedIndex) {
 }
 
 function renderPracticeQuestions() {
+  syncSurroundings();
   const attempt = state.activePractice;
   if (!attempt) return;
   const list = $('#worksheetQuestions');
@@ -587,6 +600,7 @@ function openFollowUpTest() {
 }
 
 function renderFollowUpQuestion() {
+  syncSurroundings();
   const active = state.activeFollowUp;
   if (!active) return;
   const { plan } = active;
@@ -651,6 +665,7 @@ function renderFollowUpQuestion() {
 
 function returnFromFollowUp() {
   state.activeFollowUp = null;
+  syncSurroundings();
   $('#followUpTest').hidden = true;
   $('#worksheetQuestions').hidden = false;
   $('#worksheetCount').hidden = false;
@@ -867,6 +882,7 @@ function buildOptions(question, attempt) {
 /* ---------- focus mode ---------- */
 function setFocusMode(active) {
   document.body.classList.toggle('focus-mode', active);
+  syncSurroundings();
   $('#focusToggle').setAttribute('aria-pressed', String(active));
   storage.set(FOCUS_KEY, active ? '1' : '0');
 }
