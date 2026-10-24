@@ -1,12 +1,14 @@
 'use strict';
 
-// Ambient presentation only. No question, attempt, identity or score data is read.
+// Presentation only. Identity contributes only a verified-session boolean;
+// no identifier, question, answer, attempt or score data enters this layer.
 (function exposeEnvironments(root) {
   const SVG = 'http://www.w3.org/2000/svg';
   const LAYERS = ['macro', 'mid', 'micro'];
   const MODE = new Set(['browse', 'question', 'test', 'lab', 'focus']);
   const SCENE_KEY = 'ignite-surroundings-scene-v1';
   const STATIC_KEY = 'ignite-surroundings-static-v1';
+  const assetBase = typeof document === 'undefined' ? null : new URL('./', document.currentScript?.src || root.location.href);
   const normalizeSubject = value => {
     const key = String(value || '').trim().toLowerCase().replace(/[_-]/g, ' ');
     if (['math', 'maths', 'mathematics'].includes(key)) return 'mathematics';
@@ -21,8 +23,15 @@
     return null;
   }
   const clamp = value => Math.max(0, Math.min(1, Number(value) || 0));
-  const tent = (value, a, b, c) => value <= a || value >= c ? 0 : value < b ? (value-a)/(b-a) : (c-value)/(c-b);
-  const dominant = value => value < .32 ? 'macro' : value < .65 ? 'mid' : 'micro';
+  const dominant = value => value < .28 ? 'macro' : value < .75 ? 'mid' : 'micro';
+  function cameraAt(scene, depth) {
+    const t=clamp(depth), first=t<=.55, a=scene.cameras[first?0:1], b=scene.cameras[first?1:2];
+    const q=first?t/.55:(t-.55)/.45, u=q*q*(3-2*q);
+    const width=a[2]*Math.exp(Math.log(b[2]/a[2])*u),height=a[3]*Math.exp(Math.log(b[3]/a[3])*u);
+    const cx=a[0]+a[2]/2+(b[0]+b[2]/2-a[0]-a[2]/2)*u;
+    const cy=a[1]+a[3]/2+(b[1]+b[3]/2-a[1]-a[3]/2)*u;
+    return [cx-width/2,cy-height/2,width,height];
+  }
   function element(tag, className, text) {
     const node = document.createElement(tag);
     if (className) node.className = className;
@@ -35,14 +44,17 @@
   }
   let instanceCount = 0;
   class IgniteEnvironmentSystem {
+    static cameraAt(scene,depth){return cameraAt(scene,depth);}
     constructor({ assets = root.IgniteEnvironmentAssets, autoMount = true } = {}) {
       this.assets = assets || {};
       this.id = `ignite-env-${++instanceCount}`;
       this.activeEnv = null; this.currentSubject = null; this.taskMode = 'browse';
       this.userStatic = storage('localStorage', STATIC_KEY) === 'true';
       this.media = root.matchMedia?.('(prefers-reduced-motion: reduce)');
+      this.contrastMedia = root.matchMedia?.('(forced-colors: active)');
       this.reducedMotion = Boolean(this.media?.matches);
       this.frame = 0; this.exploreDepth = .15; this.isExploreMode = false;
+      this.signedIn=false; this.grainFrame=0; this.cameraDepth=null;
       this.listeners = []; this.mounted = false;
       if (autoMount) this.mount();
     }
@@ -59,25 +71,33 @@
       this.mounted = true;
       this.stage = element('div', 'ignite-env-stage');
       this.stage.setAttribute('aria-hidden', 'true');
-      this.grain = element('div', 'ignite-env-grain'); this.stage.append(this.grain);
-      this.layers = {};
-      for (const layer of LAYERS) {
-        const svg = this.makeSvg(`${this.id}-${layer}`);
-        this.layers[layer] = svg; this.stage.append(svg);
-      }
+      this.grain = element('canvas', 'ignite-env-grain'); this.stage.append(this.grain);
+      this.grain.setAttribute('aria-hidden','true');
+      try { this.grainContext=this.grain.getContext('2d'); } catch { this.grainContext=null; }
+      this.world=this.makeSvg(`${this.id}-world`);this.layers={macro:this.world};this.stage.append(this.world);
       document.body.prepend(this.stage);
       this.mountControls(); this.mountExplorer();
       document.body.classList.add('ignite-env-ready');
       document.body.classList.toggle('ignite-env-dashboard', Boolean(document.querySelector('.mobile-nav')));
+      this.landing=Boolean(document.querySelector('.landing-hero'));
+      document.body.classList.toggle('ignite-env-landing',this.landing);
+      document.body.classList.toggle('ignite-env-flow-ready',this.landing&&Boolean(this.grainContext));
+      this.resizeGrain();
+      const identity=root.IgniteIdentity;
+      const appearance=user=>this.setSignedIn(Boolean(user?.emailVerified));
+      if(identity?.onChange)this.listeners.push(identity.onChange(appearance));
+      try{appearance(identity?.session?.());}catch{appearance(null);}
       this.on(root, 'scroll', () => this.schedule(), { passive: true });
-      this.on(root, 'resize', () => { this.schedule(); if (this.isExploreMode) this.renderInspection(); }, { passive: true });
+      this.on(root, 'resize', () => { this.resizeGrain();this.schedule(); if (this.isExploreMode) this.renderInspection(); }, { passive: true });
       this.on(document, 'visibilitychange', () => {
         if (document.hidden && this.frame) { root.cancelAnimationFrame(this.frame); this.frame = 0; }
+        if(document.hidden)this.stopGrain();
         if (!document.hidden) this.schedule();
       });
       const mediaChanged = event => { this.reducedMotion = event.matches; this.refreshControls(); this.render(); if (this.isExploreMode) this.renderInspection(); };
       if (this.media?.addEventListener) this.on(this.media, 'change', mediaChanged);
       else if (this.media?.addListener) { this.media.addListener(mediaChanged); this.listeners.push(() => this.media.removeListener(mediaChanged)); }
+      if(this.contrastMedia?.addEventListener)this.on(this.contrastMedia,'change',()=>this.schedule());
       this.on(document, 'click', event => { if (!this.toolbar.contains(event.target)) this.toolbar.open = false; });
       this.observer = new MutationObserver(() => {
         this.otherDialog = Boolean(document.querySelector('dialog[open]:not(.ignite-env-explorer)'));
@@ -86,6 +106,38 @@
       });
       this.observer.observe(document.body, { subtree: true, attributes: true, attributeFilter: ['open'] });
       return this;
+    }
+    setSignedIn(value) {
+      this.signedIn=Boolean(value);
+      // Studios keep their independent, established visual design.
+      document.body.dataset.envAppearance=this.signedIn&&this.taskMode!=='lab'?'studio':'visitor';
+      this.schedule();
+    }
+    resizeGrain() {
+      if(!this.grainContext)return;
+      const ratio=Math.min(root.devicePixelRatio||1,1.5);
+      this.grain.width=Math.round(root.innerWidth*ratio);this.grain.height=Math.round(root.innerHeight*ratio);
+      this.grainContext.setTransform(ratio,0,0,ratio,0,0);this.drawGrain(0);
+    }
+    drawGrain(time) {
+      const ctx=this.grainContext;if(!ctx)return;
+      const w=root.innerWidth,h=root.innerHeight,t=time*.00022;
+      ctx.clearRect(0,0,w,h);ctx.fillStyle=this.signedIn?'#77939688':'#a399847d';ctx.beginPath();
+      for(let y=-22;y<h+22;y+=22)for(let x=-22;x<w+22;x+=22){
+        const dx=6*Math.sin(t+y*.013)+3*Math.cos(t*.63+x*.017);
+        const dy=5*Math.cos(t*.87+x*.012)+2*Math.sin(t*.51+y*.017);
+        ctx.moveTo(x+dx+.65,y+dy);ctx.arc(x+dx,y+dy,.65,0,Math.PI*2);
+      }
+      ctx.fill();this.lastGrainTime=time;
+    }
+    stopGrain(){if(this.grainFrame)root.cancelAnimationFrame(this.grainFrame);this.grainFrame=0;}
+    updateGrain() {
+      const moving=this.landing&&!this.isStatic&&!this.contrastMedia?.matches&&this.taskMode==='browse'&&!this.otherDialog&&!this.isExploreMode&&!document.hidden&&root.scrollY<root.innerHeight*1.35;
+      this.grain.style.opacity=this.userStatic||!this.landing?'0':'1';
+      if(!moving){this.stopGrain();if(!this.userStatic)this.drawGrain(0);return;}
+      if(this.grainFrame||!this.grainContext)return;
+      const tick=time=>{this.grainFrame=0;if(time-(this.lastGrainTime||0)>=32)this.drawGrain(time);this.grainFrame=root.requestAnimationFrame(tick);};
+      this.grainFrame=root.requestAnimationFrame(tick);
     }
     makeSvg(prefix) {
       const svg = document.createElementNS(SVG, 'svg');
@@ -99,7 +151,8 @@
       // unique across ambient layers and the separate inspection canvas.
       const prefix = svg.dataset.prefix;
       svg.innerHTML = String(artwork || '').replace(/id="([A-Za-z0-9_-]+)"/g, (_,id) => `id="${prefix}-${id}"`)
-        .replace(/url\(#([A-Za-z0-9_-]+)\)/g, (_,id) => `url(#${prefix}-${id})`);
+        .replace(/url\(#([A-Za-z0-9_-]+)\)/g, (_,id) => `url(#${prefix}-${id})`)
+        .replace(/href="\.\/assets\/([A-Za-z0-9_./-]+)"/g,(_,file)=>`href="${new URL('assets/'+file,assetBase).href}"`);
     }
     mountControls() {
       this.toolbar = element('details', 'ignite-env-toolbar');
@@ -129,7 +182,7 @@
       this.depthName = element('span', 'ignite-env-depth-name'); this.depthName.setAttribute('role', 'status');
       const stages = element('div', 'ignite-env-depth-stages');
       LAYERS.forEach((layer,index) => stages.append(button('', ['Distant','Structure','Detail'][index], () => {
-        this.exploreDepth = [.15,.48,.78][index]; this.depth.value = String(this.exploreDepth*100); this.renderInspection();
+        this.exploreDepth = [0,.55,1][index]; this.depth.value = String(this.exploreDepth*100); this.renderInspection();
       })));
       controls.append(depthLabel, this.depth, this.depthName, stages);
       const grid = element('div', 'ignite-env-inspection-grid');
@@ -154,6 +207,7 @@
     setContext({ subject = null, taskMode = 'browse' } = {}) {
       this.currentSubject = normalizeSubject(subject);
       this.taskMode = MODE.has(taskMode) ? taskMode : 'browse';
+      this.setSignedIn(this.signedIn);
       document.body.dataset.envMode = this.taskMode;
       if (this.taskMode !== 'browse' && this.isExploreMode) this.toggleExploreMode(false);
       const pool = this.pool();
@@ -167,7 +221,8 @@
       document.body.dataset.environment = scene?.id || 'paper';
       if (this.activeEnv?.id === scene?.id && this.activeEnv === scene) { this.refreshControls(); this.render(); return; }
       this.activeEnv = scene;
-      for (const layer of LAYERS) this.setArtwork(this.layers[layer], scene?.[layer]);
+      this.setArtwork(this.world,scene?.artwork);
+      this.cameraDepth=null;
       if (scene) storage('sessionStorage', SCENE_KEY, scene.id);
       this.refreshControls(); this.render();
       if (this.isExploreMode) this.renderInspection();
@@ -182,6 +237,7 @@
       this.staticButton.setAttribute('aria-pressed', String(this.userStatic));
       this.motionNote.textContent = this.reducedMotion ? 'Your device’s reduced-motion setting is active.' : 'Your study progress is unaffected.';
       document.body.dataset.envStatic = String(this.isStatic);
+      document.body.dataset.envPaper = String(this.userStatic);
     }
     cycleEnvironment() {
       const pool = this.pool();
@@ -196,7 +252,8 @@
       if (this.isExploreMode) this.renderInspection();
     }
     progress() {
-      return clamp(root.scrollY/Math.max(1,document.documentElement.scrollHeight-root.innerHeight));
+      const intro=this.landing?(document.querySelector('.landing-hero')?.offsetHeight||0)*.75:0;
+      return clamp((root.scrollY-intro)/Math.max(1,document.documentElement.scrollHeight-root.innerHeight-intro));
     }
     schedule() {
       if (this.frame || document.hidden) return;
@@ -204,19 +261,19 @@
     }
     render() {
       if (!this.mounted) return;
-      const still = this.isStatic || this.taskMode !== 'browse' || this.otherDialog;
-      const progress = still ? .48 : this.progress();
-      const amplitude = this.taskMode === 'browse' ? .42 : this.taskMode === 'question' ? .035 : 0;
-      const paper = progress > .86 ? (1-progress)/.14 : 1;
-      const alphas = [tent(progress,-.1,.16,.49),tent(progress,.14,.48,.8),tent(progress,.46,.77,1.01)];
-      LAYERS.forEach((layer,index) => {
-        const svg = this.layers[layer];
-        svg.style.opacity = String(this.userStatic || !this.activeEnv ? 0 : alphas[index]*amplitude*paper);
-        const scale = still ? 1 : [.96,.88,.82][index] + progress*[.2,.34,.44][index];
-        svg.style.transform = `scale(${scale})`;
-      });
-      this.grain.style.transform = still ? 'translate3d(0,0,0)' : `translate3d(0,${-this.progress()*38}px,0)`;
-      this.grain.style.opacity = this.userStatic ? '0' : this.taskMode === 'browse' ? '.3' : '0';
+      const still=this.isStatic||this.taskMode!=='browse'||this.otherDialog||this.isExploreMode;
+      const target=still ? .55 : this.progress();
+      if(this.cameraDepth===null||still)this.cameraDepth=target;
+      else this.cameraDepth+= (target-this.cameraDepth)*.2;
+      if(Math.abs(target-this.cameraDepth)>.0004&&!still)this.schedule();else this.cameraDepth=target;
+      const hero=this.landing?clamp((root.scrollY-root.innerHeight*.6)/(root.innerHeight*.5)):1;
+      const amplitude=this.taskMode==='browse' ? (this.signedIn ? .35 : .24)*hero : this.taskMode==='question' ? .018 : 0;
+      this.world.style.opacity=String(this.userStatic||!this.activeEnv?0:amplitude);
+      if(this.activeEnv){
+        this.world.setAttribute('viewBox',cameraAt(this.activeEnv,this.cameraDepth).map(n=>n.toFixed(4)).join(' '));
+        this.world.dataset.depth=this.cameraDepth.toFixed(4);
+      }
+      document.body.dataset.envStatic=String(this.isStatic);this.updateGrain();
     }
     toggleExploreMode(force) {
       const open = typeof force === 'boolean' ? force : !this.isExploreMode;
@@ -231,6 +288,7 @@
       this.depth.value = String(Math.round(this.exploreDepth*100));
       this.toolbar.open = false;
       this.dialog.showModal(); this.isExploreMode = true;
+      this.stopGrain();
       document.documentElement.style.overflow = 'hidden';
       document.body.dataset.exploreMode = 'true';
       this.renderInspection(); this.closeButton.focus({preventScroll:true}); return true;
@@ -251,14 +309,16 @@
       this.exploreCaption.textContent = scene.caption;
       this.depthName.textContent = {macro:'Distant outline',mid:'Structure',micro:'Close detail'}[layer];
       this.depth.setAttribute('aria-valuetext', this.depthName.textContent);
-      this.setArtwork(this.inspectSvg, scene[layer]);
+      if(this.inspectSvg.dataset.scene!==scene.id){this.setArtwork(this.inspectSvg,scene.artwork);this.inspectSvg.dataset.scene=scene.id;}
       // Inspection may crop into a detail, while ambient art keeps its full canvas.
       // Pins use this same coordinate transform, not viewport percentages.
-      const view = scene.inspectionViews?.[layer] || [0,0,1440,900];
+      const view = cameraAt(scene,this.exploreDepth);
       this.inspectSvg.setAttribute('viewBox', view.join(' '));
       this.inspectSvg.dataset.layer = layer;
       this.reference.href = scene.referenceUrl; this.reference.textContent = scene.referenceLabel + ' ↗';
       this.pins.replaceChildren(); this.annotationList.replaceChildren();
+      const leaders=document.createElementNS(SVG,'svg');leaders.classList.add('ignite-env-leaders');this.pins.append(leaders);
+      const placed=[];
       const labels = scene.labels.filter(label => label.layer === layer);
       labels.forEach((label,index) => {
         const detailId = `${this.id}-label-${index}`;
@@ -280,8 +340,13 @@
         const width=this.art.clientWidth,height=this.art.clientHeight;
         const [vx,vy,vw,vh]=view;
         const scale=Math.min(width/vw,height/vh);
-        marker.style.left = `${(width-vw*scale)/2+(label.x-vx)*scale}px`;
-        marker.style.top = `${(height-vh*scale)/2+(label.y-vy)*scale}px`;
+        const px=x=>(width-vw*scale)/2+(x-vx)*scale,py=y=>(height-vh*scale)/2+(y-vy)*scale;
+        const ax=px(label.x),ay=py(label.y);
+        if(ax<0||ax>width||ay<0||ay>height)return;
+        let mx=Math.max(24,Math.min(width-24,px(label.pinX??label.x))),my=Math.max(24,Math.min(height-24,py(label.pinY??label.y)));
+        for(let tries=0;tries<8&&placed.some(p=>Math.abs(mx-p[0])<46&&Math.abs(my-p[1])<46);tries++)my=Math.max(24,Math.min(height-24,my+(my<height/2?48:-48)));
+        placed.push([mx,my]);marker.style.left=`${mx}px`;marker.style.top=`${my}px`;
+        const line=document.createElementNS(SVG,'line');line.setAttribute('x1',ax);line.setAttribute('y1',ay);line.setAttribute('x2',mx);line.setAttribute('y2',my);leaders.append(line);
         this.pins.append(marker);
       });
     }
@@ -289,9 +354,10 @@
       if (this.dialog) this.toggleExploreMode(false); this.observer?.disconnect();
       this.listeners.splice(0).forEach(remove=>remove());
       if (this.frame) root.cancelAnimationFrame(this.frame);
+      this.stopGrain();
       this.stage?.remove(); this.toolbar?.remove(); this.dialog?.remove();
-      document.body.classList.remove('ignite-env-ready','ignite-env-dashboard');
-      ['envMode','envStatic','environment','exploreMode'].forEach(key=>delete document.body.dataset[key]);
+      document.body.classList.remove('ignite-env-ready','ignite-env-dashboard','ignite-env-landing','ignite-env-flow-ready');
+      ['envMode','envStatic','envPaper','environment','exploreMode','envAppearance'].forEach(key=>delete document.body.dataset[key]);
       this.mounted = false;
     }
   }
@@ -312,7 +378,13 @@
     catch (error) { root.igniteEnv?.destroy(); root.igniteEnv = null; document.body.classList.remove('ignite-env-ready'); console.warn('Surroundings unavailable; the study page remains available.',error); }
   }
   if (typeof document !== 'undefined' && !root.__IGNITE_ENVIRONMENT_NO_BOOT__) {
-    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded',boot,{once:true});
+    // Deferred scripts can run while readyState is already interactive, before
+    // the later identity script exists. Wait for all deferred page dependencies.
+    if (document.readyState !== 'complete') {
+      const ready=()=>{document.removeEventListener('DOMContentLoaded',ready);root.removeEventListener('load',ready);boot();};
+      document.addEventListener('DOMContentLoaded',ready,{once:true});
+      root.addEventListener('load',ready,{once:true});
+    }
     else boot();
   }
 })(typeof window === 'undefined' ? globalThis : window);

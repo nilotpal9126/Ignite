@@ -12,9 +12,11 @@ async function fixture() {
   const root = path.join(temp, 'source');
   await mkdir(path.join(root, 'integrations/enrollment'), { recursive: true });
   await writeFile(path.join(root, 'index.html'), '<link rel="stylesheet" href="./enrollment.css"><script src="./enrollment.js"></script>');
-  for (const file of ['enrollment-config.js', 'enrollment-validation.js', 'enrollment.css', 'enrollment.js', 'firebase-session.js', 'account-ui.js', 'account.css', 'trial-diagrams.js']) {
+  for (const file of ['enrollment-config.js', 'enrollment-validation.js', 'enrollment.css', 'enrollment.js', 'firebase-session.js', 'account-ui.js', 'account.css', 'trial-diagrams.js','environment-assets.js','environments.js','environments.css']) {
     await copyFile(path.resolve(source, '../..', file), path.join(root, file));
   }
+  await mkdir(path.join(root,'assets/environments'),{recursive:true});
+  for(const file of ['nasa-full-moon.jpg','CREDITS.txt'])await copyFile(path.resolve(source,'../../assets/environments',file),path.join(root,'assets/environments',file));
   for (const file of ['Code.gs', 'appsscript.json', 'worker.mjs', 'wrangler.jsonc', '.dev.vars.example', 'DEPLOYMENT.md']) {
     await copyFile(path.join(source, file), path.join(root, 'integrations/enrollment', file));
   }
@@ -41,7 +43,9 @@ test('deployment generator separates website and servers, copies identical rules
   const manifest = JSON.parse(await readFile(path.join(input.output, 'deployment-manifest.json'), 'utf8'));
   const siteRelease = JSON.parse(await readFile(path.join(input.output, 'website/release.json'), 'utf8'));
   assert.equal(Object.hasOwn(siteRelease.files, 'release.json'), false);
-  assert.equal(result.websiteFiles, site.length);
+  assert.equal(result.websiteFiles, Object.keys(siteRelease.files).length+1);
+  assert.ok(siteRelease.files['assets/environments/nasa-full-moon.jpg']);
+  assert.ok(siteRelease.files['assets/environments/CREDITS.txt']);
   assert.equal(siteRelease.enquiries, 'not_configured');
   assert.equal(siteRelease.files['enrollment.js'], manifest.files['website/enrollment.js']);
   assert.equal(manifest.serverSecretsIncluded, false);

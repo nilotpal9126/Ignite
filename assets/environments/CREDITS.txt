@@ -1,0 +1,10 @@
+Moon image: NASA's Scientific Visualization Studio / Ernie Wright.
+Lunar Reconnaissance Orbiter data visualization, not a live lunar phase.
+Source: https://svs.gsfc.nasa.gov/5415/
+Original: https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005048/phase_full.1571_print.jpg
+The locally hosted JPEG is unmodified. SVG applies a circular viewport crop and
+ambient opacity, without replacing terrain with AI-generated or invented details.
+
+Leaf, methane and cylinder illustrations are original Project Ignite SVG models.
+They are schematic, not photographs, micrographs or measured density maps.
+Factual references are linked from Explore. No textbook artwork is copied.
