@@ -13,6 +13,14 @@ it does not replace page layouts, typography, subject cards or study content.
   displacement and a short, damped coast. Grain contrast keeps the motion visible
   within the existing warm paper palette. The landing page has no Moon/molecule
   imagery; those scenes belong on learning pages.
+- Moving a mouse or pen cursor gently pushes nearby landing grains outward,
+  leaving a short wake which relaxes back into the water flow. Repulsion has a
+  128px reach, caps displacement at 64px and retains at most four fading wake
+  points. It uses the particles' drawn, scroll-advected coordinates. Pointer
+  positions are ephemeral, never stored or transmitted, and expire after 2.2s.
+  Touch swipes retain native scrolling without a separate cursor-scatter force.
+  The canvas cannot intercept clicks; dialogs, questions, hidden pages, reduced
+  motion and Static paper clear/disable the pointer effect.
 - The user dashboard starts with the Moon and provides a visible Moon / Molecule
   switch below the board bar. Its session preference survives reloads and subject
   filters; it does not read or change learner/account data. Both scenes remain

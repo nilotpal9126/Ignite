@@ -58,6 +58,7 @@
       this.signedIn=false; this.grainFrame=0; this.cameraDepth=null;
       this.grainFlow={velocity:0,offset:0,phase:0};this.grainScrollY=root.scrollY||0;
       this.grainRipples=[];this.motionPreference='system';
+      this.grainCursor=null;this.grainCursorTrail=[];
       this.listeners = []; this.mounted = false;
       if (autoMount) this.mount();
     }
@@ -120,7 +121,22 @@
         }
         this.schedule();
       }, { passive: true });
-      this.on(root,'pointermove',event=>{if(this.landing)this.grainOrigin={x:event.clientX,y:event.clientY};},{passive:true});
+      this.on(root,'pointermove',event=>{
+        if(!this.landing)return;
+        this.grainOrigin={x:event.clientX,y:event.clientY};
+        if(event.pointerType==='touch'||this.isStatic||this.contrastMedia?.matches||this.taskMode!=='browse'||this.otherDialog||this.isExploreMode||document.hidden)return;
+        const now=root.performance.now(),previous=this.grainCursor;
+        const distance=previous?Math.hypot(event.clientX-previous.x,event.clientY-previous.y):20;
+        if(distance<.5)return;
+        const speed=previous?distance/Math.max(8,now-previous.moved):1;
+        const power=.65+clamp(speed/2)*.6;
+        if(previous&&(distance>18||now-(this.grainCursorTrail.at(-1)?.moved||0)>65)){
+          this.grainCursorTrail.push({...previous,power:previous.power*.45});
+          if(this.grainCursorTrail.length>4)this.grainCursorTrail.shift();
+        }
+        this.grainCursor={x:event.clientX,y:event.clientY,power,moved:now};
+        this.schedule();
+      },{passive:true});
       this.on(root, 'resize', () => { this.resizeGrain();this.schedule(); if (this.isExploreMode) this.renderInspection(); }, { passive: true });
       this.on(document, 'visibilitychange', () => {
         if (document.hidden && this.frame) { root.cancelAnimationFrame(this.frame); this.frame = 0; }
@@ -156,6 +172,7 @@
       const ctx=this.grainContext;if(!ctx)return;
       const w=root.innerWidth,h=root.innerHeight;
       const flow=this.isStatic?{velocity:0,offset:0,phase:0}:this.grainFlow;
+      const cursorInfluences=this.isStatic?[]:[...this.grainCursorTrail,...(this.grainCursor?[this.grainCursor]:[])];
       const t=time*.00022+flow.phase,wrap=(v,size)=>((v%size)+size)%size;
       ctx.clearRect(0,0,w,h);ctx.fillStyle=this.signedIn?'#779396a0':'#958a73a6';ctx.beginPath();
       for(let y=-44;y<h+44;y+=22)for(let x=-44;x<w+44;x+=22){
@@ -169,12 +186,27 @@
           const push=Math.sin((distance-age*.22)*.04)*ripple.strength*Math.exp(-wave*wave-age/950);
           dx+=rx/distance*push;dy+=ry/distance*push;
         }
-        const px=wrap(x+dx+44,w+88)-44,py=wrap(y+dy+44,h+88)-44;
+        let px=wrap(x+dx+44,w+88)-44,py=wrap(y+dy+44,h+88)-44;
+        let scatterX=0,scatterY=0;
+        for(const cursor of cursorInfluences){
+          const rx=px-cursor.x,ry=py-cursor.y;
+          if(Math.abs(rx)>128||Math.abs(ry)>128)continue;
+          const distance=Math.hypot(rx,ry);if(distance>=128)continue;
+          const falloff=(1-distance/128)**2;
+          const push=58*cursor.power*falloff*Math.exp(-Math.max(0,time-cursor.moved)/520);
+          // Repulsion follows the drawn position after scroll advection, so it
+          // stays under the cursor even while the page and water are moving.
+          const ux=distance<1?Math.cos(seed*Math.PI*2):rx/distance;
+          const uy=distance<1?Math.sin(seed*Math.PI*2):ry/distance;
+          scatterX+=ux*push;scatterY+=uy*push;
+        }
+        const scatterLength=Math.hypot(scatterX,scatterY),limit=scatterLength>64?64/scatterLength:1;
+        px+=scatterX*limit;py+=scatterY*limit;
         ctx.moveTo(px+radius,py);ctx.arc(px,py,radius,0,Math.PI*2);
       }
       ctx.fill();this.lastGrainTime=time;
     }
-    stopGrain(){if(this.grainFrame)root.cancelAnimationFrame(this.grainFrame);this.grainFrame=0;this.grainFlow.velocity=0;this.grainRipples=[];this.lastGrainTime=0;}
+    stopGrain(){if(this.grainFrame)root.cancelAnimationFrame(this.grainFrame);this.grainFrame=0;this.grainFlow.velocity=0;this.grainRipples=[];this.grainCursor=null;this.grainCursorTrail=[];this.lastGrainTime=0;}
     updateGrain() {
       const moving=this.landing&&!this.isStatic&&!this.contrastMedia?.matches&&this.taskMode==='browse'&&!this.otherDialog&&!this.isExploreMode&&!document.hidden;
       this.grain.style.opacity=this.userStatic||!this.landing?'0':'1';
@@ -186,6 +218,8 @@
         if(elapsed>=32){
           const dt=Math.min(elapsed,64),flow=this.grainFlow;
           this.grainRipples=this.grainRipples.filter(ripple=>time-ripple.born<2400);
+          this.grainCursorTrail=this.grainCursorTrail.filter(cursor=>time-cursor.moved<2200);
+          if(this.grainCursor&&time-this.grainCursor.moved>=2200)this.grainCursor=null;
           flow.offset+=flow.velocity*dt/33;flow.phase+=flow.velocity*dt*.00035;
           flow.velocity*=Math.exp(-dt/420);
           if(Math.abs(flow.velocity)<.001)flow.velocity=0;
