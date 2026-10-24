@@ -5,6 +5,6 @@ Original: https://svs.gsfc.nasa.gov/vis/a000000/a005000/a005048/phase_full.1571_
 The locally hosted JPEG is unmodified. SVG applies a circular viewport crop and
 ambient opacity, without replacing terrain with AI-generated or invented details.
 
-Leaf, methane and cylinder illustrations are original Project Ignite SVG models.
-They are schematic, not photographs, micrographs or measured density maps.
+The methane illustration is an original Project Ignite SVG model.
+It is schematic, not a photograph or measured density map.
 Factual references are linked from Explore. No textbook artwork is copied.

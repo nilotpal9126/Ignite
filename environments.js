@@ -55,12 +55,17 @@
       this.reducedMotion = Boolean(this.media?.matches);
       this.frame = 0; this.exploreDepth = .15; this.isExploreMode = false;
       this.signedIn=false; this.grainFrame=0; this.cameraDepth=null;
+      this.grainFlow={velocity:0,offset:0,phase:0};this.grainScrollY=root.scrollY||0;
       this.listeners = []; this.mounted = false;
       if (autoMount) this.mount();
     }
     get isStatic() { return this.userStatic || this.reducedMotion; }
     pool() {
-      return Object.values(this.assets).filter(scene => !this.currentSubject || scene.subjects.includes(this.currentSubject));
+      const scenes=Object.values(this.assets);
+      const preferred=scenes.filter(scene => !this.currentSubject || scene.subjects.includes(this.currentSubject));
+      // Remaining scenery is also available on Maths/Biology pages, without
+      // representing it as a diagram of those subjects.
+      return preferred.length ? preferred : ['mathematics','biology'].includes(this.currentSubject) ? scenes : [];
     }
     on(target, type, handler, options) {
       target.addEventListener(type, handler, options);
@@ -87,7 +92,15 @@
       const appearance=user=>this.setSignedIn(Boolean(user?.emailVerified));
       if(identity?.onChange)this.listeners.push(identity.onChange(appearance));
       try{appearance(identity?.session?.());}catch{appearance(null);}
-      this.on(root, 'scroll', () => this.schedule(), { passive: true });
+      this.on(root, 'scroll', () => {
+        const delta=root.scrollY-this.grainScrollY;this.grainScrollY=root.scrollY;
+        if(this.landing&&!this.isStatic&&!this.isExploreMode&&!this.otherDialog&&!document.hidden){
+          // Actual scroll displacement covers wheel, touch and keyboard input.
+          // The native page scroll is never prevented or replaced.
+          this.grainFlow.velocity=Math.max(-18,Math.min(18,this.grainFlow.velocity*.45+delta*.075));
+        }
+        this.schedule();
+      }, { passive: true });
       this.on(root, 'resize', () => { this.resizeGrain();this.schedule(); if (this.isExploreMode) this.renderInspection(); }, { passive: true });
       this.on(document, 'visibilitychange', () => {
         if (document.hidden && this.frame) { root.cancelAnimationFrame(this.frame); this.frame = 0; }
@@ -121,22 +134,38 @@
     }
     drawGrain(time) {
       const ctx=this.grainContext;if(!ctx)return;
-      const w=root.innerWidth,h=root.innerHeight,t=time*.00022;
+      const w=root.innerWidth,h=root.innerHeight;
+      const flow=this.isStatic?{velocity:0,offset:0,phase:0}:this.grainFlow;
+      const t=time*.00022+flow.phase,wrap=(v,size)=>((v%size)+size)%size;
       ctx.clearRect(0,0,w,h);ctx.fillStyle=this.signedIn?'#77939688':'#a399847d';ctx.beginPath();
-      for(let y=-22;y<h+22;y+=22)for(let x=-22;x<w+22;x+=22){
-        const dx=6*Math.sin(t+y*.013)+3*Math.cos(t*.63+x*.017);
-        const dy=5*Math.cos(t*.87+x*.012)+2*Math.sin(t*.51+y*.017);
-        ctx.moveTo(x+dx+.65,y+dy);ctx.arc(x+dx,y+dy,.65,0,Math.PI*2);
+      for(let y=-44;y<h+44;y+=22)for(let x=-44;x<w+44;x+=22){
+        const seed=(Math.sin(x*12.9898+y*78.233)*43758.5453)%1;
+        const depth=.55+Math.abs(seed)*.45,radius=.5+Math.abs(seed)*.28;
+        const dx=seed*4+6*Math.sin(t+y*.013)+3*Math.cos(t*.63+x*.017)+Math.sin(y*.023+x*.006+t*1.3)*flow.velocity*1.6;
+        const dy=seed*3+5*Math.cos(t*.87+x*.012)+2*Math.sin(t*.51+y*.017)-flow.offset*depth+Math.cos(x*.019-y*.007+t)*flow.velocity*.8;
+        const px=wrap(x+dx+44,w+88)-44,py=wrap(y+dy+44,h+88)-44;
+        ctx.moveTo(px+radius,py);ctx.arc(px,py,radius,0,Math.PI*2);
       }
       ctx.fill();this.lastGrainTime=time;
     }
-    stopGrain(){if(this.grainFrame)root.cancelAnimationFrame(this.grainFrame);this.grainFrame=0;}
+    stopGrain(){if(this.grainFrame)root.cancelAnimationFrame(this.grainFrame);this.grainFrame=0;this.grainFlow.velocity=0;this.lastGrainTime=0;}
     updateGrain() {
       const moving=this.landing&&!this.isStatic&&!this.contrastMedia?.matches&&this.taskMode==='browse'&&!this.otherDialog&&!this.isExploreMode&&!document.hidden&&root.scrollY<root.innerHeight*1.35;
       this.grain.style.opacity=this.userStatic||!this.landing?'0':'1';
       if(!moving){this.stopGrain();if(!this.userStatic)this.drawGrain(0);return;}
       if(this.grainFrame||!this.grainContext)return;
-      const tick=time=>{this.grainFrame=0;if(time-(this.lastGrainTime||0)>=32)this.drawGrain(time);this.grainFrame=root.requestAnimationFrame(tick);};
+      const tick=time=>{
+        this.grainFrame=0;
+        const elapsed=time-(this.lastGrainTime||time-33);
+        if(elapsed>=32){
+          const dt=Math.min(elapsed,64),flow=this.grainFlow;
+          flow.offset+=flow.velocity*dt/33;flow.phase+=flow.velocity*dt*.00035;
+          flow.velocity*=Math.exp(-dt/420);
+          if(Math.abs(flow.velocity)<.001)flow.velocity=0;
+          this.drawGrain(time);
+        }
+        this.grainFrame=root.requestAnimationFrame(tick);
+      };
       this.grainFrame=root.requestAnimationFrame(tick);
     }
     makeSvg(prefix) {
@@ -266,7 +295,7 @@
       if(this.cameraDepth===null||still)this.cameraDepth=target;
       else this.cameraDepth+= (target-this.cameraDepth)*.2;
       if(Math.abs(target-this.cameraDepth)>.0004&&!still)this.schedule();else this.cameraDepth=target;
-      const hero=this.landing?clamp((root.scrollY-root.innerHeight*.6)/(root.innerHeight*.5)):1;
+      const hero=this.landing?clamp((root.scrollY-root.innerHeight*.35)/(root.innerHeight*.55)):1;
       const amplitude=this.taskMode==='browse' ? (this.signedIn ? .35 : .24)*hero : this.taskMode==='question' ? .018 : 0;
       this.world.style.opacity=String(this.userStatic||!this.activeEnv?0:amplitude);
       if(this.activeEnv){

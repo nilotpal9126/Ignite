@@ -6,8 +6,8 @@ const root=new URL('../',import.meta.url),context=vm.createContext({window:{}});
 vm.runInContext(readFileSync(new URL('environment-assets.js',root),'utf8'),context);
 vm.runInContext(readFileSync(new URL('environments.js',root),'utf8'),context);
 const assets=context.window.IgniteEnvironmentAssets, camera=context.window.IgniteEnvironmentSystem.cameraAt;
-test('four complete worlds use one unchanged artwork across all camera depths',()=>{
-  assert.equal(Object.keys(assets).length,4);
+test('only Moon and methane backgrounds remain, each continuous at every depth',()=>{
+  assert.deepEqual(Object.keys(assets).sort(),['lunar_surface','molecular_lattice']);
   for(const scene of Object.values(assets)){
     assert.ok(scene.artwork.includes('<defs>'));assert.equal(new URL(scene.referenceUrl).protocol,'https:');
     assert.doesNotMatch(scene.artwork,/<script|foreignObject|\bon[a-z]+\s*=|https?:/i);
@@ -38,17 +38,6 @@ test('continuous cameras hit exact waypoints without switching art or nonpositiv
     }
   }
 });
-test('cylinder section satisfies both 3D surface and plane equations',()=>{
-  const {cylinderRadius:r,planeSlope:k,section}=assets.geometric_cross_sections.geometry;
-  assert.equal(section.length,121);
-  for(const [x,y,z]of section){assert.ok(Math.abs(x*x+y*y-r*r)<1e-8);assert.ok(Math.abs(z-k*x)<1e-10);}
-});
-test('true ellipse inset satisfies its focal-distance invariant',()=>{
-  const {a,b,c,px:x,py:y}=assets.geometric_cross_sections.geometry.ellipse;
-  assert.ok(Math.abs(c*c-(a*a-b*b))<1e-8);
-  assert.ok(Math.abs(x*x/(a*a)+y*y/(b*b)-1)<1e-10);
-  assert.ok(Math.abs(Math.hypot(x+c,y)+Math.hypot(x-c,y)-2*a)<1e-8);
-});
 test('four methane directions form an exact regular tetrahedron',()=>{
   const vertices=assets.molecular_lattice.geometry.tetrahedron;
   assert.equal(vertices.length,4);
@@ -63,5 +52,4 @@ test('NASA source is locally hosted, unmodified and explicitly credited',()=>{
   assert.equal(readFileSync(new URL('assets/environments/nasa-full-moon.jpg',root)).subarray(0,2).toString('hex'),'ffd8');
   assert.match(readFileSync(new URL('assets/environments/CREDITS.txt',root),'utf8'),/NASA.*Scientific Visualization Studio/);
   assert.match(assets.lunar_surface.caption,/not a live/);
-  assert.match(assets.leaf_to_cell.caption,/not a micrograph/);
 });

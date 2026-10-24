@@ -5,11 +5,17 @@ it does not replace page layouts, typography, subject cards or study content.
 
 ## Included
 
-- Four continuous scenes: NASA's LRO-based Moon visualization, an original
-  leaf/epidermis illustration, a tetrahedral methane model and a cylinder section
-  with a true-view ellipse inset. Each scene retains one artwork at every depth.
+- Two continuous scenes: NASA's LRO-based Moon visualization and a methane
+  model. Stomata/leaf and mathematical background figures have been removed.
+  Each remaining scene retains one artwork at every depth.
 - A smoothly interpolated camera approaches the same features as the user scrolls.
-  The landing hero keeps its paper texture, with dots drifting in a slow flow.
+  The images appear directly behind the page as the user scrolls, without needing
+  to open Explore. The landing hero keeps its paper texture: grains drift in a
+  slow flow and respond to actual scroll displacement with directional currents,
+  a curling wake, depth-dependent displacement and a short, damped coast.
+  Scrolling back reverses the current. Native wheel, touch and keyboard scrolling
+  stay unchanged. Maths/Biology use the remaining scenery as ambient backgrounds;
+  unsupported subjects retain paper. Removed scene IDs in storage fall back safely.
 - Confirmed, verified sign-in changes the outer paper to a mist-blue studio.
   Cream cards, navy text, lime accents, fonts and layouts retain their existing
   design. Sign-out returns the visitor atmosphere; studios keep their own theme.
@@ -59,7 +65,7 @@ deployment preparer and credit their provenance, as for the NASA image.
 Describe artwork as schematic unless its geometry, scale and provenance are
 actually supported. Test every layer at 320/390/800/1280px, with non-overlapping
 44px pins, reduced motion and blocked storage. Future kidney/weather/space scenes
-must be supplied and reviewed individually; they are not part of these four assets.
+must be supplied and reviewed individually; they are not part of these two assets.
 The existing kidney studio is already linked and retained, not repurposed as a
 background.
 
