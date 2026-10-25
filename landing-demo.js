@@ -6,11 +6,12 @@
     const get = (id) => document.getElementById(id);
     const practice = window.IgnitePractice;
     window.IgniteBoard?.mountBar(get('boardBar'));
-    const items = (window.__IGNITE_PILOT_CONTENT__?.items || []).filter((item) =>
+    const availableItems = () => (window.__IGNITE_PILOT_CONTENT__?.items || []).filter((item) =>
       item.visibility === 'demo_sample' && practice?.playable(item)
       && [9, 10, 11].includes(item.classLevel)
       && ['Biology', 'Chemistry', 'Physics', 'Mathematics'].includes(item.subject))
       .map((item) => window.IgniteTrialDiagrams?.adapt(item) || item);
+    let items = availableItems();
     let active = null;
     let step = 0;
     let answers = Object.create(null);
@@ -126,7 +127,7 @@
       syncSubjects();
     }
 
-    function finish() {
+    function finish({ preview = false } = {}) {
       window.IgniteSurroundings?.setContext({subject:active?.subject,taskMode:'browse'});
       const tally = practice.score(active.questions, answers);
       get('demoNext').disabled = true;
@@ -151,6 +152,7 @@
       get('demoMistakes').replaceChildren(...review);
       recovery?.show(active, answers);
       get('demoResultTitle').focus();
+      if (!preview) window.dispatchEvent(new CustomEvent('ignite:trial-complete', { detail: { classLevel: active.classLevel } }));
     }
 
     get('demoClass').addEventListener('change', () => { resetSelection(); syncSubjects(); });
@@ -173,6 +175,13 @@
       resetSelection(); syncSubjects(); start();
     });
     get('demoSubject').addEventListener('change', syncSubjects);
+    window.addEventListener('ignite:board-changed', () => {
+      items = availableItems();
+      window.IgniteBoard?.mountBar(get('boardBar'));
+      const next = selected() || items.find(item => item.classLevel === Number(get('demoClass').value)) || items[0];
+      if (next) { get('demoClass').value = String(next.classLevel); get('demoSubject').value = next.subject; }
+      resetSelection();
+    });
     get('demoStart').addEventListener('click', start);
     get('demoRestart').addEventListener('click', start);
     get('demoFinish').addEventListener('click', () => {
@@ -197,7 +206,7 @@
         answers = Object.fromEntries(example.questions.map((question) => [question.id,
           Object.hasOwn(illustrativeMistakes, question.id) ? illustrativeMistakes[question.id] : question.answerIndex]));
         get('demoNotice').textContent = example.notice;
-        finish();
+        finish({ preview: true });
         syncSubjects();
         get('demoPreviewNotice').hidden = false;
         get('demoStatus').textContent = 'Example attempt loaded. Start the recovery mission below, or restart to answer the worksheet yourself.';

@@ -54,11 +54,12 @@
     if (!own && state.last) { state.byLearner[learnerId] = state.last; persist(); }
   }
 
-  function choose(board, learnerId) {
+  function choose(board, learnerId, { reloadPage = true } = {}) {
     if (!ids.includes(board)) return;
     state = { last: board, byLearner: { ...state.byLearner, ...(learnerId ? { [learnerId]: board } : {}) } };
     persist();
-    reload();
+    if (reloadPage) reload();
+    else { apply(board); window.dispatchEvent(new CustomEvent('ignite:board-changed', { detail: { board } })); }
   }
 
   const make = (tag, props = {}, ...children) => {

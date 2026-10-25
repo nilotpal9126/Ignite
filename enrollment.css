@@ -17,6 +17,8 @@ html:has(.enroll-dialog[open]) { overflow: hidden; }
 .enroll-steps { display: flex; padding: 0; margin: 0 0 25px; list-style: none; gap: 8px; }
 .enroll-steps li { flex: 1; display: flex; align-items: center; gap: 7px; padding: 10px 0; color: #536171; border-bottom: 3px solid #ded8cc; font-size: 13px; font-weight: 800; }
 .enroll-steps li[aria-current="step"] { color: #10243e; border-color: #91a528; }
+.enroll-steps button { display:flex;align-items:center;gap:7px;width:100%;min-height:44px;padding:0;border:0;background:transparent;color:inherit;font:inherit;font-weight:inherit;text-align:left;cursor:pointer; }
+.enroll-steps button:hover:not(:disabled) { color:#10243e;text-decoration:underline;text-underline-offset:4px; }
 .enroll-steps span { display: inline-grid; place-items: center; width: 24px; height: 24px; color: #10243e; background: #f0ecdf; border-radius: 50%; font-size: 11px; }
 .enroll-steps [aria-current="step"] span { background: #dff04f; }
 .enroll-dialog fieldset { min-width: 0; margin: 0; padding: 0; border: 0; }

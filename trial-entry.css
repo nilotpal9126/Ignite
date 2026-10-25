@@ -1,0 +1,11 @@
+.trial-entry-dialog { width:min(560px,calc(100% - 24px)); }
+.trial-entry-dialog .enroll-shell { padding:clamp(22px,4vw,34px); }
+.trial-entry-dialog .enroll-close { min-width:44px;min-height:44px; }
+.trial-entry-dialog h2 { font-size:clamp(28px,5vw,38px); }
+.trial-entry-dialog .enroll-lead { margin-bottom:20px; }
+.trial-entry-dialog .enroll-grid { gap:14px; }
+.trial-entry-note { color:#536171;font-size:12px;line-height:1.5;margin:16px 0; }
+.trial-entry-actions { display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;border-top:1px solid #ded8cc;padding-top:18px; }
+.trial-entry-actions button { min-height:44px;font:inherit;font-weight:800;cursor:pointer; }
+@media(max-width:440px){.trial-entry-actions{align-items:stretch}.trial-entry-actions button{width:100%}.trial-entry-dialog .enroll-shell{padding:20px 18px}}
+@media print{.trial-entry-dialog{display:none!important}}

@@ -27,7 +27,7 @@
   dialog.innerHTML = `<div class="enroll-shell">
     <div class="enroll-heading"><div><p class="eyebrow">PROJECT IGNITE · YOUR NEXT STEP</p><h2 id="enrollTitle" tabindex="-1">Enroll Now!</h2></div><button class="enroll-close" type="button" aria-label="Close enrolment">×</button></div>
     <p class="enroll-lead">Tell us a little about the student and where you would like to learn. Our team will contact the parent or guardian.</p>
-    <ol class="enroll-steps" aria-label="Enrolment steps"><li aria-current="step"><span>1</span>Student</li><li><span>2</span>Location</li><li><span>3</span>Contact</li></ol>
+    <ol class="enroll-steps" aria-label="Enrolment steps"><li aria-current="step"><button type="button" data-enroll-goto="0" aria-current="step"><span>1</span>Student</button></li><li><button type="button" data-enroll-goto="1"><span>2</span>Location</button></li><li><button type="button" data-enroll-goto="2"><span>3</span>Contact</button></li></ol>
     <form id="igniteEnquiryForm" novalidate>
       <fieldset data-enroll-step="0"><legend>Let’s start with the student.</legend><p class="enroll-step-copy">All fields marked * are required.</p><div class="enroll-grid">
         ${field('studentName', 'Student name', 'type="text" autocomplete="name" minlength="2" maxlength="80"', true)}
@@ -62,6 +62,7 @@
   const form = dialog.querySelector('form');
   const steps = [...form.querySelectorAll('[data-enroll-step]')];
   const progress = [...dialog.querySelectorAll('.enroll-steps li')];
+  const stepButtons = [...dialog.querySelectorAll('[data-enroll-goto]')];
   const back = form.querySelector('.enroll-back');
   const next = form.querySelector('.enroll-next');
   const submit = form.querySelector('.enroll-submit');
@@ -109,11 +110,14 @@
     progress.forEach((item, i) => {
       if (i === step) item.setAttribute('aria-current', 'step');
       else item.removeAttribute('aria-current');
+      if (i === step) stepButtons[i].setAttribute('aria-current', 'step');
+      else stepButtons[i].removeAttribute('aria-current');
     });
     back.hidden = step === 0;
     next.hidden = step === 2;
     submit.hidden = step !== 2;
-    submit.disabled = !connected;
+    submit.disabled = pending;
+    submit.textContent = connected ? 'Enroll Now!' : 'Review enquiry';
     status.textContent = '';
     if (step === 2) {
       const data = collect();
@@ -121,6 +125,7 @@
       const location = [rules.isSiliguri(data.city) ? data.preferredLocation : '', data.city, data.state].filter(Boolean).join(', ');
       dialog.querySelector('#enroll-summary').textContent = `${data.studentName} · Class ${data.studentClass} · ${data.school} · ${board} | ${location}`;
       prepareVerification();
+      if (!connected) status.textContent = 'You can review these details. Online submissions are not connected yet; nothing will be sent.';
     }
     if (focus) { steps[step].querySelector('legend').tabIndex = -1; steps[step].querySelector('legend').focus(); }
   }
@@ -172,6 +177,18 @@
   dialog.addEventListener('close', () => { opener?.focus(); });
   next.addEventListener('click', () => { if (validateStep()) showStep(step + 1); });
   back.addEventListener('click', () => showStep(step - 1));
+  stepButtons.forEach((button, target) => button.addEventListener('click', () => {
+    if (pending || completed) return;
+    if (target > step) {
+      const { errors } = rules.validate(collect());
+      for (let i = 0; i < target; i++) {
+        if (Object.keys(errors).some(key => steps[i].contains(control(key)))) {
+          showStep(i, false);showErrors(errors, true)?.focus();return;
+        }
+      }
+    }
+    showStep(target);
+  }));
 
   function locationFields() {
     control('district').disabled = !control('state').value;
@@ -228,13 +245,14 @@
       showErrors(result.errors)?.focus();
       return;
     }
-    if (!connected) { status.textContent = 'Enrolment submissions will open shortly. Nothing has been sent.'; return; }
+    if (!connected) { status.textContent = 'Your details are complete. Online enrolment submissions are not connected yet; nothing has been sent.'; return; }
     if (!verificationToken) { status.textContent = 'Please complete the verification before submitting.'; return; }
     const signature = JSON.stringify(result.data);
     if (!requestId || signature !== lastPayload) { requestId = crypto.randomUUID(); lastPayload = signature; }
     pending = true;
     close.disabled = back.disabled = submit.disabled = true;
     steps.forEach((section) => { section.disabled = true; });
+    stepButtons.forEach(button => { button.disabled = true; });
     submit.textContent = 'Submitting…';
     status.textContent = 'Saving your enquiry. Please wait for confirmation.';
     const abort = new AbortController();
@@ -272,6 +290,7 @@
         }
       } catch { /* No channel link is shown until the real invite URL is supplied. */ }
       form.reset(); // Personal details are never persisted in browser storage.
+      window.dispatchEvent(new Event('ignite:enrollment-saved'));
       dialog.querySelector('#enroll-success-title').focus();
     } catch (error) {
       status.textContent = error.name === 'AbortError'
@@ -281,13 +300,28 @@
       clearTimeout(timeout);
       pending = false;
       close.disabled = back.disabled = false;
-      submit.disabled = !connected;
+      submit.disabled = false;
       steps.forEach((section) => { section.disabled = false; });
+      stepButtons.forEach(button => { button.disabled = false; });
       focusAfterSave?.focus();
       submit.textContent = 'Enroll Now!';
       verificationToken = '';
       if (widget !== undefined) window.turnstile.reset(widget);
     }
+  });
+  window.IgniteEnrollment = Object.freeze({
+    open,
+    canSubmit: connected,
+    prefill(values = {}) {
+      if (completed || pending) return false;
+      for (const name of ['studentName','studentClass','board','phone','email']) {
+        if (!Object.hasOwn(values, name)) continue;
+        const input = control(name);
+        const value = name === 'board' && values[name] === 'ICSE' ? 'CISCE' : rules.clean(String(values[name] ?? ''));
+        if (!input.value && value) input.value = value;
+      }
+      optionalFields();locationFields();showStep(step, false);return true;
+    },
   });
   if (window.location.hash === '#enroll') open(document.querySelector('[data-open-enroll]'));
 })();
